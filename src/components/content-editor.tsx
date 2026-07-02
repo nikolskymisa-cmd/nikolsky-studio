@@ -1,13 +1,26 @@
 "use client";
 
-import { Copy, Download, ExternalLink, FolderOpen, RotateCcw } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  ArrowUpRight,
+  Check,
+  ExternalLink,
+  GitBranch,
+  Plus,
+  RefreshCw,
+  Save,
+  Star,
+  Trash2,
+} from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import seedContent from "../../data/landing-content.json";
 import seedWorks from "../../data/works.json";
+import { getThumbnailUrl } from "@/lib/youtube";
+import { workCategories, type Work } from "@/types/work";
 
 const STORAGE_KEY = "nikolsky-studio-content-v1";
 const WORKS_STORAGE_KEY = "nikolsky-studio-works-v1";
+const ADMIN_API = "http://127.0.0.1:4317";
 
 type Pair = [string, string];
 type Product = {
@@ -18,22 +31,6 @@ type Product = {
   includes: string[];
   cta: string;
 };
-type EditableWork = {
-  id?: string;
-  title: string;
-  titleRu?: string;
-  category: string;
-  youtubeUrl: string;
-  thumbnail?: string;
-  description?: string;
-  descriptionRu?: string;
-  taskRu?: string;
-  formatRu?: string;
-  workDoneRu?: string[];
-  whyItWorksRu?: string;
-  deliverablesRu?: string[];
-  featured?: boolean;
-};
 type EditorContent = typeof seedContent & {
   ru: typeof seedContent.ru & {
     products: Product[];
@@ -43,340 +40,618 @@ type EditorContent = typeof seedContent & {
     terms: Pair[];
   };
 };
-type WritableFileHandle = {
-  createWritable: () => Promise<{
-    write: (data: string) => Promise<void>;
-    close: () => Promise<void>;
-  }>;
+type Path = Array<string | number>;
+type TextSelection = {
+  type: "text";
+  label: string;
+  path: Path;
+  area?: boolean;
 };
-type LocalDirectoryHandle = {
-  name: string;
-  getFileHandle: (name: string, options?: { create?: boolean }) => Promise<WritableFileHandle>;
-  getDirectoryHandle?: (name: string, options?: { create?: boolean }) => Promise<LocalDirectoryHandle>;
+type WorkSelection = {
+  type: "work";
+  index: number;
 };
-type SavePickerWindow = Window & {
-  showSaveFilePicker?: (options: {
-    suggestedName: string;
-    types: Array<{ description: string; accept: Record<string, string[]> }>;
-  }) => Promise<WritableFileHandle>;
-  showDirectoryPicker?: (options?: { mode?: "read" | "readwrite" }) => Promise<LocalDirectoryHandle>;
-};
+type Selection = TextSelection | WorkSelection;
 
-const sections = [
-  ["hero", "Hero"],
-  ["position", "Смысл"],
-  ["products", "Продукты"],
-  ["showreel", "Шоурил"],
-  ["videos", "Видео"],
-  ["cases", "Работы"],
-  ["method", "Метод"],
-  ["terms", "Условия"],
-  ["contact", "Контакт"],
-] as const;
-
-function cloneSeed(): EditorContent {
+function cloneContent(): EditorContent {
   return JSON.parse(JSON.stringify(seedContent)) as EditorContent;
 }
 
-function cloneWorks(): EditableWork[] {
-  return JSON.parse(JSON.stringify(seedWorks)) as EditableWork[];
+function cloneWorks(): Work[] {
+  return JSON.parse(JSON.stringify(seedWorks)) as Work[];
+}
+
+function clone<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T;
+}
+
+function getAt(source: unknown, path: Path): unknown {
+  return path.reduce<unknown>((current, key) => {
+    if (current && typeof current === "object") {
+      return (current as Record<string | number, unknown>)[key];
+    }
+    return undefined;
+  }, source);
+}
+
+function setAt<T>(source: T, path: Path, value: unknown): T {
+  const next = clone(source) as Record<string | number, unknown>;
+  let cursor: Record<string | number, unknown> = next;
+
+  path.slice(0, -1).forEach((key) => {
+    cursor = cursor[key] as Record<string | number, unknown>;
+  });
+  cursor[path[path.length - 1]] = value;
+  return next as T;
+}
+
+function makeWork(): Work {
+  return {
+    id: `work-${Date.now()}`,
+    title: "New Work",
+    titleRu: "Новая работа",
+    category: "Reels",
+    youtubeUrl: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID",
+    thumbnail: "auto",
+    descriptionRu: "Короткое описание ролика.",
+    taskRu: "Какую задачу решал ролик.",
+    formatRu: "Reels / 9:16",
+    workDoneRu: ["монтаж", "субтитры", "акценты"],
+    whyItWorksRu: "Почему эта версия работает.",
+    deliverablesRu: ["финальный ролик"],
+  };
+}
+
+async function postAdmin(path: string, body: unknown) {
+  const response = await fetch(`${ADMIN_API}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = (await response.json()) as { ok?: boolean; message?: string; output?: string };
+  if (!response.ok || !data.ok) {
+    throw new Error(data.message || "Локальная команда не выполнена.");
+  }
+  return data;
 }
 
 export function ContentEditor() {
-  const [content, setContent] = useState<EditorContent>(() => {
-    if (typeof window === "undefined") return cloneSeed();
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      return raw ? (JSON.parse(raw) as EditorContent) : cloneSeed();
-    } catch {
-      return cloneSeed();
-    }
-  });
-  const [works, setWorks] = useState<EditableWork[]>(() => {
-    if (typeof window === "undefined") return cloneWorks();
-    try {
-      const raw = window.localStorage.getItem(WORKS_STORAGE_KEY);
-      return raw ? (JSON.parse(raw) as EditableWork[]) : cloneWorks();
-    } catch {
-      return cloneWorks();
-    }
-  });
-  const [active, setActive] = useState<(typeof sections)[number][0]>("hero");
-  const [dataDirectory, setDataDirectory] = useState<LocalDirectoryHandle | null>(null);
-  const [saveStatus, setSaveStatus] = useState("");
+  const [content, setContent] = useState<EditorContent>(() => cloneContent());
+  const [works, setWorks] = useState<Work[]>(() => cloneWorks());
+  const [selection, setSelection] = useState<Selection>({ type: "text", label: "Главный заголовок", path: ["ru", "heroTitle"], area: false });
+  const [status, setStatus] = useState("Готово");
+  const [dirty, setDirty] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const mounted = useRef(false);
+
+  const ru = content.ru;
+  const featuredIndex = works.findIndex((work) => work.featured);
+  const showreel = works[featuredIndex >= 0 ? featuredIndex : 0];
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
-  }, [content]);
+    window.localStorage.setItem(WORKS_STORAGE_KEY, JSON.stringify(works));
+  }, [content, works]);
+
+  const selectedText = useMemo(() => {
+    if (selection.type !== "text") return "";
+    const value = getAt(content, selection.path);
+    return typeof value === "string" ? value : "";
+  }, [content, selection]);
+
+  const markDirty = () => setDirty(true);
+
+  const selectText = (label: string, path: Path, area = false) => {
+    setSelection({ type: "text", label, path, area });
+  };
+
+  const updateText = (value: string) => {
+    if (selection.type !== "text") return;
+    setContent((current) => setAt(current, selection.path, value));
+    markDirty();
+  };
+
+  const updateContent = (path: Path, value: unknown) => {
+    setContent((current) => setAt(current, path, value));
+    markDirty();
+  };
+
+  const updateWork = (index: number, patch: Partial<Work>) => {
+    setWorks((current) => current.map((work, i) => (i === index ? { ...work, ...patch } : work)));
+    markDirty();
+  };
+
+  const updateWorkList = (index: number, key: "workDoneRu" | "deliverablesRu", value: string[]) => {
+    updateWork(index, { [key]: value });
+  };
+
+  const addWork = () => {
+    const next = makeWork();
+    setWorks((current) => [...current, next]);
+    setSelection({ type: "work", index: works.length });
+    markDirty();
+  };
+
+  const removeWork = (index: number) => {
+    setWorks((current) => current.filter((_, i) => i !== index));
+    setSelection({ type: "text", label: "Работы", path: ["ru", "casesTitle"] });
+    markDirty();
+  };
+
+  const makeFeatured = (index: number) => {
+    setWorks((current) => current.map((work, i) => ({ ...work, featured: i === index })));
+    markDirty();
+  };
+
+  const saveToFiles = useCallback(async (message = "Сохранено в data") => {
+    setSaving(true);
+    setStatus("Сохраняю...");
+    try {
+      await postAdmin("/save", { content, works });
+      setDirty(false);
+      setStatus(message);
+    } catch {
+      setStatus("Admin API не запущен. Перезапусти npm run dev.");
+    } finally {
+      setSaving(false);
+    }
+  }, [content, works]);
 
   useEffect(() => {
-    window.localStorage.setItem(WORKS_STORAGE_KEY, JSON.stringify(works));
-  }, [works]);
-
-  const ru = content.ru;
-  const updateRu = <K extends keyof EditorContent["ru"]>(key: K, value: EditorContent["ru"][K]) => {
-    setContent((current) => ({ ...current, ru: { ...current.ru, [key]: value } }));
-  };
-
-  const getProjectDataDirectory = async (handle: LocalDirectoryHandle) => {
-    if (handle.name === "data" || !handle.getDirectoryHandle) return handle;
-    return handle.getDirectoryHandle("data", { create: true });
-  };
-
-  const writeJsonFile = async (directory: LocalDirectoryHandle, fileName: string, data: unknown) => {
-    const file = await directory.getFileHandle(fileName, { create: true });
-    const writable = await file.createWritable();
-    await writable.write(JSON.stringify(data, null, 2));
-    await writable.close();
-  };
-
-  const chooseDataFolder = async () => {
-    const picker = (window as SavePickerWindow).showDirectoryPicker;
-    if (!picker) {
-      setSaveStatus("Браузер не умеет сохранять в папку. Используй кнопки JSON ниже.");
-      return null;
-    }
-
-    try {
-      const selected = await picker({ mode: "readwrite" });
-      const directory = await getProjectDataDirectory(selected);
-      setDataDirectory(directory);
-      setSaveStatus("Папка data подключена.");
-      return directory;
-    } catch {
-      setSaveStatus("Выбор папки отменён.");
-      return null;
-    }
-  };
-
-  const saveProjectData = async () => {
-    const directory = dataDirectory ?? (await chooseDataFolder());
-    if (!directory) return;
-
-    try {
-      await Promise.all([
-        writeJsonFile(directory, "landing-content.json", content),
-        writeJsonFile(directory, "works.json", works),
-      ]);
-      setSaveStatus("Сохранено в data/landing-content.json и data/works.json.");
-    } catch {
-      setSaveStatus("Не получилось сохранить. Проверь доступ к папке проекта.");
-    }
-  };
-
-  const saveJson = async (fileName: string, data: unknown) => {
-    const text = JSON.stringify(data, null, 2);
-    const picker = (window as SavePickerWindow).showSaveFilePicker;
-    if (picker) {
-      const handle = await picker({
-        suggestedName: fileName,
-        types: [{ description: "JSON", accept: { "application/json": [".json"] } }],
-      });
-      const writable = await handle.createWritable();
-      await writable.write(text);
-      await writable.close();
+    if (!mounted.current) {
+      mounted.current = true;
       return;
     }
+    if (!dirty) return;
 
-    downloadJson(fileName, text);
+    const timer = window.setTimeout(() => {
+      void saveToFiles("Автосохранено");
+    }, 700);
+    return () => window.clearTimeout(timer);
+  }, [dirty, saveToFiles]);
+
+  const publish = async () => {
+    setSaving(true);
+    setStatus("Сохраняю и пушу...");
+    try {
+      await postAdmin("/save", { content, works });
+      const result = await postAdmin("/publish", {});
+      setDirty(false);
+      setStatus(result.message || "Запушено в GitHub");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Не получилось запушить.");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const downloadJson = (fileName: string, text: string) => {
-    const blob = new Blob([text], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = fileName;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const copyJson = async () => {
-    await navigator.clipboard.writeText(JSON.stringify(content, null, 2));
-  };
-  const copyWorks = async () => {
-    await navigator.clipboard.writeText(JSON.stringify(works, null, 2));
-  };
-
-  const reset = () => {
-    const clean = cloneSeed();
-    setContent(clean);
+  const resetLocal = () => {
+    setContent(cloneContent());
     setWorks(cloneWorks());
     window.localStorage.removeItem(STORAGE_KEY);
     window.localStorage.removeItem(WORKS_STORAGE_KEY);
+    setDirty(true);
+    setStatus("Сброшено к файлам проекта");
   };
 
   return (
     <main className="min-h-screen bg-[#030506] text-white">
-      <div className="grid min-h-screen lg:grid-cols-[520px_1fr]">
-        <aside className="border-r border-white/10 bg-[#06090b]">
-          <div className="sticky top-0 z-10 border-b border-white/10 bg-[#06090b]/95 p-4 backdrop-blur">
-            <div className="mb-4 flex items-start justify-between gap-4">
-              <div>
-                <p className="font-mono text-xs uppercase text-accent">Nikolsky editor</p>
-                <h1 className="mt-1 text-2xl font-semibold uppercase">Конструктор текста</h1>
-              </div>
-              <a href="/" target="_blank" className="grid size-10 place-items-center bg-white text-black">
-                <ExternalLink size={16} />
-              </a>
-            </div>
-            <div className="grid grid-cols-4 gap-2">
-              {sections.map(([id, label]) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setActive(id)}
-                  className={`h-9 border px-2 font-mono text-[11px] uppercase ${
-                    active === id ? "border-accent bg-accent text-black" : "border-white/10 text-white/58"
-                  }`}
-                >
-                  {label}
-                </button>
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-[#05080b]/96 backdrop-blur">
+        <div className="mx-auto flex max-w-[1720px] flex-wrap items-center justify-between gap-3 px-4 py-3">
+          <div>
+            <p className="font-mono text-xs uppercase text-accent">Nikolsky local admin</p>
+            <h1 className="text-xl font-semibold uppercase">Кликни элемент, измени справа</h1>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusPill text={dirty ? `${status} / есть изменения` : status} active={dirty || saving} />
+            <a href="/" target="_blank" className="inline-flex h-10 items-center gap-2 border border-white/12 px-3 text-sm text-white/72">
+              <ExternalLink size={15} />
+              Сайт
+            </a>
+            <button type="button" onClick={() => saveToFiles()} className="inline-flex h-10 items-center gap-2 bg-white px-3 text-sm font-semibold text-black">
+              <Save size={15} />
+              Сохранить
+            </button>
+            <button type="button" onClick={publish} className="inline-flex h-10 items-center gap-2 bg-accent px-3 text-sm font-semibold text-black">
+              <GitBranch size={15} />
+              Запушить в Git
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div className="mx-auto grid max-w-[1720px] gap-4 p-4 xl:grid-cols-[minmax(0,1fr)_430px]">
+        <section className="grid gap-4">
+          <AdminHero ru={ru} selectText={selectText} showreel={showreel} showreelIndex={featuredIndex >= 0 ? featuredIndex : 0} selectWork={(index) => setSelection({ type: "work", index })} />
+
+          <AdminSection title="Смысл">
+            <ClickText label="Лейбл" selected={selection} path={["ru", "positionEyebrow"]} onSelect={selectText}>
+              {ru.positionEyebrow}
+            </ClickText>
+            <ClickText label="Заголовок" selected={selection} path={["ru", "positionTitle"]} area onSelect={selectText}>
+              {ru.positionTitle}
+            </ClickText>
+            <ClickText label="Текст" selected={selection} path={["ru", "positionText"]} area onSelect={selectText}>
+              {ru.positionText}
+            </ClickText>
+            <div className="grid gap-2 md:grid-cols-3">
+              {ru.positionCards.map(([title, text], index) => (
+                <MiniCard key={index}>
+                  <ClickText label={`Карточка ${index + 1}: заголовок`} selected={selection} path={["ru", "positionCards", index, 0]} onSelect={selectText}>
+                    {title}
+                  </ClickText>
+                  <ClickText label={`Карточка ${index + 1}: текст`} selected={selection} path={["ru", "positionCards", index, 1]} area onSelect={selectText}>
+                    {text}
+                  </ClickText>
+                </MiniCard>
               ))}
             </div>
-          </div>
+          </AdminSection>
 
-          <div className="space-y-4 p-4">
-            <div className="border border-accent/35 bg-accent/[0.06] p-4">
-              <p className="text-sm leading-6 text-white/70">
-                Для постоянных правок выбери корневую папку проекта или папку data. После этого редактор сам сохранит
-                тексты и YouTube-ссылки в JSON.
-              </p>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <button type="button" onClick={chooseDataFolder} className="flex h-11 items-center justify-center gap-2 border border-white/12 text-sm">
-                  <FolderOpen size={15} />
-                  Выбрать папку
-                </button>
-                <button type="button" onClick={saveProjectData} className="flex h-11 items-center justify-center gap-2 bg-accent text-sm font-semibold text-black">
-                  <Download size={15} />
-                  Сохранить в проект
-                </button>
-              </div>
-              {saveStatus ? <p className="mt-3 text-xs uppercase text-white/48">{saveStatus}</p> : null}
+          <AdminSection
+            title="Видео и портфолио"
+            action={
+              <button type="button" onClick={addWork} className="inline-flex h-9 items-center gap-2 bg-accent px-3 text-sm font-semibold text-black">
+                <Plus size={15} />
+                Добавить видео
+              </button>
+            }
+          >
+            <ClickText label="Заголовок блока работ" selected={selection} path={["ru", "casesTitle"]} onSelect={selectText}>
+              {ru.casesTitle}
+            </ClickText>
+            <ClickText label="Описание блока работ" selected={selection} path={["ru", "casesText"]} area onSelect={selectText}>
+              {ru.casesText}
+            </ClickText>
+            <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
+              {works.map((work, index) => (
+                <WorkAdminCard
+                  key={work.id ?? index}
+                  work={work}
+                  active={selection.type === "work" && selection.index === index}
+                  onSelect={() => setSelection({ type: "work", index })}
+                  onFeatured={() => makeFeatured(index)}
+                  onRemove={() => removeWork(index)}
+                />
+              ))}
             </div>
+          </AdminSection>
 
-            {active === "hero" ? (
-              <Panel title="Первый экран">
-                <Field label="Маленький label" value={ru.label} onChange={(v) => updateRu("label", v)} />
-                <Field label="Техническая строка" value={ru.eyebrow} onChange={(v) => updateRu("eyebrow", v)} />
-                <Field label="Заголовок" value={ru.heroTitle} onChange={(v) => updateRu("heroTitle", v)} />
-                <Field area label="Подзаголовок" value={ru.heroSub} onChange={(v) => updateRu("heroSub", v)} />
-                <Field label="Кнопка работ" value={ru.casesCta} onChange={(v) => updateRu("casesCta", v)} />
-                <Field label="Кнопка связи" value={ru.projectCta} onChange={(v) => updateRu("projectCta", v)} />
-                <Field area label="Строка доверия" value={ru.trust} onChange={(v) => updateRu("trust", v)} />
-                <PairList label="Метрики" value={ru.stats} onChange={(v) => updateRu("stats", v)} />
-              </Panel>
-            ) : null}
-
-            {active === "position" ? (
-              <Panel title="Смысловой блок">
-                <Field label="Лейбл" value={ru.positionEyebrow} onChange={(v) => updateRu("positionEyebrow", v)} />
-                <Field area label="Заголовок" value={ru.positionTitle} onChange={(v) => updateRu("positionTitle", v)} />
-                <Field area label="Текст" value={ru.positionText} onChange={(v) => updateRu("positionText", v)} />
-                <PairList label="Карточки" value={ru.positionCards} onChange={(v) => updateRu("positionCards", v)} />
-              </Panel>
-            ) : null}
-
-            {active === "products" ? (
-              <Panel title="Продукты / услуги">
-                <Field label="Лейбл" value={ru.productsEyebrow} onChange={(v) => updateRu("productsEyebrow", v)} />
-                <Field label="Заголовок" value={ru.productsTitle} onChange={(v) => updateRu("productsTitle", v)} />
-                <ProductList value={ru.products} onChange={(v) => updateRu("products", v)} />
-              </Panel>
-            ) : null}
-
-            {active === "showreel" ? (
-              <Panel title="Шоурил">
-                <Field label="Лейбл" value={ru.reelEyebrow} onChange={(v) => updateRu("reelEyebrow", v)} />
-                <Field label="Заголовок" value={ru.reelTitle} onChange={(v) => updateRu("reelTitle", v)} />
-                <Field area label="Текст" value={ru.reelText} onChange={(v) => updateRu("reelText", v)} />
-                <Field label="Кнопка" value={ru.showreelCta} onChange={(v) => updateRu("showreelCta", v)} />
-                <Field label="Заголовок дорожек" value={ru.chapters} onChange={(v) => updateRu("chapters", v)} />
-              </Panel>
-            ) : null}
-
-            {active === "videos" ? (
-              <Panel title="Видео и YouTube-ссылки">
-                <p className="text-sm leading-6 text-white/58">
-                  Здесь меняются ролики, которые отображаются на сайте. Для шоурила включи галочку Главный шоурил.
-                </p>
-                <WorkList value={works} onChange={setWorks} />
-              </Panel>
-            ) : null}
-
-            {active === "cases" ? (
-              <Panel title="Работы">
-                <Field label="Лейбл" value={ru.casesEyebrow} onChange={(v) => updateRu("casesEyebrow", v)} />
-                <Field label="Заголовок" value={ru.casesTitle} onChange={(v) => updateRu("casesTitle", v)} />
-                <Field area label="Описание" value={ru.casesText} onChange={(v) => updateRu("casesText", v)} />
-                <Field label="Кнопка кейса" value={ru.openCase} onChange={(v) => updateRu("openCase", v)} />
-              </Panel>
-            ) : null}
-
-            {active === "method" ? (
-              <Panel title="Метод">
-                <Field label="Лейбл" value={ru.methodEyebrow} onChange={(v) => updateRu("methodEyebrow", v)} />
-                <Field label="Заголовок" value={ru.methodTitle} onChange={(v) => updateRu("methodTitle", v)} />
-                <PairList label="Шаги" value={ru.methodSteps} onChange={(v) => updateRu("methodSteps", v)} />
-              </Panel>
-            ) : null}
-
-            {active === "terms" ? (
-              <Panel title="Условия">
-                <Field label="Лейбл" value={ru.termsEyebrow} onChange={(v) => updateRu("termsEyebrow", v)} />
-                <Field label="Заголовок" value={ru.termsTitle} onChange={(v) => updateRu("termsTitle", v)} />
-                <Field area label="Текст" value={ru.termsText} onChange={(v) => updateRu("termsText", v)} />
-                <PairList label="Пункты" value={ru.terms} onChange={(v) => updateRu("terms", v)} />
-              </Panel>
-            ) : null}
-
-            {active === "contact" ? (
-              <Panel title="Финальный CTA">
-                <Field label="Лейбл" value={ru.contactEyebrow} onChange={(v) => updateRu("contactEyebrow", v)} />
-                <Field area label="Заголовок" value={ru.contactTitle} onChange={(v) => updateRu("contactTitle", v)} />
-                <Field area label="Текст" value={ru.contactText} onChange={(v) => updateRu("contactText", v)} />
-                <Field label="Футер" value={ru.footer} onChange={(v) => updateRu("footer", v)} />
-              </Panel>
-            ) : null}
-
-            <div className="grid grid-cols-2 gap-2 pt-2">
-              <button type="button" onClick={copyJson} className="flex h-11 items-center justify-center gap-2 border border-white/12 text-sm">
-                <Copy size={15} />
-                Копировать текст
-              </button>
-              <button type="button" onClick={() => saveJson("landing-content.json", content)} className="flex h-11 items-center justify-center gap-2 bg-white text-sm font-semibold text-black">
-                <Download size={15} />
-                Скачать текст
-              </button>
-              <button type="button" onClick={copyWorks} className="flex h-11 items-center justify-center gap-2 border border-white/12 text-sm">
-                <Copy size={15} />
-                Копировать работы
-              </button>
-              <button type="button" onClick={() => saveJson("works.json", works)} className="flex h-11 items-center justify-center gap-2 bg-white text-sm font-semibold text-black">
-                <Download size={15} />
-                Скачать работы
-              </button>
-              <button type="button" onClick={reset} className="col-span-2 flex h-11 items-center justify-center gap-2 border border-white/12 text-sm">
-                <RotateCcw size={15} />
-                Сбросить
-              </button>
+          <AdminSection title="Услуги">
+            <ClickText label="Заголовок услуг" selected={selection} path={["ru", "productsTitle"]} onSelect={selectText}>
+              {ru.productsTitle}
+            </ClickText>
+            <div className="grid gap-3 lg:grid-cols-3">
+              {ru.products.map((product, index) => (
+                <MiniCard key={product.code}>
+                  <ClickText label={`Услуга ${index + 1}: название`} selected={selection} path={["ru", "products", index, "title"]} onSelect={selectText}>
+                    {product.title}
+                  </ClickText>
+                  <ClickText label={`Услуга ${index + 1}: для кого`} selected={selection} path={["ru", "products", index, "audience"]} area onSelect={selectText}>
+                    {product.audience}
+                  </ClickText>
+                  <ClickText label={`Услуга ${index + 1}: описание`} selected={selection} path={["ru", "products", index, "text"]} area onSelect={selectText}>
+                    {product.text}
+                  </ClickText>
+                  <div className="grid gap-1">
+                    {product.includes.map((item, itemIndex) => (
+                      <ClickText key={itemIndex} label={`Услуга ${index + 1}: пункт ${itemIndex + 1}`} selected={selection} path={["ru", "products", index, "includes", itemIndex]} onSelect={selectText}>
+                        {item}
+                      </ClickText>
+                    ))}
+                  </div>
+                </MiniCard>
+              ))}
             </div>
-          </div>
-        </aside>
+          </AdminSection>
 
-        <section className="hidden bg-black lg:block">
-          <iframe title="Preview" src="/" className="h-screen w-full border-0" />
+          <AdminSection title="Метод и условия">
+            <TwoColumnPairs title="Метод" pairs={ru.methodSteps} root={["ru", "methodSteps"]} selection={selection} selectText={selectText} />
+            <TwoColumnPairs title="Условия" pairs={ru.terms} root={["ru", "terms"]} selection={selection} selectText={selectText} />
+          </AdminSection>
+
+          <AdminSection title="Контакт">
+            <ClickText label="Заголовок контакта" selected={selection} path={["ru", "contactTitle"]} area onSelect={selectText}>
+              {ru.contactTitle}
+            </ClickText>
+            <ClickText label="Текст контакта" selected={selection} path={["ru", "contactText"]} area onSelect={selectText}>
+              {ru.contactText}
+            </ClickText>
+            <ClickText label="Футер" selected={selection} path={["ru", "footer"]} area onSelect={selectText}>
+              {ru.footer}
+            </ClickText>
+          </AdminSection>
         </section>
+
+        <aside className="xl:sticky xl:top-[86px] xl:h-[calc(100vh-104px)]">
+          <Inspector
+            selection={selection}
+            textValue={selectedText}
+            works={works}
+            onTextChange={updateText}
+            onWorkChange={updateWork}
+            onWorkListChange={updateWorkList}
+            onFeatured={makeFeatured}
+            onRemove={removeWork}
+            onReset={resetLocal}
+            setSelection={setSelection}
+            updateContent={updateContent}
+          />
+        </aside>
       </div>
     </main>
   );
 }
 
-function Panel({ title, children }: { title: string; children: React.ReactNode }) {
+function AdminHero({
+  ru,
+  showreel,
+  showreelIndex,
+  selectText,
+  selectWork,
+}: {
+  ru: EditorContent["ru"];
+  showreel?: Work;
+  showreelIndex: number;
+  selectText: (label: string, path: Path, area?: boolean) => void;
+  selectWork: (index: number) => void;
+}) {
   return (
-    <section className="border border-white/10 bg-white/[0.025] p-4">
-      <h2 className="mb-4 font-mono text-xs uppercase text-accent">{title}</h2>
-      <div className="space-y-4">{children}</div>
+    <AdminSection title="Первый экран">
+      <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
+        <div className="border border-white/10 bg-white/[0.025] p-4">
+          <ClickText label="Техническая строка" path={["ru", "eyebrow"]} onSelect={selectText}>{ru.eyebrow}</ClickText>
+          <ClickText label="Направление" path={["ru", "label"]} onSelect={selectText}>{ru.label}</ClickText>
+          <ClickText label="Главный заголовок" path={["ru", "heroTitle"]} onSelect={selectText}>
+            <span className="text-4xl font-semibold uppercase leading-none">{ru.heroTitle}</span>
+          </ClickText>
+          <ClickText label="Подзаголовок" path={["ru", "heroSub"]} area onSelect={selectText}>{ru.heroSub}</ClickText>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <ClickText label="Кнопка работ" path={["ru", "casesCta"]} onSelect={selectText}>{ru.casesCta}</ClickText>
+            <ClickText label="Кнопка связи" path={["ru", "projectCta"]} onSelect={selectText}>{ru.projectCta}</ClickText>
+          </div>
+          <ClickText label="Строка доверия" path={["ru", "trust"]} area onSelect={selectText}>{ru.trust}</ClickText>
+        </div>
+        {showreel ? (
+          <button type="button" onClick={() => selectWork(showreelIndex)} className="group overflow-hidden border border-accent/40 bg-white/[0.025] text-left">
+            <div className="aspect-video bg-cover bg-center" style={{ backgroundImage: `url(${getThumbnailUrl(showreel)})` }} />
+            <div className="p-4">
+              <p className="font-mono text-xs uppercase text-accent">Главный шоурил</p>
+              <h3 className="mt-2 text-2xl font-semibold uppercase">{showreel.titleRu ?? showreel.title}</h3>
+              <p className="mt-2 break-all text-sm text-white/50">{showreel.youtubeUrl}</p>
+            </div>
+          </button>
+        ) : null}
+      </div>
+    </AdminSection>
+  );
+}
+
+function Inspector({
+  selection,
+  textValue,
+  works,
+  onTextChange,
+  onWorkChange,
+  onWorkListChange,
+  onFeatured,
+  onRemove,
+  onReset,
+  updateContent,
+}: {
+  selection: Selection;
+  textValue: string;
+  works: Work[];
+  onTextChange: (value: string) => void;
+  onWorkChange: (index: number, patch: Partial<Work>) => void;
+  onWorkListChange: (index: number, key: "workDoneRu" | "deliverablesRu", value: string[]) => void;
+  onFeatured: (index: number) => void;
+  onRemove: (index: number) => void;
+  onReset: () => void;
+  setSelection: (selection: Selection) => void;
+  updateContent: (path: Path, value: unknown) => void;
+}) {
+  if (selection.type === "work") {
+    const work = works[selection.index];
+    if (!work) return null;
+    return (
+      <Panel title="Редактирование видео" subtitle={`Видео ${selection.index + 1}`}>
+        <div className="aspect-video border border-white/12 bg-cover bg-center" style={{ backgroundImage: `url(${getThumbnailUrl(work)})` }} />
+        <Field label="Название на русском" value={work.titleRu ?? ""} onChange={(value) => onWorkChange(selection.index, { titleRu: value })} />
+        <Field label="Название EN / fallback" value={work.title} onChange={(value) => onWorkChange(selection.index, { title: value })} />
+        <Field label="YouTube ссылка" value={work.youtubeUrl} onChange={(value) => onWorkChange(selection.index, { youtubeUrl: value })} />
+        <Field label="Превью карточки" hint="auto или прямая ссылка на картинку" value={work.thumbnail ?? "auto"} onChange={(value) => onWorkChange(selection.index, { thumbnail: value || "auto" })} />
+        <label className="block">
+          <span className="mb-2 block text-xs uppercase text-white/48">Категория</span>
+          <select
+            className="h-11 w-full border border-white/10 bg-black/35 px-3 text-sm text-white outline-none"
+            value={work.category}
+            onChange={(event) => onWorkChange(selection.index, { category: event.target.value })}
+          >
+            {["Showreel", ...workCategories].map((category) => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
+        </label>
+        <Field label="Формат" value={work.formatRu ?? ""} onChange={(value) => onWorkChange(selection.index, { formatRu: value })} />
+        <Field area label="Описание" value={work.descriptionRu ?? ""} onChange={(value) => onWorkChange(selection.index, { descriptionRu: value })} />
+        <Field area label="Задача" value={work.taskRu ?? ""} onChange={(value) => onWorkChange(selection.index, { taskRu: value })} />
+        <StringList label="Что сделано" value={work.workDoneRu ?? []} onChange={(value) => onWorkListChange(selection.index, "workDoneRu", value)} />
+        <Field area label="Почему работает" value={work.whyItWorksRu ?? ""} onChange={(value) => onWorkChange(selection.index, { whyItWorksRu: value })} />
+        <StringList label="Что отдаю" value={work.deliverablesRu ?? []} onChange={(value) => onWorkListChange(selection.index, "deliverablesRu", value)} />
+        <div className="grid grid-cols-2 gap-2">
+          <button type="button" onClick={() => onFeatured(selection.index)} className="inline-flex h-10 items-center justify-center gap-2 border border-accent/40 text-sm text-accent">
+            <Star size={15} />
+            Главный
+          </button>
+          <a href={work.youtubeUrl} target="_blank" className="inline-flex h-10 items-center justify-center gap-2 border border-white/12 text-sm text-white/70">
+            <ArrowUpRight size={15} />
+            YouTube
+          </a>
+        </div>
+        <button type="button" onClick={() => onRemove(selection.index)} className="inline-flex h-10 items-center justify-center gap-2 border border-red-400/35 text-sm text-red-200">
+          <Trash2 size={15} />
+          Удалить видео
+        </button>
+      </Panel>
+    );
+  }
+
+  return (
+    <Panel title="Редактирование текста" subtitle={selection.label}>
+      <Field area={selection.area ?? textValue.length > 80} label={selection.label} value={textValue} onChange={onTextChange} />
+      <button type="button" onClick={onReset} className="inline-flex h-10 items-center justify-center gap-2 border border-white/12 text-sm text-white/62">
+        <RefreshCw size={15} />
+        Сбросить к файлам
+      </button>
+      <p className="text-sm leading-6 text-white/48">
+        Выделяй текст или видео слева. Изменения автоматически пишутся в JSON и сразу видны на локальном сайте.
+      </p>
+      <QuickStats updateContent={updateContent} />
+    </Panel>
+  );
+}
+
+function QuickStats({ updateContent }: { updateContent: (path: Path, value: unknown) => void }) {
+  const stats = cloneContent().ru.stats;
+  return (
+    <div className="border-t border-white/10 pt-4">
+      <p className="mb-2 font-mono text-xs uppercase text-white/40">Подсказка</p>
+      <p className="text-sm leading-6 text-white/48">
+        Метрики тоже редактируются на canvas слева. При необходимости можно менять массивы прямо в JSON, но для обычной работы это не нужно.
+      </p>
+      <button type="button" onClick={() => updateContent(["ru", "stats"], stats)} className="mt-3 hidden">
+        reset stats
+      </button>
+    </div>
+  );
+}
+
+function AdminSection({ title, children, action }: { title: string; children: React.ReactNode; action?: React.ReactNode }) {
+  return (
+    <section className="border border-white/10 bg-[#06090b] p-4">
+      <div className="mb-4 flex items-center justify-between gap-3 border-b border-white/10 pb-3">
+        <h2 className="font-mono text-xs uppercase text-accent">{title}</h2>
+        {action}
+      </div>
+      <div className="grid gap-3">{children}</div>
+    </section>
+  );
+}
+
+function MiniCard({ children }: { children: React.ReactNode }) {
+  return <div className="grid gap-2 border border-white/10 bg-white/[0.02] p-3">{children}</div>;
+}
+
+function ClickText({
+  label,
+  path,
+  selected,
+  area,
+  onSelect,
+  children,
+}: {
+  label: string;
+  path: Path;
+  selected?: Selection;
+  area?: boolean;
+  onSelect: (label: string, path: Path, area?: boolean) => void;
+  children: React.ReactNode;
+}) {
+  const active = selected?.type === "text" && JSON.stringify(selected.path) === JSON.stringify(path);
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(label, path, area)}
+      className={`block w-full border p-2 text-left transition ${
+        active ? "border-accent bg-accent/10" : "border-white/10 bg-black/20 hover:border-accent/55"
+      }`}
+    >
+      <span className="mb-1 block font-mono text-[10px] uppercase text-white/36">{label}</span>
+      <span className="block text-sm leading-6 text-white/78">{children}</span>
+    </button>
+  );
+}
+
+function WorkAdminCard({
+  work,
+  active,
+  onSelect,
+  onFeatured,
+  onRemove,
+}: {
+  work: Work;
+  active: boolean;
+  onSelect: () => void;
+  onFeatured: () => void;
+  onRemove: () => void;
+}) {
+  return (
+    <article className={`overflow-hidden border ${active ? "border-accent" : "border-white/10"} bg-white/[0.02]`}>
+      <button type="button" onClick={onSelect} className="block w-full text-left">
+        <div className="relative aspect-video bg-cover bg-center" style={{ backgroundImage: `url(${getThumbnailUrl(work)})` }}>
+          {work.featured ? <span className="absolute left-3 top-3 bg-accent px-2 py-1 font-mono text-[10px] uppercase text-black">Шоурил</span> : null}
+        </div>
+        <div className="p-3">
+          <p className="font-mono text-[10px] uppercase text-accent">{work.category}</p>
+          <h3 className="mt-1 text-lg font-semibold uppercase">{work.titleRu ?? work.title}</h3>
+          <p className="mt-2 line-clamp-2 text-sm leading-5 text-white/52">{work.taskRu ?? work.descriptionRu ?? work.youtubeUrl}</p>
+        </div>
+      </button>
+      <div className="grid grid-cols-2 border-t border-white/10">
+        <button type="button" onClick={onFeatured} className="inline-flex h-10 items-center justify-center gap-2 border-r border-white/10 text-sm text-white/70">
+          <Star size={14} />
+          Главный
+        </button>
+        <button type="button" onClick={onRemove} className="inline-flex h-10 items-center justify-center gap-2 text-sm text-red-200">
+          <Trash2 size={14} />
+          Удалить
+        </button>
+      </div>
+    </article>
+  );
+}
+
+function TwoColumnPairs({
+  title,
+  pairs,
+  root,
+  selection,
+  selectText,
+}: {
+  title: string;
+  pairs: Pair[];
+  root: Path;
+  selection: Selection;
+  selectText: (label: string, path: Path, area?: boolean) => void;
+}) {
+  return (
+    <div>
+      <p className="mb-2 font-mono text-xs uppercase text-white/38">{title}</p>
+      <div className="grid gap-2 md:grid-cols-2">
+        {pairs.map(([heading, text], index) => (
+          <MiniCard key={index}>
+            <ClickText label={`${title} ${index + 1}: заголовок`} selected={selection} path={[...root, index, 0]} onSelect={selectText}>
+              {heading}
+            </ClickText>
+            <ClickText label={`${title} ${index + 1}: текст`} selected={selection} path={[...root, index, 1]} area onSelect={selectText}>
+              {text}
+            </ClickText>
+          </MiniCard>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Panel({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
+  return (
+    <section className="grid max-h-full gap-4 overflow-y-auto border border-white/10 bg-[#06090b] p-4">
+      <div className="border-b border-white/10 pb-3">
+        <p className="font-mono text-xs uppercase text-accent">{title}</p>
+        {subtitle ? <h2 className="mt-1 text-xl font-semibold uppercase">{subtitle}</h2> : null}
+      </div>
+      {children}
     </section>
   );
 }
@@ -385,161 +660,58 @@ function Field({
   label,
   value,
   onChange,
-  area = false,
+  area,
+  hint,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   area?: boolean;
+  hint?: string;
 }) {
-  const className =
-    "w-full border border-white/10 bg-black/35 px-3 py-2 text-sm text-white outline-none focus:border-accent";
+  const className = "w-full border border-white/10 bg-black/35 px-3 py-2 text-sm text-white outline-none focus:border-accent";
   return (
     <label className="block">
       <span className="mb-2 block text-xs uppercase text-white/48">{label}</span>
       {area ? (
-        <textarea className={`${className} min-h-24 resize-y`} value={value} onChange={(e) => onChange(e.target.value)} />
+        <textarea className={`${className} min-h-28 resize-y leading-6`} value={value} onChange={(event) => onChange(event.target.value)} />
       ) : (
-        <input className={className} value={value} onChange={(e) => onChange(e.target.value)} />
+        <input className={className} value={value} onChange={(event) => onChange(event.target.value)} />
       )}
+      {hint ? <span className="mt-1 block text-xs text-white/34">{hint}</span> : null}
     </label>
-  );
-}
-
-function PairList({ label, value, onChange }: { label: string; value: Pair[]; onChange: (value: Pair[]) => void }) {
-  return (
-    <div>
-      <p className="mb-2 text-xs uppercase text-white/48">{label}</p>
-      <div className="space-y-2">
-        {value.map(([a, b], index) => (
-          <div key={index} className="grid gap-2">
-            <input className="border border-white/10 bg-black/35 px-3 py-2 text-sm" value={a} onChange={(e) => onChange(value.map((item, i) => (i === index ? [e.target.value, item[1]] : item)))} />
-            <textarea className="min-h-16 border border-white/10 bg-black/35 px-3 py-2 text-sm" value={b} onChange={(e) => onChange(value.map((item, i) => (i === index ? [item[0], e.target.value] : item)))} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ProductList({ value, onChange }: { value: Product[]; onChange: (value: Product[]) => void }) {
-  const update = (index: number, product: Product) => onChange(value.map((item, i) => (i === index ? product : item)));
-  return (
-    <div className="space-y-4">
-      {value.map((product, index) => (
-        <div key={product.code} className="border border-white/10 p-3">
-          <p className="mb-3 font-mono text-xs uppercase text-accent">{product.code}</p>
-          <Field label="Название" value={product.title} onChange={(v) => update(index, { ...product, title: v })} />
-          <Field label="Для кого" value={product.audience} onChange={(v) => update(index, { ...product, audience: v })} />
-          <Field area label="Описание" value={product.text} onChange={(v) => update(index, { ...product, text: v })} />
-          <Field label="CTA" value={product.cta} onChange={(v) => update(index, { ...product, cta: v })} />
-          <div className="mt-4 space-y-2">
-            <p className="text-xs uppercase text-white/48">Что входит</p>
-            {product.includes.map((item, itemIndex) => (
-              <input
-                key={itemIndex}
-                className="w-full border border-white/10 bg-black/35 px-3 py-2 text-sm"
-                value={item}
-                onChange={(e) =>
-                  update(index, {
-                    ...product,
-                    includes: product.includes.map((current, i) => (i === itemIndex ? e.target.value : current)),
-                  })
-                }
-              />
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function WorkList({ value, onChange }: { value: EditableWork[]; onChange: (value: EditableWork[]) => void }) {
-  const update = (index: number, work: EditableWork) => onChange(value.map((item, i) => (i === index ? work : item)));
-  const addWork = () =>
-    onChange([
-      ...value,
-      {
-        id: `work-${Date.now()}`,
-        title: "New Work",
-        titleRu: "Новая работа",
-        category: "Reels",
-        youtubeUrl: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID",
-        thumbnail: "auto",
-        descriptionRu: "Короткое описание ролика.",
-        taskRu: "Какую задачу решал ролик.",
-        formatRu: "Reels / 9:16",
-        workDoneRu: ["монтаж", "субтитры", "акценты"],
-        whyItWorksRu: "Почему эта версия работает.",
-        deliverablesRu: ["финальный ролик"],
-      },
-    ]);
-
-  return (
-    <div className="space-y-4">
-      {value.map((work, index) => (
-        <div key={work.id ?? index} className="border border-white/10 p-3">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <p className="font-mono text-xs uppercase text-accent">Видео {index + 1}</p>
-            <label className="flex items-center gap-2 text-xs uppercase text-white/58">
-              <input
-                type="checkbox"
-                checked={Boolean(work.featured)}
-                onChange={(event) =>
-                  onChange(value.map((item, i) => ({ ...item, featured: i === index ? event.target.checked : false })))
-                }
-              />
-              Главный шоурил
-            </label>
-          </div>
-
-          <Field label="YouTube ссылка" value={work.youtubeUrl} onChange={(v) => update(index, { ...work, youtubeUrl: v })} />
-          <Field label="Название на русском" value={work.titleRu ?? ""} onChange={(v) => update(index, { ...work, titleRu: v })} />
-          <Field label="Название EN / fallback" value={work.title} onChange={(v) => update(index, { ...work, title: v })} />
-          <Field label="Категория" value={work.category} onChange={(v) => update(index, { ...work, category: v })} />
-          <Field label="Формат" value={work.formatRu ?? ""} onChange={(v) => update(index, { ...work, formatRu: v })} />
-          <Field area label="Короткое описание" value={work.descriptionRu ?? ""} onChange={(v) => update(index, { ...work, descriptionRu: v })} />
-          <Field area label="Задача" value={work.taskRu ?? ""} onChange={(v) => update(index, { ...work, taskRu: v })} />
-          <StringList label="Что сделано" value={work.workDoneRu ?? []} onChange={(v) => update(index, { ...work, workDoneRu: v })} />
-          <Field area label="Почему работает" value={work.whyItWorksRu ?? ""} onChange={(v) => update(index, { ...work, whyItWorksRu: v })} />
-          <StringList label="Что отдаю" value={work.deliverablesRu ?? []} onChange={(v) => update(index, { ...work, deliverablesRu: v })} />
-
-          <button
-            type="button"
-            onClick={() => onChange(value.filter((_, i) => i !== index))}
-            className="mt-3 h-9 border border-red-400/30 px-3 text-sm text-red-200"
-          >
-            Удалить видео
-          </button>
-        </div>
-      ))}
-      <button type="button" onClick={addWork} className="h-11 w-full bg-accent text-sm font-semibold text-black">
-        Добавить видео
-      </button>
-    </div>
   );
 }
 
 function StringList({ label, value, onChange }: { label: string; value: string[]; onChange: (value: string[]) => void }) {
   return (
-    <div className="mt-4 space-y-2">
+    <div className="grid gap-2">
       <p className="text-xs uppercase text-white/48">{label}</p>
       {value.map((item, index) => (
         <div key={index} className="grid grid-cols-[1fr_auto] gap-2">
           <input
-            className="w-full border border-white/10 bg-black/35 px-3 py-2 text-sm"
+            className="w-full border border-white/10 bg-black/35 px-3 py-2 text-sm text-white outline-none focus:border-accent"
             value={item}
             onChange={(event) => onChange(value.map((current, i) => (i === index ? event.target.value : current)))}
           />
-          <button type="button" onClick={() => onChange(value.filter((_, i) => i !== index))} className="w-10 border border-white/10 text-white/58">
+          <button type="button" onClick={() => onChange(value.filter((_, i) => i !== index))} className="grid size-10 place-items-center border border-white/10 text-white/52">
             x
           </button>
         </div>
       ))}
-      <button type="button" onClick={() => onChange([...value, "Новый пункт"])} className="h-9 border border-white/12 px-3 text-sm text-white/72">
+      <button type="button" onClick={() => onChange([...value, "Новый пункт"])} className="inline-flex h-9 items-center justify-center gap-2 border border-white/12 text-sm text-white/70">
+        <Plus size={14} />
         Добавить пункт
       </button>
     </div>
+  );
+}
+
+function StatusPill({ text, active }: { text: string; active?: boolean }) {
+  return (
+    <span className={`inline-flex min-h-10 items-center gap-2 border px-3 font-mono text-[11px] uppercase ${active ? "border-accent/50 text-accent" : "border-white/12 text-white/46"}`}>
+      {active ? <RefreshCw size={13} /> : <Check size={13} />}
+      {text}
+    </span>
   );
 }

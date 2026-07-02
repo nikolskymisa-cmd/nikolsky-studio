@@ -542,7 +542,7 @@ export function StudioLanding({ works }: StudioLandingProps) {
         <Reveal className="mx-auto max-w-7xl">
           <div className="grid overflow-hidden border border-white/12 bg-[#05080b]/88 lg:grid-cols-[0.78fr_1.22fr]">
             <button type="button" onClick={() => setSelectedWork(showreel)} className="group relative min-h-[320px] overflow-hidden border-b border-white/10 text-left sm:min-h-[420px] lg:border-b-0 lg:border-r">
-              <div className="absolute inset-0 bg-cover bg-center opacity-[0.42] grayscale" style={{ backgroundImage: `url(${getThumbnailUrl(showreel)})` }} />
+              <div className="absolute inset-0 bg-cover bg-center opacity-[0.52]" style={{ backgroundImage: `url(${getThumbnailUrl(showreel)})` }} />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,6,0.18),rgba(3,5,6,0.88)),radial-gradient(circle_at_45%_34%,rgba(0,183,255,0.18),transparent_30%)]" />
               <div className="relative flex h-full flex-col justify-between p-5 sm:p-7">
                 <div>
@@ -795,7 +795,7 @@ function ShowreelPlayer({
         <span>00:00:00:00</span>
       </div>
       <button type="button" onClick={onPlay} className="group relative block aspect-video w-full overflow-hidden text-left">
-        <div className="absolute inset-0 bg-cover bg-center opacity-[0.62] grayscale" style={{ backgroundImage: `url(${thumbnailUrl})` }} />
+        <div className="absolute inset-0 bg-cover bg-center opacity-[0.68]" style={{ backgroundImage: `url(${thumbnailUrl})` }} />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,6,0.05),rgba(3,5,6,0.82)),radial-gradient(circle_at_50%_35%,rgba(0,183,255,0.16),transparent_32%)]" />
         <div className="absolute inset-4 border border-white/12 sm:inset-6" />
         <div className="absolute left-4 top-4 font-mono text-[10px] uppercase text-white/48 sm:left-5 sm:top-5 sm:text-[11px]">{safeFrame}</div>
@@ -932,7 +932,7 @@ function TimelineChapters({
             <div className="border-r border-white/10 p-2 font-mono text-[9px] uppercase leading-4 text-white/42 sm:p-3 sm:text-[10px]">{clipTime(index)}</div>
             <div className="p-3">
               <div className="mb-2 grid grid-cols-[48px_1fr_auto] items-center gap-2 sm:grid-cols-[58px_1fr_auto] sm:gap-3">
-                <div className="h-9 border border-white/10 bg-cover bg-center grayscale" style={{ backgroundImage: `url(${getThumbnailUrl(work)})` }} />
+                <div className="h-9 border border-white/10 bg-cover bg-center" style={{ backgroundImage: `url(${getThumbnailUrl(work)})` }} />
                 <span className="font-mono text-[10px] uppercase text-accent">{getCategoryLabel(work.category, lang)}</span>
                 <Clock3 size={13} className="text-white/30" />
               </div>
@@ -972,7 +972,7 @@ function CasePanel({
       className="group grid overflow-hidden border border-white/10 bg-white/[0.02] transition hover:border-accent/70 lg:grid-cols-[320px_1fr_220px]"
     >
       <button type="button" onClick={() => onSelect(work)} className="relative aspect-[1.18/1] overflow-hidden border-b border-white/10 text-left sm:aspect-video lg:aspect-auto lg:border-b-0 lg:border-r">
-        <div className="absolute inset-0 bg-cover bg-center opacity-75 grayscale transition group-hover:grayscale-0" style={{ backgroundImage: `url(${getThumbnailUrl(work)})` }} />
+        <div className="absolute inset-0 bg-cover bg-center opacity-80 transition" style={{ backgroundImage: `url(${getThumbnailUrl(work)})` }} />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,6,0.08),rgba(3,5,6,0.72))]" />
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between sm:bottom-4 sm:left-4 sm:right-4">
           <span className="font-mono text-[11px] uppercase text-accent sm:text-xs">{clipTime(index)}</span>

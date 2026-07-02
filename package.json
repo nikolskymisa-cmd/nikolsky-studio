@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev.mjs",
+    "next:dev": "next dev",
+    "admin-api": "node scripts/admin-api.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
