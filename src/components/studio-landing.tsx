@@ -472,33 +472,33 @@ export function StudioLanding({ works }: StudioLandingProps) {
 
       <Header lang={lang} setLang={setLang} nav={t.nav} />
 
-      <section id="top" className="relative mx-auto w-full max-w-7xl px-4 pb-10 pt-24 sm:px-6 lg:px-8">
-        <div className="grid min-h-[calc(100vh-6rem)] gap-8 lg:grid-cols-[minmax(0,1fr)_470px] lg:items-center xl:grid-cols-[minmax(0,1fr)_520px]">
+      <section id="top" className="relative mx-auto w-full max-w-7xl px-4 pb-8 pt-28 sm:px-6 sm:pt-24 lg:px-8">
+        <div className="grid gap-6 lg:min-h-[calc(100vh-6rem)] lg:grid-cols-[minmax(0,1fr)_470px] lg:items-center lg:gap-8 xl:grid-cols-[minmax(0,1fr)_520px]">
           <motion.div
             initial={false}
             animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="mb-7 flex max-w-2xl items-center justify-between border-y border-white/12 py-3 font-mono text-[11px] uppercase text-white/48">
+            <div className="mb-5 flex max-w-2xl items-center justify-between border-y border-white/12 py-2.5 font-mono text-[10px] uppercase text-white/48 sm:mb-7 sm:py-3 sm:text-[11px]">
               <span>{t.eyebrow}</span>
               <span>{t.rec}</span>
             </div>
-            <p className="mb-5 font-mono text-xs uppercase text-accent">{t.label}</p>
-            <h1 className="max-w-4xl text-[3.8rem] font-semibold uppercase leading-[0.84] text-white sm:text-[5.5rem] md:text-[6.4rem] lg:text-[5.05rem] xl:text-[5.45rem]">
+            <p className="mb-4 font-mono text-[11px] uppercase leading-5 text-accent sm:mb-5 sm:text-xs">{t.label}</p>
+            <h1 className="max-w-4xl text-[2.36rem] font-semibold uppercase leading-[0.9] text-white min-[380px]:text-[2.65rem] sm:text-[5.5rem] sm:leading-[0.84] md:text-[6.4rem] lg:text-[5.05rem] xl:text-[5.45rem]">
               {t.heroTitle}
             </h1>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-white/66 sm:text-xl">{t.heroSub}</p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <a href="#work" className="inline-flex h-12 items-center justify-center gap-2 bg-accent px-6 text-sm font-semibold text-black transition hover:bg-white">
+            <p className="mt-5 max-w-2xl text-[15px] leading-7 text-white/68 sm:mt-7 sm:text-xl sm:leading-8">{t.heroSub}</p>
+            <div className="mt-6 grid grid-cols-2 gap-2 sm:mt-9 sm:flex sm:flex-row sm:gap-3">
+              <a href="#work" className="inline-flex h-11 items-center justify-center gap-2 bg-accent px-3 text-sm font-semibold text-black transition hover:bg-white sm:h-12 sm:px-6">
                 <CirclePlay size={17} />
                 {t.casesCta}
               </a>
-              <a href={profile.telegramUrl} target="_blank" rel="noreferrer" className="inline-flex h-12 items-center justify-center gap-2 border border-white/16 bg-white/[0.035] px-6 text-sm font-semibold text-white transition hover:border-accent hover:text-accent">
+              <a href={profile.telegramUrl} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center justify-center gap-2 border border-white/16 bg-white/[0.035] px-3 text-sm font-semibold text-white transition hover:border-accent hover:text-accent sm:h-12 sm:px-6">
                 <Send size={17} />
                 {t.projectCta}
               </a>
             </div>
-            <p className="mt-6 max-w-2xl border-l border-accent/70 pl-4 font-mono text-xs uppercase leading-6 text-white/48">
+            <p className="mt-5 max-w-2xl border-l border-accent/70 pl-3 font-mono text-[10px] uppercase leading-5 text-white/48 sm:mt-6 sm:pl-4 sm:text-xs sm:leading-6">
               {t.trust}
             </p>
           </motion.div>
@@ -516,7 +516,7 @@ export function StudioLanding({ works }: StudioLandingProps) {
         <StatsPanel stats={t.stats} />
       </section>
 
-      <section className="scene-section relative px-4 py-20 sm:px-6 lg:px-8">
+      <section className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <Reveal className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.85fr_1.15fr]">
           <SectionHeader eyebrow={t.positionEyebrow} title={t.positionTitle} text={t.positionText} />
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
@@ -527,7 +527,7 @@ export function StudioLanding({ works }: StudioLandingProps) {
         </Reveal>
       </section>
 
-      <section id="products" className="scene-section relative px-4 py-20 sm:px-6 lg:px-8">
+      <section id="products" className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <Reveal className="mx-auto max-w-7xl">
           <SectionHeader eyebrow={t.productsEyebrow} title={t.productsTitle} />
           <div className="mt-8 grid gap-3 lg:grid-cols-3">
@@ -538,16 +538,16 @@ export function StudioLanding({ works }: StudioLandingProps) {
         </Reveal>
       </section>
 
-      <section className="scene-section relative px-4 py-20 sm:px-6 lg:px-8">
+      <section className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <Reveal className="mx-auto max-w-7xl">
           <div className="grid overflow-hidden border border-white/12 bg-[#05080b]/88 lg:grid-cols-[0.78fr_1.22fr]">
-            <button type="button" onClick={() => setSelectedWork(showreel)} className="group relative min-h-[420px] overflow-hidden border-b border-white/10 text-left lg:border-b-0 lg:border-r">
+            <button type="button" onClick={() => setSelectedWork(showreel)} className="group relative min-h-[320px] overflow-hidden border-b border-white/10 text-left sm:min-h-[420px] lg:border-b-0 lg:border-r">
               <div className="absolute inset-0 bg-cover bg-center opacity-[0.42] grayscale" style={{ backgroundImage: `url(${getThumbnailUrl(showreel)})` }} />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,6,0.18),rgba(3,5,6,0.88)),radial-gradient(circle_at_45%_34%,rgba(0,183,255,0.18),transparent_30%)]" />
               <div className="relative flex h-full flex-col justify-between p-5 sm:p-7">
                 <div>
                   <p className="font-mono text-xs uppercase text-accent">{t.reelEyebrow}</p>
-                  <h2 className="mt-4 max-w-xl text-5xl font-semibold uppercase leading-[0.9] text-white sm:text-6xl">
+                  <h2 className="mt-4 max-w-xl text-[2.35rem] font-semibold uppercase leading-[0.92] text-white sm:text-6xl sm:leading-[0.9]">
                     {t.reelTitle}
                   </h2>
                   <p className="mt-5 max-w-md text-base leading-7 text-white/62">{t.reelText}</p>
@@ -563,7 +563,7 @@ export function StudioLanding({ works }: StudioLandingProps) {
         </Reveal>
       </section>
 
-      <section id="work" className="scene-section relative px-4 py-20 sm:px-6 lg:px-8">
+      <section id="work" className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <Reveal className="mx-auto max-w-7xl">
           <div className="mb-8 grid gap-6 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
             <SectionHeader eyebrow={t.casesEyebrow} title={t.casesTitle} text={t.casesText} />
@@ -602,16 +602,16 @@ export function StudioLanding({ works }: StudioLandingProps) {
         </Reveal>
       </section>
 
-      <section id="method" className="scene-section relative px-4 py-20 sm:px-6 lg:px-8">
+      <section id="method" className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <Reveal className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <SectionHeader eyebrow={t.methodEyebrow} title={t.methodTitle} />
           <div className="grid border border-white/10 bg-white/[0.02]">
             {t.methodSteps.map(([title, text], index) => (
-              <div key={title} className="grid gap-4 border-b border-white/10 p-5 last:border-b-0 sm:grid-cols-[112px_1fr]">
+              <div key={title} className="grid gap-3 border-b border-white/10 p-4 last:border-b-0 sm:grid-cols-[112px_1fr] sm:gap-4 sm:p-5">
                 <span className="font-mono text-xs uppercase text-accent">{t.stepLabel} {String(index + 1).padStart(2, "0")}</span>
                 <div>
-                  <h3 className="text-xl font-semibold uppercase text-white">{title}</h3>
-                  <p className="mt-2 leading-7 text-white/62">{text}</p>
+                  <h3 className="text-lg font-semibold uppercase text-white sm:text-xl">{title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-white/62 sm:text-base sm:leading-7">{text}</p>
                 </div>
               </div>
             ))}
@@ -619,7 +619,7 @@ export function StudioLanding({ works }: StudioLandingProps) {
         </Reveal>
       </section>
 
-      <section id="terms" className="scene-section relative px-4 py-20 sm:px-6 lg:px-8">
+      <section id="terms" className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <Reveal className="mx-auto max-w-7xl">
           <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr]">
             <SectionHeader eyebrow={t.termsEyebrow} title={t.termsTitle} text={t.termsText} />
@@ -632,22 +632,22 @@ export function StudioLanding({ works }: StudioLandingProps) {
         </Reveal>
       </section>
 
-      <section id="contact" className="scene-section relative px-4 pb-10 pt-20 sm:px-6 lg:px-8">
-        <Reveal className="mx-auto max-w-7xl border border-white/12 bg-white/[0.025] p-5 sm:p-8">
+      <section id="contact" className="scene-section relative px-4 pb-8 pt-12 sm:px-6 sm:pt-16 lg:px-8 lg:pt-20">
+        <Reveal className="mx-auto max-w-7xl border border-white/12 bg-white/[0.025] p-4 sm:p-8">
           <div className="grid gap-10 lg:grid-cols-[1fr_430px] lg:items-end">
             <div>
               <p className="mb-5 font-mono text-xs uppercase text-accent">{t.contactEyebrow}</p>
-              <h2 className="max-w-5xl text-4xl font-semibold uppercase leading-[0.92] text-white sm:text-6xl">
+              <h2 className="max-w-5xl text-[2rem] font-semibold uppercase leading-[0.98] text-white sm:text-6xl sm:leading-[0.92]">
                 {t.contactTitle}
               </h2>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-white/62">{t.contactText}</p>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-white/62 sm:mt-5 sm:text-base sm:leading-7">{t.contactText}</p>
             </div>
             <div className="grid gap-3">
               <a href={profile.telegramUrl} target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center gap-2 bg-accent px-6 text-sm font-semibold text-black transition hover:bg-white">
                 <Send size={17} />
                 Telegram
               </a>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 <a href={`mailto:${profile.email}`} className="flex h-11 items-center justify-center gap-2 border border-white/14 text-sm font-semibold text-white/72 hover:text-accent">
                   <Mail size={16} />
                   {t.email}
@@ -691,10 +691,10 @@ export function StudioLanding({ works }: StudioLandingProps) {
 function Header({ lang, setLang, nav }: { lang: Lang; setLang: (lang: Lang) => void; nav: readonly string[] }) {
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-white/[0.08] bg-[#030506]/88 backdrop-blur-xl">
-      <nav className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <nav className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between px-4 sm:h-16 sm:px-6 lg:px-8">
         <a href="#top" className="flex items-center gap-3" aria-label="Nikolsky Studio">
           <span className="grid size-8 place-items-center border border-white/18 bg-white/[0.04] font-mono text-xs text-white">NS</span>
-          <span className="hidden text-sm font-medium text-white/86 sm:inline">{profile.studioName}</span>
+          <span className="text-sm font-medium text-white/86">{profile.studioName}</span>
         </a>
         <div className="hidden items-center gap-1 lg:flex">
           {nav.map((label, index) => (
@@ -704,7 +704,7 @@ function Header({ lang, setLang, nav }: { lang: Lang; setLang: (lang: Lang) => v
           ))}
         </div>
         <div className="flex items-center gap-2">
-          <div className="grid h-10 grid-cols-2 border border-white/12 bg-white/[0.025] p-1">
+          <div className="grid h-9 grid-cols-2 border border-white/12 bg-white/[0.025] p-1 sm:h-10">
             {(["ru", "en"] as Lang[]).map((item) => (
               <button
                 key={item}
@@ -719,7 +719,7 @@ function Header({ lang, setLang, nav }: { lang: Lang; setLang: (lang: Lang) => v
               </button>
             ))}
           </div>
-          <a href={profile.telegramUrl} target="_blank" rel="noreferrer" aria-label="Telegram" className="grid size-10 place-items-center bg-white text-black transition hover:bg-accent sm:hidden">
+          <a href={profile.telegramUrl} target="_blank" rel="noreferrer" aria-label="Telegram" className="grid size-9 place-items-center bg-white text-black transition hover:bg-accent sm:hidden">
             <Send size={15} />
           </a>
           <a href={profile.telegramUrl} target="_blank" rel="noreferrer" className="hidden h-10 items-center justify-center gap-2 bg-white px-4 text-sm font-semibold text-black transition hover:bg-accent sm:inline-flex">
@@ -728,6 +728,19 @@ function Header({ lang, setLang, nav }: { lang: Lang; setLang: (lang: Lang) => v
           </a>
         </div>
       </nav>
+      <div className="lg:hidden">
+        <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 pb-2">
+          {nav.map((label, index) => (
+            <a
+              key={label}
+              href={navHrefs[index]}
+              className="shrink-0 border border-white/10 bg-white/[0.03] px-2 py-2 font-mono text-[9px] uppercase text-white/52 min-[380px]:px-3 min-[380px]:text-[10px]"
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+      </div>
     </header>
   );
 }
@@ -745,11 +758,11 @@ function StudioBackground() {
 function SectionHeader({ eyebrow, title, text }: { eyebrow: string; title: string; text?: string }) {
   return (
     <div>
-      <p className="mb-4 font-mono text-xs uppercase text-accent">{eyebrow}</p>
-      <h2 className="max-w-4xl text-4xl font-semibold uppercase leading-[0.95] text-white sm:text-5xl">
+      <p className="mb-3 font-mono text-[11px] uppercase text-accent sm:mb-4 sm:text-xs">{eyebrow}</p>
+      <h2 className="max-w-4xl text-[2rem] font-semibold uppercase leading-[0.98] text-white sm:text-5xl sm:leading-[0.95]">
         {title}
       </h2>
-      {text ? <p className="mt-5 max-w-3xl text-base leading-7 text-white/62">{text}</p> : null}
+      {text ? <p className="mt-4 max-w-3xl text-[15px] leading-7 text-white/62 sm:mt-5 sm:text-base">{text}</p> : null}
     </div>
   );
 }
@@ -775,28 +788,28 @@ function ShowreelPlayer({
       initial={false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className="relative border border-white/12 bg-[#05080b]/92 shadow-[0_30px_90px_rgba(0,0,0,0.44)]"
+      className="relative border border-white/12 bg-[#05080b]/92 shadow-[0_24px_70px_rgba(0,0,0,0.38)] sm:shadow-[0_30px_90px_rgba(0,0,0,0.44)]"
     >
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 font-mono text-[11px] uppercase text-white/42">
+      <div className="flex items-center justify-between border-b border-white/10 px-3 py-2.5 font-mono text-[10px] uppercase text-white/42 sm:px-4 sm:py-3 sm:text-[11px]">
         <span>{label}</span>
         <span>00:00:00:00</span>
       </div>
       <button type="button" onClick={onPlay} className="group relative block aspect-video w-full overflow-hidden text-left">
         <div className="absolute inset-0 bg-cover bg-center opacity-[0.62] grayscale" style={{ backgroundImage: `url(${thumbnailUrl})` }} />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,6,0.05),rgba(3,5,6,0.82)),radial-gradient(circle_at_50%_35%,rgba(0,183,255,0.16),transparent_32%)]" />
-        <div className="absolute inset-6 border border-white/12" />
-        <div className="absolute left-5 top-5 font-mono text-[11px] uppercase text-white/48">{safeFrame}</div>
+        <div className="absolute inset-4 border border-white/12 sm:inset-6" />
+        <div className="absolute left-4 top-4 font-mono text-[10px] uppercase text-white/48 sm:left-5 sm:top-5 sm:text-[11px]">{safeFrame}</div>
         <div className="absolute inset-0 grid place-items-center">
-          <span className="grid size-20 place-items-center border border-white/24 bg-white/[0.08] text-white backdrop-blur transition group-hover:border-accent group-hover:text-accent">
-            <Play size={34} fill="currentColor" />
+          <span className="grid size-14 place-items-center border border-white/24 bg-white/[0.08] text-white backdrop-blur transition group-hover:border-accent group-hover:text-accent sm:size-20">
+            <Play size={26} fill="currentColor" className="sm:size-[34px]" />
           </span>
         </div>
-        <div className="absolute bottom-5 left-5 right-5">
-          <p className="font-mono text-[11px] uppercase text-accent">{work.category}</p>
-          <h3 className="mt-2 text-3xl font-semibold uppercase leading-none text-white sm:text-4xl">{work.title}</h3>
+        <div className="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-5">
+          <p className="font-mono text-[10px] uppercase text-accent sm:text-[11px]">{work.category}</p>
+          <h3 className="mt-2 text-2xl font-semibold uppercase leading-none text-white sm:text-4xl">{work.title}</h3>
         </div>
       </button>
-      <div className="grid border-t border-white/10">
+      <div className="hidden border-t border-white/10 sm:grid">
         {tracks.map((track, index) => (
           <div key={track} className="grid grid-cols-[92px_1fr] border-b border-white/10 last:border-b-0">
             <div className="border-r border-white/10 px-3 py-3 font-mono text-[10px] uppercase text-white/38">{track}</div>
@@ -809,9 +822,9 @@ function ShowreelPlayer({
           </div>
         ))}
       </div>
-      <div className="grid gap-3 px-4 py-4 sm:grid-cols-[1fr_auto] sm:items-center">
-        <Waveform bars={34} />
-        <button type="button" onClick={onPlay} className="h-11 bg-white px-5 text-sm font-semibold text-black transition hover:bg-accent">
+      <div className="grid gap-3 px-3 py-3 sm:grid-cols-[1fr_auto] sm:items-center sm:px-4 sm:py-4">
+        <Waveform bars={22} className="h-9 sm:h-12" />
+        <button type="button" onClick={onPlay} className="h-10 bg-white px-5 text-sm font-semibold text-black transition hover:bg-accent sm:h-11">
           {button}
         </button>
       </div>
@@ -821,11 +834,11 @@ function ShowreelPlayer({
 
 function StatsPanel({ stats }: { stats: readonly (readonly [string, string])[] }) {
   return (
-    <div className="mt-8 grid border border-white/10 bg-black/18 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="mt-6 grid grid-cols-2 border border-white/10 bg-black/18 sm:mt-8 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map(([value, label]) => (
-        <div key={label} className="flex min-h-28 items-end justify-between gap-4 border-b border-white/10 p-4 sm:border-r lg:border-b-0 last:border-r-0">
-          <span className="font-mono text-3xl text-white sm:text-4xl">{value}</span>
-          <span className="max-w-32 text-right font-mono text-[11px] uppercase leading-5 text-white/42">{label}</span>
+        <div key={label} className="flex min-h-24 flex-col justify-between gap-3 border-b border-r border-white/10 p-3 even:border-r-0 sm:min-h-28 sm:p-4 lg:border-b-0 lg:even:border-r lg:last:border-r-0">
+          <span className="font-mono text-2xl text-white sm:text-4xl">{value}</span>
+          <span className="max-w-32 font-mono text-[10px] uppercase leading-4 text-white/42 sm:text-right sm:text-[11px] sm:leading-5">{label}</span>
         </div>
       ))}
     </div>
@@ -846,13 +859,13 @@ function ControlPanel({
   compact?: boolean;
 }) {
   return (
-    <div className={`border border-white/10 bg-white/[0.02] p-5 ${compact ? "min-h-40" : "min-h-44"}`}>
-      <div className="mb-6 flex items-center justify-between font-mono text-xs uppercase">
+    <div className={`border border-white/10 bg-white/[0.02] p-4 sm:p-5 ${compact ? "sm:min-h-40" : "sm:min-h-44"}`}>
+      <div className="mb-4 flex items-center justify-between font-mono text-[11px] uppercase sm:mb-6 sm:text-xs">
         <span className="text-accent">{blockLabel} / {String(index + 1).padStart(2, "0")}</span>
         <span className="text-white/32">00:{String(index * 9 + 3).padStart(2, "0")}:12</span>
       </div>
-      <h3 className="text-2xl font-semibold uppercase text-white">{title}</h3>
-      <p className="mt-4 leading-7 text-white/62">{text}</p>
+      <h3 className="text-xl font-semibold uppercase text-white sm:text-2xl">{title}</h3>
+      <p className="mt-3 text-sm leading-6 text-white/62 sm:mt-4 sm:text-base sm:leading-7">{text}</p>
     </div>
   );
 }
@@ -872,15 +885,15 @@ function ProductPanel({
   label: string;
 }) {
   return (
-    <article className="group flex min-h-[540px] flex-col border border-white/10 bg-white/[0.025] p-5 transition hover:border-accent/70">
-      <div className="mb-8 flex items-center justify-between border-b border-white/10 pb-4 font-mono text-xs uppercase">
+    <article className="group flex flex-col border border-white/10 bg-white/[0.025] p-4 transition hover:border-accent/70 sm:p-5 lg:min-h-[540px]">
+      <div className="mb-5 flex items-center justify-between border-b border-white/10 pb-3 font-mono text-[11px] uppercase sm:mb-8 sm:pb-4 sm:text-xs">
         <span className="text-accent">{product.code}</span>
         <span className="text-white/32">{label}</span>
       </div>
-      <h3 className="text-3xl font-semibold uppercase leading-[0.96] text-white">{product.title}</h3>
-      <p className="mt-4 min-h-12 text-sm uppercase leading-6 text-white/50">{product.audience}</p>
-      <p className="mt-6 leading-7 text-white/66">{product.text}</p>
-      <div className="mt-8 grid gap-2">
+      <h3 className="text-2xl font-semibold uppercase leading-[0.98] text-white sm:text-3xl sm:leading-[0.96]">{product.title}</h3>
+      <p className="mt-3 text-xs uppercase leading-5 text-white/50 sm:mt-4 sm:min-h-12 sm:text-sm sm:leading-6">{product.audience}</p>
+      <p className="mt-4 text-sm leading-6 text-white/66 sm:mt-6 sm:text-base sm:leading-7">{product.text}</p>
+      <div className="mt-5 grid gap-2 sm:mt-8">
         {product.includes.map((item) => (
           <div key={item} className="flex items-start gap-3 border-t border-white/[0.08] pt-3 text-sm leading-6 text-white/62">
             <Check size={15} className="mt-1 shrink-0 text-accent" />
@@ -888,7 +901,7 @@ function ProductPanel({
           </div>
         ))}
       </div>
-      <a href={profile.telegramUrl} target="_blank" rel="noreferrer" className="mt-auto inline-flex h-11 items-center justify-center gap-2 bg-white px-4 text-sm font-semibold text-black transition group-hover:bg-accent">
+      <a href={profile.telegramUrl} target="_blank" rel="noreferrer" className="mt-6 inline-flex h-11 items-center justify-center gap-2 bg-white px-4 text-sm font-semibold text-black transition group-hover:bg-accent sm:mt-auto">
         {product.cta}
         <ArrowUpRight size={15} />
       </a>
@@ -908,23 +921,23 @@ function TimelineChapters({
   onSelect: (work: Work) => void;
 }) {
   return (
-    <div className="p-5 sm:p-6">
-      <div className="mb-5 flex justify-between font-mono text-xs uppercase text-white/42">
+    <div className="p-4 sm:p-6">
+      <div className="mb-4 flex justify-between font-mono text-[11px] uppercase text-white/42 sm:mb-5 sm:text-xs">
         <span>{title}</span>
         <span>V1 / A1 / FX</span>
       </div>
       <div className="grid gap-3">
         {works.map((work, index) => (
-          <button key={work.id ?? work.title} type="button" onClick={() => onSelect(work)} className="group grid grid-cols-[74px_1fr] border border-white/10 bg-white/[0.02] text-left transition hover:border-accent/70">
-            <div className="border-r border-white/10 p-3 font-mono text-[10px] uppercase text-white/42">{clipTime(index)}</div>
+          <button key={work.id ?? work.title} type="button" onClick={() => onSelect(work)} className="group grid grid-cols-[62px_1fr] border border-white/10 bg-white/[0.02] text-left transition hover:border-accent/70 sm:grid-cols-[74px_1fr]">
+            <div className="border-r border-white/10 p-2 font-mono text-[9px] uppercase leading-4 text-white/42 sm:p-3 sm:text-[10px]">{clipTime(index)}</div>
             <div className="p-3">
-              <div className="mb-2 grid grid-cols-[58px_1fr_auto] items-center gap-3">
+              <div className="mb-2 grid grid-cols-[48px_1fr_auto] items-center gap-2 sm:grid-cols-[58px_1fr_auto] sm:gap-3">
                 <div className="h-9 border border-white/10 bg-cover bg-center grayscale" style={{ backgroundImage: `url(${getThumbnailUrl(work)})` }} />
                 <span className="font-mono text-[10px] uppercase text-accent">{getCategoryLabel(work.category, lang)}</span>
                 <Clock3 size={13} className="text-white/30" />
               </div>
-              <p className="text-sm font-semibold uppercase text-white">{getWorkTitle(work, lang)}</p>
-              <Waveform seed={index} bars={24} className="h-10" />
+              <p className="text-sm font-semibold uppercase leading-5 text-white">{getWorkTitle(work, lang)}</p>
+              <Waveform seed={index} bars={18} className="h-8 sm:h-10" />
             </div>
           </button>
         ))}
@@ -958,40 +971,40 @@ function CasePanel({
       transition={{ duration: 0.3, delay: index * 0.02 }}
       className="group grid overflow-hidden border border-white/10 bg-white/[0.02] transition hover:border-accent/70 lg:grid-cols-[320px_1fr_220px]"
     >
-      <button type="button" onClick={() => onSelect(work)} className="relative aspect-video overflow-hidden border-b border-white/10 text-left lg:aspect-auto lg:border-b-0 lg:border-r">
+      <button type="button" onClick={() => onSelect(work)} className="relative aspect-[1.18/1] overflow-hidden border-b border-white/10 text-left sm:aspect-video lg:aspect-auto lg:border-b-0 lg:border-r">
         <div className="absolute inset-0 bg-cover bg-center opacity-75 grayscale transition group-hover:grayscale-0" style={{ backgroundImage: `url(${getThumbnailUrl(work)})` }} />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,6,0.08),rgba(3,5,6,0.72))]" />
-        <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-          <span className="font-mono text-xs uppercase text-accent">{clipTime(index)}</span>
-          <span className="grid size-11 place-items-center border border-white/18 bg-black/36 text-white backdrop-blur">
+        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between sm:bottom-4 sm:left-4 sm:right-4">
+          <span className="font-mono text-[11px] uppercase text-accent sm:text-xs">{clipTime(index)}</span>
+          <span className="grid size-10 place-items-center border border-white/18 bg-black/36 text-white backdrop-blur sm:size-11">
             <Play size={18} fill="currentColor" />
           </span>
         </div>
       </button>
-      <div className="p-5">
-        <div className="mb-4 flex flex-wrap items-center gap-2 font-mono text-[11px] uppercase text-white/44">
+      <div className="p-4 sm:p-5">
+        <div className="mb-3 flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase text-white/44 sm:mb-4 sm:text-[11px]">
           <Film size={13} />
           <span>{displayWork.category}</span>
           <span>/</span>
           <span>{getWorkFormat(work, lang)}</span>
         </div>
-        <h3 className="text-3xl font-semibold uppercase leading-tight text-white">{displayWork.title}</h3>
-        <div className="mt-5 border-l border-accent/70 pl-4">
+        <h3 className="text-2xl font-semibold uppercase leading-tight text-white sm:text-3xl">{displayWork.title}</h3>
+        <div className="mt-4 border-l border-accent/70 pl-3 sm:mt-5 sm:pl-4">
           <p className="font-mono text-[11px] uppercase text-accent">{labels.task}</p>
-          <p className="mt-2 leading-7 text-white/66">{getWorkTask(work, lang)}</p>
+          <p className="mt-2 text-sm leading-6 text-white/66 sm:text-base sm:leading-7">{getWorkTask(work, lang)}</p>
         </div>
-        <div className="mt-5 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap gap-2 sm:mt-5">
           {done.map((item) => (
-            <span key={item} className="border border-white/10 bg-black/[0.22] px-3 py-1.5 font-mono text-[11px] uppercase text-white/54">
+            <span key={item} className="border border-white/10 bg-black/[0.22] px-2.5 py-1.5 font-mono text-[10px] uppercase leading-4 text-white/54 sm:px-3 sm:text-[11px]">
               {item}
             </span>
           ))}
         </div>
       </div>
-      <div className="grid border-t border-white/10 p-5 lg:border-l lg:border-t-0">
-        <p className="font-mono text-[11px] uppercase text-white/38">{labels.done}</p>
-        <Waveform seed={index * 2} bars={28} className="mt-3" />
-        <div className="mt-auto grid gap-2 pt-5">
+      <div className="grid border-t border-white/10 p-4 sm:p-5 lg:border-l lg:border-t-0">
+        <p className="hidden font-mono text-[11px] uppercase text-white/38 sm:block">{labels.done}</p>
+        <Waveform seed={index * 2} bars={28} className="mt-3 hidden sm:flex" />
+        <div className="grid grid-cols-2 gap-2 sm:mt-auto sm:grid-cols-1 sm:pt-5">
           <button type="button" onClick={() => onSelect(work)} className="inline-flex h-10 items-center justify-center gap-2 bg-white px-4 text-sm font-semibold text-black transition hover:bg-accent">
             {labels.open}
             <ArrowUpRight size={15} />
@@ -1031,7 +1044,7 @@ function WorkModal({
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/88 px-4 py-6 backdrop-blur-xl"
+        className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/88 px-0 py-0 backdrop-blur-xl sm:px-4 sm:py-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -1041,35 +1054,35 @@ function WorkModal({
         aria-label={`${displayWork.title} preview`}
       >
         <motion.div
-          className="w-full max-w-6xl border border-white/12 bg-[#05080b]"
+          className="min-h-screen w-full max-w-6xl border-white/12 bg-[#05080b] sm:min-h-0 sm:border"
           initial={{ opacity: 0, y: 16, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 8, scale: 0.98 }}
           transition={{ duration: 0.22 }}
           onMouseDown={(event) => event.stopPropagation()}
         >
-          <div className="flex items-center justify-between gap-4 border-b border-white/10 p-4">
+          <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-white/10 bg-[#05080b]/95 p-4 backdrop-blur">
             <div>
-              <p className="font-mono text-xs uppercase text-accent">{displayWork.category}</p>
-              <h3 className="mt-1 text-2xl font-semibold uppercase text-white">{displayWork.title}</h3>
+              <p className="font-mono text-[11px] uppercase text-accent sm:text-xs">{displayWork.category}</p>
+              <h3 className="mt-1 text-xl font-semibold uppercase leading-tight text-white sm:text-2xl">{displayWork.title}</h3>
             </div>
             <button type="button" onClick={onClose} aria-label={labels.close} className="grid size-11 place-items-center border border-white/14 bg-white/[0.04] text-white transition hover:bg-white/[0.1]">
               <X size={20} />
             </button>
           </div>
           <div className="grid lg:grid-cols-[1.22fr_0.78fr]">
-            <div className="border-b border-white/10 p-4 lg:border-b-0 lg:border-r">
+            <div className="border-b border-white/10 p-3 sm:p-4 lg:border-b-0 lg:border-r">
               <div className="relative aspect-video w-full overflow-hidden border border-white/12 bg-black">
                 <YouTubeEmbed work={displayWork} autoplay className="absolute inset-0 h-full w-full" />
               </div>
-              <div className="mt-4 flex justify-end">
+              <div className="mt-3 flex justify-end sm:mt-4">
                 <a href={work.youtubeUrl} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center justify-center gap-2 border border-white/14 px-4 text-sm text-white/70 transition hover:border-accent hover:text-accent">
                   {labels.open}
                   <ArrowUpRight size={15} />
                 </a>
               </div>
             </div>
-            <div className="grid gap-5 p-5">
+            <div className="grid gap-4 p-4 sm:gap-5 sm:p-5">
               <ModalBlock label={labels.task} text={displayWork.task} />
               <ModalList label={labels.done} items={displayWork.workDone ?? []} />
               <ModalBlock label={labels.why} text={displayWork.whyItWorks} />

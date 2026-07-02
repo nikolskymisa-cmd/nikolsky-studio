@@ -124,6 +124,31 @@ a {
   }
 }
 
+@media (max-width: 640px) {
+  .editor-bg {
+    background:
+      radial-gradient(circle at 74% 8%, rgba(0, 183, 255, 0.12), transparent 32%),
+      linear-gradient(180deg, #030506 0%, #05080a 46%, #020303 100%);
+  }
+
+  .scanline-layer {
+    opacity: 0.18;
+  }
+
+  .studio-grid {
+    background-size:
+      48px 48px,
+      48px 48px,
+      100% 100%;
+  }
+
+  .scene-section {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.014), transparent 72px),
+      linear-gradient(90deg, transparent, rgba(0, 183, 255, 0.024), transparent);
+  }
+}
+
 .text-balance {
   text-wrap: balance;
 }
