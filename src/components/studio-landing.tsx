@@ -473,17 +473,12 @@ export function StudioLanding({ works }: StudioLandingProps) {
       <Header lang={lang} setLang={setLang} nav={t.nav} projectCta={t.projectCta} />
 
       <section id="top" className="relative mx-auto w-full max-w-7xl px-4 pb-8 pt-28 sm:px-6 sm:pt-24 lg:px-8">
-        <HeroAtmosphere />
         <div className="relative z-10 grid gap-6 lg:min-h-[640px] lg:grid-cols-[minmax(0,1fr)_470px] lg:items-center lg:gap-8 xl:min-h-[680px] xl:grid-cols-[minmax(0,1fr)_520px]">
           <motion.div
             initial={false}
             animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="mb-5 flex max-w-2xl items-center justify-between gap-4 border-y border-white/10 py-2.5 font-mono text-[10px] uppercase text-white/52 sm:mb-7 sm:py-3 sm:text-[11px]">
-              <span>{t.eyebrow}</span>
-              <span className="text-right">{t.rec}</span>
-            </div>
             <p className="mb-4 font-mono text-[11px] uppercase leading-5 text-accent sm:mb-5 sm:text-xs">{t.label}</p>
             <h1 className="max-w-4xl text-[2.36rem] font-semibold uppercase leading-[0.9] text-white min-[380px]:text-[2.65rem] sm:text-[5.5rem] sm:leading-[0.84] md:text-[6.4rem] lg:text-[5.05rem] xl:text-[5.45rem]">
               {t.heroTitle}
@@ -513,8 +508,6 @@ export function StudioLanding({ works }: StudioLandingProps) {
             onPlay={() => setSelectedWork(showreel)}
           />
         </div>
-
-        <StatsPanel stats={t.stats} />
       </section>
 
       <section className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
@@ -740,9 +733,6 @@ function Header({
             <Send size={15} />
             {projectCta}
           </a>
-          <a href={profile.telegramUrl} target="_blank" rel="noreferrer" aria-label="Telegram" className="hidden size-10 place-items-center border border-white/14 bg-white/[0.035] font-mono text-[11px] text-white/72 transition hover:border-accent hover:text-accent sm:grid">
-            TG
-          </a>
         </div>
       </nav>
       <div className="lg:hidden">
@@ -760,10 +750,6 @@ function Header({
       </div>
     </header>
   );
-}
-
-function HeroAtmosphere() {
-  return <div aria-hidden className="hero-atmosphere pointer-events-none absolute inset-x-[-12vw] top-0 h-[calc(100%+3rem)]" />;
 }
 
 function StudioBackground() {
@@ -850,19 +836,6 @@ function ShowreelPlayer({
         </button>
       </div>
     </motion.div>
-  );
-}
-
-function StatsPanel({ stats }: { stats: readonly (readonly [string, string])[] }) {
-  return (
-    <div className="relative z-10 mt-7 grid grid-cols-2 border border-white/10 bg-black/22 backdrop-blur-sm sm:mt-9 sm:grid-cols-2 lg:grid-cols-4">
-      {stats.map(([value, label]) => (
-        <div key={label} className="flex min-h-24 flex-col justify-between gap-4 border-b border-r border-white/10 p-3.5 even:border-r-0 sm:min-h-28 sm:p-4 lg:border-b-0 lg:even:border-r lg:last:border-r-0">
-          <span className="font-mono text-[1.35rem] leading-none text-white sm:text-[1.7rem]">{value}</span>
-          <span className="max-w-40 text-sm leading-5 text-white/52">{label}</span>
-        </div>
-      ))}
-    </div>
   );
 }
 
