@@ -51,25 +51,25 @@ const defaultCopy = {
     nav: ["Работы", "Продукты", "Метод", "Условия", "Контакт"],
     label: "Моушн-дизайн / видеомонтаж / постпродакшн",
     eyebrow: "Монтажная система Nikolsky",
-    rec: "Запись 2026",
+    rec: "Reels · YouTube · Motion",
     safeFrame: "Кадр / 16:9",
     productLabel: "Услуга",
     stepLabel: "Шаг",
     blockLabel: "Блок",
     heroTitle: "Режиссирую внимание.",
     heroSub:
-      "Собираю Reels, YouTube, курсы и продуктовые ролики из сырого материала — так, чтобы видео было понятным, собранным и визуально сильным.",
+      "Собираю исходники в Reels, YouTube-выпуски, курсы и продуктовые ролики — с понятной структурой, чистым темпом и подачей под задачу.",
     casesCta: "Смотреть работы",
     projectCta: "Обсудить проект",
-    trust: "6–7 лет в монтаже · Reels / YouTube / моушн / курсы · работа по предоплате",
+    trust: "6–7 лет в монтаже · Reels / YouTube / Motion / Courses · работа по предоплате",
     showreelCta: "Смотреть шоурил",
     showreelLabel: "ШОУРИЛ_01",
     tracks: ["V1: смысл", "V2: темп", "A1: речь", "FX: акцент"],
     stats: [
-      ["6–7 лет", "в монтаже"],
-      ["00:03", "чтобы зацепить первые секунды"],
-      ["5", "направлений работ"],
-      ["01", "фокус: внимание"],
+      ["6–7 лет", "опыт монтажа"],
+      ["Short-form", "Reels / Shorts / TikTok"],
+      ["Long-form", "YouTube / курсы"],
+      ["Motion", "product / SaaS / запуск"],
     ],
     positionEyebrow: "Позиционирование",
     positionTitle: "Монтаж — это не про эффекты. Это про логику и подачу.",
@@ -173,25 +173,25 @@ const defaultCopy = {
     nav: ["Work", "Products", "Method", "Terms", "Contact"],
     label: "Motion design / video editor / attention director",
     eyebrow: "Nikolsky Control Room",
-    rec: "REC 2026",
+    rec: "Reels · YouTube · Motion",
     safeFrame: "Safe frame / 16:9",
     productLabel: "Product",
     stepLabel: "Step",
     blockLabel: "Block",
     heroTitle: "I direct attention.",
     heroSub:
-      "I edit Reels, Shorts, SaaS motion, courses, and YouTube so the idea lands, the pace holds, and the packaging does not feel cheap.",
+      "I turn raw footage into Reels, YouTube episodes, courses, and product videos with clear structure, clean pacing, and task-driven delivery.",
     casesCta: "View cases",
     projectCta: "Discuss project",
-    trust: "6–7 years editing · short-form / motion / YouTube / courses · prepaid work",
+    trust: "6–7 years editing · Reels / YouTube / Motion / Courses · prepaid work",
     showreelCta: "Watch showreel",
     showreelLabel: "SHOWREEL_01",
     tracks: ["V1: meaning", "V2: pace", "A1: voice", "FX: accent"],
     stats: [
-      ["6–7 yrs", "in editing"],
-      ["00:03", "to hook the first seconds"],
-      ["5", "work directions"],
-      ["01", "focus: attention"],
+      ["6–7 yrs", "editing experience"],
+      ["Short-form", "Reels / Shorts / TikTok"],
+      ["Long-form", "YouTube / courses"],
+      ["Motion", "product / SaaS / launch"],
     ],
     positionEyebrow: "Positioning",
     positionTitle: "I do not decorate video. I build an attention route.",
@@ -470,35 +470,36 @@ export function StudioLanding({ works }: StudioLandingProps) {
         style={{ scaleX }}
       />
 
-      <Header lang={lang} setLang={setLang} nav={t.nav} />
+      <Header lang={lang} setLang={setLang} nav={t.nav} projectCta={t.projectCta} />
 
       <section id="top" className="relative mx-auto w-full max-w-7xl px-4 pb-8 pt-28 sm:px-6 sm:pt-24 lg:px-8">
-        <div className="grid gap-6 lg:min-h-[calc(100vh-6rem)] lg:grid-cols-[minmax(0,1fr)_470px] lg:items-center lg:gap-8 xl:grid-cols-[minmax(0,1fr)_520px]">
+        <HeroAtmosphere />
+        <div className="relative z-10 grid gap-6 lg:min-h-[640px] lg:grid-cols-[minmax(0,1fr)_470px] lg:items-center lg:gap-8 xl:min-h-[680px] xl:grid-cols-[minmax(0,1fr)_520px]">
           <motion.div
             initial={false}
             animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="mb-5 flex max-w-2xl items-center justify-between border-y border-white/12 py-2.5 font-mono text-[10px] uppercase text-white/48 sm:mb-7 sm:py-3 sm:text-[11px]">
+            <div className="mb-5 flex max-w-2xl items-center justify-between gap-4 border-y border-white/10 py-2.5 font-mono text-[10px] uppercase text-white/52 sm:mb-7 sm:py-3 sm:text-[11px]">
               <span>{t.eyebrow}</span>
-              <span>{t.rec}</span>
+              <span className="text-right">{t.rec}</span>
             </div>
             <p className="mb-4 font-mono text-[11px] uppercase leading-5 text-accent sm:mb-5 sm:text-xs">{t.label}</p>
             <h1 className="max-w-4xl text-[2.36rem] font-semibold uppercase leading-[0.9] text-white min-[380px]:text-[2.65rem] sm:text-[5.5rem] sm:leading-[0.84] md:text-[6.4rem] lg:text-[5.05rem] xl:text-[5.45rem]">
               {t.heroTitle}
             </h1>
-            <p className="mt-5 max-w-2xl text-[15px] leading-7 text-white/68 sm:mt-7 sm:text-xl sm:leading-8">{t.heroSub}</p>
-            <div className="mt-6 grid grid-cols-2 gap-2 sm:mt-9 sm:flex sm:flex-row sm:gap-3">
-              <a href="#work" className="inline-flex h-11 items-center justify-center gap-2 bg-accent px-3 text-sm font-semibold text-black transition hover:bg-white sm:h-12 sm:px-6">
+            <p className="mt-5 max-w-2xl text-base leading-7 text-white/72 sm:mt-7 sm:text-xl sm:leading-8">{t.heroSub}</p>
+            <div className="mt-7 grid grid-cols-2 gap-2.5 sm:mt-9 sm:flex sm:flex-row sm:gap-3">
+              <a href="#work" className="inline-flex h-[50px] items-center justify-center gap-2 bg-accent px-4 text-sm font-semibold text-black shadow-[0_0_34px_rgba(0,183,255,0.16)] transition hover:bg-white sm:h-14 sm:px-7 sm:text-[15px]">
                 <CirclePlay size={17} />
                 {t.casesCta}
               </a>
-              <a href={profile.telegramUrl} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center justify-center gap-2 border border-white/16 bg-white/[0.035] px-3 text-sm font-semibold text-white transition hover:border-accent hover:text-accent sm:h-12 sm:px-6">
+              <a href={profile.telegramUrl} target="_blank" rel="noreferrer" className="inline-flex h-[50px] items-center justify-center gap-2 border border-white/16 bg-white/[0.035] px-4 text-sm font-semibold text-white transition hover:border-accent hover:text-accent sm:h-14 sm:px-7 sm:text-[15px]">
                 <Send size={17} />
                 {t.projectCta}
               </a>
             </div>
-            <p className="mt-5 max-w-2xl border-l border-accent/70 pl-3 font-mono text-[10px] uppercase leading-5 text-white/48 sm:mt-6 sm:pl-4 sm:text-xs sm:leading-6">
+            <p className="mt-5 max-w-2xl border-l border-accent/55 pl-3 text-sm leading-6 text-white/58 sm:mt-6 sm:pl-4">
               {t.trust}
             </p>
           </motion.div>
@@ -688,17 +689,30 @@ export function StudioLanding({ works }: StudioLandingProps) {
   );
 }
 
-function Header({ lang, setLang, nav }: { lang: Lang; setLang: (lang: Lang) => void; nav: readonly string[] }) {
+function Header({
+  lang,
+  setLang,
+  nav,
+  projectCta,
+}: {
+  lang: Lang;
+  setLang: (lang: Lang) => void;
+  nav: readonly string[];
+  projectCta: string;
+}) {
   return (
-    <header className="fixed inset-x-0 top-0 z-40 border-b border-white/[0.08] bg-[#030506]/88 backdrop-blur-xl">
-      <nav className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between px-4 sm:h-16 sm:px-6 lg:px-8">
+    <header className="fixed inset-x-0 top-0 z-40 border-b border-white/[0.1] bg-[#030506]/91 backdrop-blur-xl">
+      <nav className="mx-auto flex h-[60px] w-full max-w-7xl items-center justify-between px-4 sm:h-[68px] sm:px-6 lg:px-8">
         <a href="#top" className="flex items-center gap-3" aria-label="Nikolsky Studio">
-          <span className="grid size-8 place-items-center border border-white/18 bg-white/[0.04] font-mono text-xs text-white">NS</span>
-          <span className="text-sm font-medium text-white/86">{profile.studioName}</span>
+          <span className="grid size-9 place-items-center border border-white/20 bg-white/[0.055] font-mono text-xs font-semibold text-white">NS</span>
+          <span className="grid gap-0.5">
+            <span className="text-[15px] font-semibold leading-none tracking-normal text-white sm:text-base">{profile.studioName}</span>
+            <span className="font-mono text-[9px] uppercase leading-none text-white/42 sm:text-[10px]">Video Editing / Motion</span>
+          </span>
         </a>
         <div className="hidden items-center gap-1 lg:flex">
           {nav.map((label, index) => (
-            <a key={label} href={navHrefs[index]} className="px-3 py-2 font-mono text-xs uppercase text-white/48 transition hover:text-accent">
+            <a key={label} href={navHrefs[index]} className="px-3.5 py-2 font-mono text-xs uppercase text-white/58 transition hover:text-accent">
               {label}
             </a>
           ))}
@@ -724,17 +738,20 @@ function Header({ lang, setLang, nav }: { lang: Lang; setLang: (lang: Lang) => v
           </a>
           <a href={profile.telegramUrl} target="_blank" rel="noreferrer" className="hidden h-10 items-center justify-center gap-2 bg-white px-4 text-sm font-semibold text-black transition hover:bg-accent sm:inline-flex">
             <Send size={15} />
-            Telegram
+            {projectCta}
+          </a>
+          <a href={profile.telegramUrl} target="_blank" rel="noreferrer" aria-label="Telegram" className="hidden size-10 place-items-center border border-white/14 bg-white/[0.035] font-mono text-[11px] text-white/72 transition hover:border-accent hover:text-accent sm:grid">
+            TG
           </a>
         </div>
       </nav>
       <div className="lg:hidden">
-        <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 pb-2">
+        <div className="mx-auto grid max-w-7xl grid-cols-5 gap-1 px-4 pb-2">
           {nav.map((label, index) => (
             <a
               key={label}
               href={navHrefs[index]}
-              className="shrink-0 border border-white/10 bg-white/[0.03] px-2 py-2 font-mono text-[9px] uppercase text-white/52 min-[380px]:px-3 min-[380px]:text-[10px]"
+              className="border border-white/10 bg-white/[0.03] px-1 py-2 text-center font-mono text-[8.5px] uppercase text-white/58 min-[380px]:text-[9.5px]"
             >
               {label}
             </a>
@@ -743,6 +760,10 @@ function Header({ lang, setLang, nav }: { lang: Lang; setLang: (lang: Lang) => v
       </div>
     </header>
   );
+}
+
+function HeroAtmosphere() {
+  return <div aria-hidden className="hero-atmosphere pointer-events-none absolute inset-x-[-12vw] top-0 h-[calc(100%+3rem)]" />;
 }
 
 function StudioBackground() {
@@ -834,11 +855,11 @@ function ShowreelPlayer({
 
 function StatsPanel({ stats }: { stats: readonly (readonly [string, string])[] }) {
   return (
-    <div className="mt-6 grid grid-cols-2 border border-white/10 bg-black/18 sm:mt-8 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="relative z-10 mt-7 grid grid-cols-2 border border-white/10 bg-black/22 backdrop-blur-sm sm:mt-9 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map(([value, label]) => (
-        <div key={label} className="flex min-h-24 flex-col justify-between gap-3 border-b border-r border-white/10 p-3 even:border-r-0 sm:min-h-28 sm:p-4 lg:border-b-0 lg:even:border-r lg:last:border-r-0">
-          <span className="font-mono text-2xl text-white sm:text-4xl">{value}</span>
-          <span className="max-w-32 font-mono text-[10px] uppercase leading-4 text-white/42 sm:text-right sm:text-[11px] sm:leading-5">{label}</span>
+        <div key={label} className="flex min-h-24 flex-col justify-between gap-4 border-b border-r border-white/10 p-3.5 even:border-r-0 sm:min-h-28 sm:p-4 lg:border-b-0 lg:even:border-r lg:last:border-r-0">
+          <span className="font-mono text-[1.35rem] leading-none text-white sm:text-[1.7rem]">{value}</span>
+          <span className="max-w-40 text-sm leading-5 text-white/52">{label}</span>
         </div>
       ))}
     </div>
