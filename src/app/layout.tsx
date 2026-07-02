@@ -1,0 +1,50 @@
+import type { Metadata, Viewport } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "Nikolsky Studio — видеомонтаж, Reels, Motion Design, YouTube",
+  description:
+    "Видеомонтажёр Михаил Никольский. Reels, Shorts, SaaS-motion, курсы, YouTube и продуктовые ролики. Режиссирую внимание: собираю сырой материал в понятный и дорогой контент.",
+  keywords: [
+    "Mikhail Nikolsky",
+    "Nikolsky Studio",
+    "motion designer",
+    "video editor",
+    "reels editing",
+    "SaaS motion design",
+  ],
+  openGraph: {
+    title: "Nikolsky Studio — режиссирую внимание",
+    description:
+      "Reels, Shorts, SaaS-motion, курсы, YouTube и продуктовые ролики без дешёвой упаковки.",
+    type: "website",
+  },
+};
+
+export const viewport: Viewport = {
+  colorScheme: "dark",
+  themeColor: "#030506",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="ru" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body>{children}</body>
+    </html>
+  );
+}
