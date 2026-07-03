@@ -12,13 +12,31 @@
     "taskRu": "Показать диапазон работ без ощущения случайной нарезки.",
     "format": "Showreel / 16:9",
     "formatRu": "Шоурил / 16:9",
-    "workDone": ["structure", "pace", "motion accents", "sound rhythm"],
-    "workDoneRu": ["структура", "темп", "анимационные акценты", "ритм звука"],
+    "workDone": [
+      "structure",
+      "pace",
+      "motion accents",
+      "sound rhythm"
+    ],
+    "workDoneRu": [
+      "структура",
+      "темп",
+      "анимационные акценты",
+      "ритм звука"
+    ],
     "whyItWorks": "The reel reads as one controlled sequence instead of separate fragments.",
     "whyItWorksRu": "Шоурил читается как собранная последовательность, а не набор фрагментов.",
-    "deliverables": ["YouTube embed", "preview", "timeline chapters"],
-    "deliverablesRu": ["встраивание YouTube", "превью", "главы таймлайна"],
-    "featured": true
+    "deliverables": [
+      "YouTube embed",
+      "preview",
+      "timeline chapters"
+    ],
+    "deliverablesRu": [
+      "встраивание YouTube",
+      "превью",
+      "главы таймлайна"
+    ],
+    "featured": false
   },
   {
     "id": "expert-reels-system",
@@ -33,12 +51,34 @@
     "taskRu": "Из сырого экспертного фрагмента собрать короткий ролик с понятной мыслью и сильным началом.",
     "format": "Reels / Shorts / 9:16",
     "formatRu": "Reels / Shorts / 9:16",
-    "workDone": ["hook rebuilt", "weak pauses removed", "subtitles", "meaning accents", "B-roll"],
-    "workDoneRu": ["пересобран хук", "убраны слабые паузы", "субтитры", "смысловые акценты", "дополнительные кадры"],
+    "workDone": [
+      "hook rebuilt",
+      "weak pauses removed",
+      "subtitles",
+      "meaning accents",
+      "B-roll"
+    ],
+    "workDoneRu": [
+      "пересобран хук",
+      "убраны слабые паузы",
+      "субтитры",
+      "смысловые акценты",
+      "дополнительные кадры"
+    ],
     "whyItWorks": "The viewer understands the idea earlier and follows the thought without friction.",
     "whyItWorksRu": "Зритель быстрее понимает тему и легче следует за мыслью.",
-    "deliverables": ["vertical master", "caption version", "social export"],
-    "deliverablesRu": ["вертикальный мастер", "версия с субтитрами", "экспорт под соцсети"]
+    "deliverables": [
+      "vertical master",
+      "caption version",
+      "social export"
+    ],
+    "deliverablesRu": [
+      "вертикальный мастер",
+      "версия с субтитрами",
+      "экспорт под соцсети",
+      "Новый пункт"
+    ],
+    "featured": true
   },
   {
     "id": "crypto-explainer",
@@ -53,12 +93,31 @@
     "taskRu": "Объяснить сложный продукт без визуального шума и перегруза эффектами.",
     "format": "Product explainer / 16:9",
     "formatRu": "Продуктовый ролик / 16:9",
-    "workDone": ["script rhythm", "UI accents", "motion hierarchy", "transitions"],
-    "workDoneRu": ["ритм сценария", "UI-акценты", "визуальная иерархия", "переходы"],
+    "workDone": [
+      "script rhythm",
+      "UI accents",
+      "motion hierarchy",
+      "transitions"
+    ],
+    "workDoneRu": [
+      "ритм сценария",
+      "UI-акценты",
+      "визуальная иерархия",
+      "переходы"
+    ],
     "whyItWorks": "The motion supports comprehension instead of competing with the message.",
     "whyItWorksRu": "Анимация помогает понять продукт, а не спорит с сообщением.",
-    "deliverables": ["16:9 master", "social cut", "thumbnail frame"],
-    "deliverablesRu": ["мастер 16:9", "короткая версия", "кадр для превью"]
+    "deliverables": [
+      "16:9 master",
+      "social cut",
+      "thumbnail frame"
+    ],
+    "deliverablesRu": [
+      "мастер 16:9",
+      "короткая версия",
+      "кадр для превью"
+    ],
+    "featured": false
   },
   {
     "id": "saas-feature-launch",
@@ -73,12 +132,33 @@
     "taskRu": "Показать новую функцию быстро, понятно и визуально аккуратно.",
     "format": "SaaS launch / product motion",
     "formatRu": "Запуск SaaS / продуктовый ролик",
-    "workDone": ["structure", "screen rhythm", "feature accents", "titles", "export variants"],
-    "workDoneRu": ["структура", "ритм экранов", "акценты на функции", "титры", "версии экспорта"],
+    "workDone": [
+      "structure",
+      "screen rhythm",
+      "feature accents",
+      "titles",
+      "export variants"
+    ],
+    "workDoneRu": [
+      "структура",
+      "ритм экранов",
+      "акценты на функции",
+      "титры",
+      "версии экспорта"
+    ],
     "whyItWorks": "The viewer sees the product value before the interface becomes heavy.",
     "whyItWorksRu": "Зритель видит ценность функции до того, как интерфейс становится тяжёлым.",
-    "deliverables": ["website version", "social version", "presentation cut"],
-    "deliverablesRu": ["версия для сайта", "версия для соцсетей", "версия для презентации"]
+    "deliverables": [
+      "website version",
+      "social version",
+      "presentation cut"
+    ],
+    "deliverablesRu": [
+      "версия для сайта",
+      "версия для соцсетей",
+      "версия для презентации"
+    ],
+    "featured": false
   },
   {
     "id": "course-module-edit",
@@ -93,12 +173,33 @@
     "taskRu": "Собрать учебный модуль так, чтобы его было легко смотреть и понимать.",
     "format": "Course lesson / 16:9",
     "formatRu": "Урок курса / 16:9",
-    "workDone": ["cleanup", "semantic blocks", "pauses", "slides", "titles"],
-    "workDoneRu": ["чистка материала", "смысловые блоки", "паузы", "слайды", "титры"],
+    "workDone": [
+      "cleanup",
+      "semantic blocks",
+      "pauses",
+      "slides",
+      "titles"
+    ],
+    "workDoneRu": [
+      "чистка материала",
+      "смысловые блоки",
+      "паузы",
+      "слайды",
+      "титры"
+    ],
     "whyItWorks": "The lesson keeps structure and does not collapse into a talking-head recording.",
     "whyItWorksRu": "Урок держит структуру и не превращается в запись говорящей головы.",
-    "deliverables": ["lesson master", "chapter markers", "short fragments"],
-    "deliverablesRu": ["финальный урок", "главы", "короткие фрагменты"]
+    "deliverables": [
+      "lesson master",
+      "chapter markers",
+      "short fragments"
+    ],
+    "deliverablesRu": [
+      "финальный урок",
+      "главы",
+      "короткие фрагменты"
+    ],
+    "featured": false
   },
   {
     "id": "youtube-longform-cut",
@@ -113,12 +214,33 @@
     "taskRu": "Собрать длинное видео так, чтобы оно ощущалось структурным, а не растянутым.",
     "format": "YouTube / 16:9",
     "formatRu": "YouTube / 16:9",
-    "workDone": ["rough cut", "chapter structure", "pace", "B-roll", "audio cleanup"],
-    "workDoneRu": ["черновая сборка", "структура глав", "темп", "дополнительные кадры", "чистка звука"],
+    "workDone": [
+      "rough cut",
+      "chapter structure",
+      "pace",
+      "B-roll",
+      "audio cleanup"
+    ],
+    "workDoneRu": [
+      "черновая сборка",
+      "структура глав",
+      "темп",
+      "дополнительные кадры",
+      "чистка звука"
+    ],
     "whyItWorks": "The viewer always understands where the episode is going next.",
     "whyItWorksRu": "Зритель понимает, куда движется выпуск, и не теряется по темпу.",
-    "deliverables": ["longform master", "shorts cutdowns", "chapter notes"],
-    "deliverablesRu": ["финальный выпуск", "короткие версии", "заметки по главам"]
+    "deliverables": [
+      "longform master",
+      "shorts cutdowns",
+      "chapter notes"
+    ],
+    "deliverablesRu": [
+      "финальный выпуск",
+      "короткие версии",
+      "заметки по главам"
+    ],
+    "featured": false
   },
   {
     "id": "founder-reel-campaign",
@@ -133,11 +255,32 @@
     "taskRu": "Упаковать экспертизу основателя в повторяемый формат коротких роликов.",
     "format": "Reels campaign / 9:16",
     "formatRu": "Кампания Reels / 9:16",
-    "workDone": ["content selection", "hooks", "captions", "motion templates", "exports"],
-    "workDoneRu": ["отбор фрагментов", "хуки", "субтитры", "анимационные шаблоны", "экспорты"],
+    "workDone": [
+      "content selection",
+      "hooks",
+      "captions",
+      "motion templates",
+      "exports"
+    ],
+    "workDoneRu": [
+      "отбор фрагментов",
+      "хуки",
+      "субтитры",
+      "анимационные шаблоны",
+      "экспорты"
+    ],
     "whyItWorks": "The videos feel like one content system, not isolated posts.",
     "whyItWorksRu": "Ролики выглядят как единая контент-система, а не отдельные посты.",
-    "deliverables": ["reels pack", "caption style", "posting versions"],
-    "deliverablesRu": ["пак Reels", "стиль субтитров", "версии для публикации"]
+    "deliverables": [
+      "reels pack",
+      "caption style",
+      "posting versions"
+    ],
+    "deliverablesRu": [
+      "пак Reels",
+      "стиль субтитров",
+      "версии для публикации"
+    ],
+    "featured": false
   }
 ]
