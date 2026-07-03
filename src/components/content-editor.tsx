@@ -36,9 +36,19 @@ type EditorContent = Partial<LandingCopy> & Record<string, unknown> & {
       accent?: string;
       heroTitleSize?: number;
       bodyScale?: number;
+      heroSubtitleSize?: number;
+      heroTextX?: number;
+      heroMediaX?: number;
+      heroMediaScale?: number;
+      heroGap?: number;
+      ctaHeight?: number;
+      ctaPadding?: number;
+      ctaFontSize?: number;
     };
   };
 };
+
+type EditorPanel = "hero" | "video" | "page" | "versions";
 
 type VersionItem = {
   id: string;
@@ -152,6 +162,7 @@ export function ContentEditor() {
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(true);
+  const [activePanel, setActivePanel] = useState<EditorPanel>("hero");
   const mounted = useRef(false);
 
   const selectionKey = useMemo(() => getEditorSelectionKey(selection), [selection]);
@@ -218,6 +229,12 @@ export function ContentEditor() {
 
   const markDirty = () => setDirty(true);
 
+  const selectEditorItem = (nextSelection: EditorSelection) => {
+    setSelection(nextSelection);
+    setActivePanel(nextSelection.type === "work" ? "video" : "hero");
+    setInspectorOpen(true);
+  };
+
   const updateText = (value: string) => {
     if (selection.type !== "text") return;
     setContent((current) => setAt(current, selection.path, value));
@@ -242,12 +259,14 @@ export function ContentEditor() {
     const next = makeWork();
     setWorks((current) => [...current, next]);
     setSelection({ type: "work", label: "Новая работа", index: works.length });
+    setActivePanel("video");
     markDirty();
   };
 
   const removeWork = (index: number) => {
     setWorks((current) => current.filter((_, i) => i !== index));
     setSelection(textFields[1]);
+    setActivePanel("hero");
     markDirty();
   };
 
@@ -260,6 +279,7 @@ export function ContentEditor() {
       return next;
     });
     setSelection({ type: "work", label: "Работа", index: target });
+    setActivePanel("video");
     markDirty();
   };
 
@@ -354,10 +374,7 @@ export function ContentEditor() {
             editorContent={content}
             editorWorks={works}
             editorSelectionKey={selectionKey}
-            onEditorSelect={(nextSelection) => {
-              setSelection(nextSelection);
-              setInspectorOpen(true);
-            }}
+            onEditorSelect={selectEditorItem}
           />
         </section>
 
@@ -375,39 +392,214 @@ export function ContentEditor() {
               <span className="font-mono text-xs uppercase text-accent">Панель редактирования</span>
               <span className="text-sm text-white/72">{inspectorOpen ? "Свернуть" : "Открыть"}</span>
             </button>
-            <Inspector
-              selection={selection}
-              textValue={selectedText}
-              works={works}
-              onTextChange={updateText}
-              onWorkChange={updateWork}
-              onWorkListChange={updateWorkList}
-              onFeatured={makeFeatured}
-              onRemove={removeWork}
-              onMove={moveWork}
-            />
-            <StructurePanel
-              selection={selection}
-              onSelect={(nextSelection) => {
-                setSelection(nextSelection);
-                setInspectorOpen(true);
-              }}
-              works={works}
-              addWork={addWork}
-              moveWork={moveWork}
-            />
-            <StylePanel content={content} updateContent={updateContent} />
-            <VersionsPanel
-              versions={versions}
-              versionName={versionName}
-              setVersionName={setVersionName}
-              createVersion={createVersion}
-              restoreVersion={restoreVersion}
-            />
+            <PanelTabs activePanel={activePanel} setActivePanel={setActivePanel} />
+            {activePanel === "hero" ? (
+              <HeroPanel
+                content={content}
+                selection={selection}
+                selectedText={selectedText}
+                onSelect={selectEditorItem}
+                onTextChange={updateText}
+                updateContent={updateContent}
+              />
+            ) : null}
+            {activePanel === "video" ? (
+              <Inspector
+                selection={selection.type === "work" ? selection : { type: "work", label: works[0]?.titleRu ?? "Видео", index: 0 }}
+                textValue={selectedText}
+                works={works}
+                onTextChange={updateText}
+                onWorkChange={updateWork}
+                onWorkListChange={updateWorkList}
+                onFeatured={makeFeatured}
+                onRemove={removeWork}
+                onMove={moveWork}
+              />
+            ) : null}
+            {activePanel === "page" ? (
+              <StructurePanel
+                selection={selection}
+                onSelect={selectEditorItem}
+                works={works}
+                addWork={addWork}
+                moveWork={moveWork}
+              />
+            ) : null}
+            {activePanel === "versions" ? (
+              <VersionsPanel
+                versions={versions}
+                versionName={versionName}
+                setVersionName={setVersionName}
+                createVersion={createVersion}
+                restoreVersion={restoreVersion}
+              />
+            ) : null}
           </div>
         </aside>
       </div>
     </main>
+  );
+}
+
+function PanelTabs({
+  activePanel,
+  setActivePanel,
+}: {
+  activePanel: EditorPanel;
+  setActivePanel: (panel: EditorPanel) => void;
+}) {
+  const tabs: Array<{ id: EditorPanel; label: string }> = [
+    { id: "hero", label: "Главный" },
+    { id: "video", label: "Видео" },
+    { id: "page", label: "Страница" },
+    { id: "versions", label: "Версии" },
+  ];
+
+  return (
+    <div className="grid grid-cols-4 gap-1 border border-white/10 bg-black/25 p-1">
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          type="button"
+          onClick={() => setActivePanel(tab.id)}
+          className={`h-9 text-xs font-semibold uppercase transition ${
+            activePanel === tab.id ? "bg-accent text-black" : "text-white/48 hover:text-white"
+          }`}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function HeroPanel({
+  content,
+  selection,
+  selectedText,
+  onSelect,
+  onTextChange,
+  updateContent,
+}: {
+  content: EditorContent;
+  selection: EditorSelection;
+  selectedText: string;
+  onSelect: (selection: EditorSelection) => void;
+  onTextChange: (value: string) => void;
+  updateContent: (path: EditorPath, value: unknown) => void;
+}) {
+  const styles = content._editor?.styles ?? {};
+  const heroFields = textFields.slice(0, 6);
+  const selectedHeroText =
+    selection.type === "text" &&
+    heroFields.some((field) => getEditorSelectionKey(field) === getEditorSelectionKey(selection));
+
+  return (
+    <>
+      <Panel title="Главный экран" subtitle="Только hero: текст, кнопки, композиция">
+        <div className="grid grid-cols-2 gap-2">
+          {heroFields.map((field) => (
+            <button
+              key={getEditorSelectionKey(field)}
+              type="button"
+              onClick={() => onSelect(field)}
+              className={`border px-3 py-2 text-left text-sm transition ${
+                getEditorSelectionKey(selection) === getEditorSelectionKey(field)
+                  ? "border-accent bg-accent/10 text-white"
+                  : "border-white/10 bg-black/20 text-white/62 hover:border-accent/55"
+              }`}
+            >
+              {field.label}
+            </button>
+          ))}
+        </div>
+        {selectedHeroText ? (
+          <Field area={selection.area ?? selectedText.length > 80} label={selection.label} value={selectedText} onChange={onTextChange} />
+        ) : (
+          <p className="border border-white/10 bg-black/20 p-3 text-sm leading-6 text-white/48">
+            Кликни текст на первом экране или выбери поле выше. Если кликнуть по шоурилу, справа откроется режим видео.
+          </p>
+        )}
+      </Panel>
+
+      <Panel title="Композиция hero" subtitle="Двигай блоки без кода">
+        <RangeField
+          label="Текст влево / вправо"
+          value={Number(styles.heroTextX ?? 0)}
+          min={-120}
+          max={120}
+          onChange={(value) => updateContent(["_editor", "styles", "heroTextX"], value)}
+        />
+        <RangeField
+          label="Шоурил влево / вправо"
+          value={Number(styles.heroMediaX ?? 0)}
+          min={-140}
+          max={140}
+          onChange={(value) => updateContent(["_editor", "styles", "heroMediaX"], value)}
+        />
+        <RangeField
+          label="Размер шоурила"
+          value={Number(styles.heroMediaScale ?? 100)}
+          min={86}
+          max={116}
+          onChange={(value) => updateContent(["_editor", "styles", "heroMediaScale"], value)}
+        />
+        <RangeField
+          label="Расстояние между текстом и шоурилом"
+          value={Number(styles.heroGap ?? 32)}
+          min={12}
+          max={96}
+          onChange={(value) => updateContent(["_editor", "styles", "heroGap"], value)}
+        />
+      </Panel>
+
+      <Panel title="Типографика и кнопки" subtitle="Размеры первого экрана">
+        <RangeField
+          label="Размер главного заголовка"
+          value={Number(styles.heroTitleSize ?? 64)}
+          min={42}
+          max={86}
+          onChange={(value) => updateContent(["_editor", "styles", "heroTitleSize"], value)}
+        />
+        <RangeField
+          label="Размер подзаголовка"
+          value={Number(styles.heroSubtitleSize ?? 20)}
+          min={14}
+          max={28}
+          onChange={(value) => updateContent(["_editor", "styles", "heroSubtitleSize"], value)}
+        />
+        <RangeField
+          label="Высота кнопок"
+          value={Number(styles.ctaHeight ?? 56)}
+          min={44}
+          max={72}
+          onChange={(value) => updateContent(["_editor", "styles", "ctaHeight"], value)}
+        />
+        <RangeField
+          label="Ширина кнопок"
+          value={Number(styles.ctaPadding ?? 28)}
+          min={16}
+          max={48}
+          onChange={(value) => updateContent(["_editor", "styles", "ctaPadding"], value)}
+        />
+        <RangeField
+          label="Размер текста кнопок"
+          value={Number(styles.ctaFontSize ?? 15)}
+          min={12}
+          max={19}
+          onChange={(value) => updateContent(["_editor", "styles", "ctaFontSize"], value)}
+        />
+        <label className="grid gap-2">
+          <span className="text-xs uppercase text-white/48">Акцентный цвет</span>
+          <input
+            type="color"
+            value={typeof styles.accent === "string" ? styles.accent : "#00b7ff"}
+            onChange={(event) => updateContent(["_editor", "styles", "accent"], event.target.value)}
+            className="h-10 w-full border border-white/10 bg-black"
+          />
+        </label>
+      </Panel>
+    </>
   );
 }
 

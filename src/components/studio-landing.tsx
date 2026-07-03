@@ -449,9 +449,27 @@ export function StudioLanding({
   const heroTitleStyle = editorStyles.heroTitleSize
     ? ({ fontSize: `clamp(2.25rem, ${Number(editorStyles.heroTitleSize) / 12}vw, ${Number(editorStyles.heroTitleSize) / 10}rem)` } as CSSProperties)
     : undefined;
+  const heroSubtitleStyle = editorStyles.heroSubtitleSize
+    ? ({ fontSize: `${Number(editorStyles.heroSubtitleSize)}px` } as CSSProperties)
+    : undefined;
   const bodyScaleStyle = editorStyles.bodyScale
     ? ({ fontSize: `${Number(editorStyles.bodyScale)}%` } as CSSProperties)
     : undefined;
+  const heroGridStyle = {
+    columnGap: editorStyles.heroGap ? `${Number(editorStyles.heroGap)}px` : undefined,
+  } as CSSProperties;
+  const heroTextStyle = {
+    transform: editorStyles.heroTextX ? `translateX(${Number(editorStyles.heroTextX)}px)` : undefined,
+  } as CSSProperties;
+  const heroMediaStyle = {
+    transform: `translateX(${Number(editorStyles.heroMediaX ?? 0)}px) scale(${Number(editorStyles.heroMediaScale ?? 100) / 100})`,
+    transformOrigin: "center",
+  } as CSSProperties;
+  const ctaStyle = {
+    height: editorStyles.ctaHeight ? `${Number(editorStyles.ctaHeight)}px` : undefined,
+    paddingInline: editorStyles.ctaPadding ? `${Number(editorStyles.ctaPadding)}px` : undefined,
+    fontSize: editorStyles.ctaFontSize ? `${Number(editorStyles.ctaFontSize)}px` : undefined,
+  } as CSSProperties;
 
   const showreel = liveWorks.find((work) => work.featured) ?? liveWorks[0];
   const portfolioWorks = useMemo(() => liveWorks.filter((work) => !work.featured), [liveWorks]);
@@ -534,11 +552,15 @@ export function StudioLanding({
       <Header lang={lang} setLang={setLang} nav={t.nav} projectCta={t.projectCta} editorMode={editorMode} />
 
       <section id="top" className="relative mx-auto w-full max-w-7xl px-4 pb-8 pt-28 sm:px-6 sm:pt-24 lg:px-8" style={bodyScaleStyle}>
-        <div className="relative z-10 grid gap-6 lg:min-h-[640px] lg:grid-cols-[minmax(0,1fr)_470px] lg:items-center lg:gap-8 xl:min-h-[680px] xl:grid-cols-[minmax(0,1fr)_520px]">
+        <div
+          className="relative z-10 grid gap-6 lg:min-h-[640px] lg:grid-cols-[minmax(0,1fr)_470px] lg:items-center lg:gap-8 xl:min-h-[680px] xl:grid-cols-[minmax(0,1fr)_520px]"
+          style={heroGridStyle}
+        >
           <motion.div
             initial={false}
             animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            style={heroTextStyle}
           >
             <p
               onClickCapture={selectInEditor({ type: "text", label: "Направление под логотипом", path: ["ru", "label"] })}
@@ -556,6 +578,7 @@ export function StudioLanding({
             <p
               onClickCapture={selectInEditor({ type: "text", label: "Подзаголовок первого экрана", path: ["ru", "heroSub"], area: true })}
               className={`mt-5 max-w-2xl text-base leading-7 text-white/72 sm:mt-7 sm:text-xl sm:leading-8${editorClass({ type: "text", label: "Подзаголовок первого экрана", path: ["ru", "heroSub"], area: true })}`}
+              style={heroSubtitleStyle}
             >
               {t.heroSub}
             </p>
@@ -564,6 +587,7 @@ export function StudioLanding({
                 href="#work"
                 onClickCapture={selectInEditor({ type: "text", label: "Кнопка смотреть работы", path: ["ru", "casesCta"] })}
                 className={`inline-flex h-[50px] items-center justify-center gap-2 bg-accent px-4 text-sm font-semibold text-black shadow-[0_0_34px_rgba(0,183,255,0.16)] transition hover:bg-white sm:h-14 sm:px-7 sm:text-[15px]${editorClass({ type: "text", label: "Кнопка смотреть работы", path: ["ru", "casesCta"] })}`}
+                style={ctaStyle}
               >
                 <CirclePlay size={17} />
                 {t.casesCta}
@@ -574,6 +598,7 @@ export function StudioLanding({
                 rel="noreferrer"
                 onClickCapture={selectInEditor({ type: "text", label: "Кнопка обсудить проект", path: ["ru", "projectCta"] })}
                 className={`inline-flex h-[50px] items-center justify-center gap-2 border border-white/16 bg-white/[0.035] px-4 text-sm font-semibold text-white transition hover:border-accent hover:text-accent sm:h-14 sm:px-7 sm:text-[15px]${editorClass({ type: "text", label: "Кнопка обсудить проект", path: ["ru", "projectCta"] })}`}
+                style={ctaStyle}
               >
                 <Send size={17} />
                 {t.projectCta}
@@ -590,6 +615,7 @@ export function StudioLanding({
           <div
             onClickCapture={selectInEditor({ type: "work", label: "Главный шоурил", index: Math.max(0, liveWorks.findIndex((work) => work === showreel)) })}
             className={editorClass({ type: "work", label: "Главный шоурил", index: Math.max(0, liveWorks.findIndex((work) => work === showreel)) })}
+            style={heroMediaStyle}
           >
             <ShowreelPlayer
               work={viewWork(showreel, lang)}
