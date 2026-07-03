@@ -72,10 +72,7 @@ a {
 }
 
 .scene-section {
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 120px),
-    linear-gradient(90deg, transparent, rgba(0, 183, 255, 0.035), transparent);
+  background: transparent;
 }
 
 @keyframes control-room-drift {
@@ -143,9 +140,7 @@ a {
   }
 
   .scene-section {
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.014), transparent 72px),
-      linear-gradient(90deg, transparent, rgba(0, 183, 255, 0.024), transparent);
+    background: transparent;
   }
 }
 
