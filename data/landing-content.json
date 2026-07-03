@@ -180,17 +180,18 @@
   "_editor": {
     "styles": {
       "accent": "#00b3ff",
-      "heroTitleSize": 62,
+      "heroTitleSize": 58,
       "bodyScale": 104,
-      "heroTextX": -43,
+      "heroTextX": -6,
       "heroMediaScale": 103,
       "heroGap": 12,
       "ctaHeight": 61,
-      "heroMediaX": 36,
+      "heroMediaX": 10,
       "casesX": 2,
       "heroSubtitleSize": 19,
       "ctaPadding": 36,
-      "ctaFontSize": 15
+      "ctaFontSize": 15,
+      "positionX": 8
     }
   }
 }
