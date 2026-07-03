@@ -158,14 +158,15 @@ const defaultCopy = {
       ["Long-form", "YouTube / курсы"],
       ["Motion", "product / SaaS / запуск"],
     ],
-    positionEyebrow: "Позиционирование",
-    positionTitle: "Монтаж — это не про эффекты. Это про логику и подачу.",
+    positionEyebrow: "Диагностика",
+    positionTitle: "Когда исходники есть, но ролик не работает",
     positionText:
-      "Часто есть материал, но нет собранного видео: смысл теряется, темп провисает, первые секунды не работают. Я помогаю выстроить структуру, усилить подачу и сделать ролик аккуратнее.",
+      "Часто проблема не в съёмке, а в сборке: видео долго разгоняется, мысль теряется, темп проседает, а визуальная подача выглядит разрозненно. Я помогаю собрать материал в понятный ролик под задачу и площадку.",
     positionCards: [
-      ["Хук", "Первые секунды должны объяснить, почему стоит смотреть дальше."],
-      ["Темп", "Резы, паузы, субтитры и акценты собираются под удержание, а не под хаос."],
-      ["Упаковка", "Видео должно выглядеть дороже продукта, а не дешевле него."],
+      ["Слабое начало", "Пересобираю первые секунды, чтобы зрителю было понятно, зачем смотреть дальше."],
+      ["Видео тянется", "Убираю лишние паузы, повторы и провалы по темпу, чтобы ролик ощущался собранным."],
+      ["Смысл теряется", "Выстраиваю структуру: что сказать первым, что оставить, что убрать и где усилить акцент."],
+      ["Нет единого стиля", "Собираю подачу через субтитры, B-roll, звук, motion-элементы и визуальные акценты."],
     ],
     productsEyebrow: "Продукты",
     productsTitle: "С чем я могу помочь",
@@ -280,14 +281,15 @@ const defaultCopy = {
       ["Long-form", "YouTube / courses"],
       ["Motion", "product / SaaS / launch"],
     ],
-    positionEyebrow: "Positioning",
-    positionTitle: "I do not decorate video. I build an attention route.",
+    positionEyebrow: "Diagnostics",
+    positionTitle: "When the footage is there, but the video does not work",
     positionText:
-      "Good editing is not a set of effects. It is logic: where the viewer hooks, where they may drop, where to speed up, pause, clarify, and lead to the offer.",
+      "The problem is often not the footage but the assembly: the video takes too long to start, the message drifts, the pacing collapses, and the visuals feel disconnected. I help assemble the material into a clear video tailored to the task and platform.",
     positionCards: [
-      ["Hook", "The first seconds explain why the viewer should keep watching."],
-      ["Pace", "Cuts, pauses, subtitles, and accents are built for retention, not chaos."],
-      ["Packaging", "The video should look more expensive than the product, not cheaper."],
+      ["Weak Opening", "I rebuild the first seconds so the viewer understands why they should keep watching."],
+      ["Video Drags On", "I remove unnecessary pauses, repetition, and pacing gaps so the video feels tight and intentional."],
+      ["Meaning Gets Lost", "I build structure: what to say first, what to keep, what to cut, and where to strengthen the point."],
+      ["No Unified Style", "I package the delivery through captions, B-roll, sound, motion elements, and visual accents."],
     ],
     productsEyebrow: "Products",
     productsTitle: "Do not choose editing. Choose the task.",
@@ -737,7 +739,7 @@ export function StudioLanding({
           >
             <SectionHeader eyebrow={t.positionEyebrow} title={t.positionTitle} text={t.positionText} />
           </div>
-          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+          <div className="grid gap-3 sm:grid-cols-2">
             {t.positionCards.map(([title, text], index) => (
               <div
                 key={title}
