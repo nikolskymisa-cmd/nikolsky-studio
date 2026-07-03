@@ -918,6 +918,7 @@ export function StudioLanding({
               <button
                 type="button"
                 onClick={() => setFaqVisible(true)}
+                aria-label={runtimeT.faqOpen ?? "Открыть FAQ"}
                 className="inline-flex h-12 w-full items-center justify-center gap-3 border border-white/12 bg-white px-5 text-sm font-semibold text-black transition hover:border-accent hover:bg-accent active:scale-[0.98] sm:w-auto"
               >
                 {runtimeT.faqOpen ?? "Открыть FAQ"}
