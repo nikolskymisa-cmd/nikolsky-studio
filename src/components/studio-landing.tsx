@@ -169,6 +169,25 @@ const categoryDescriptions: Partial<Record<PortfolioCategory, Record<Lang, strin
   },
 };
 
+const breakdownTrackCopy: Record<string, Record<Lang, Pick<ShowreelTrack, "label" | "title" | "description">>> = {
+  hook: {
+    ru: { label: "ХУК", title: "Первые секунды", description: "Цепляем внимание и задаём тон ролика." },
+    en: { label: "HOOK", title: "First seconds", description: "Hook attention and set the tone of the video." },
+  },
+  pace: {
+    ru: { label: "РИТМ", title: "Ритм монтажа", description: "Держим динамику через резы, паузы, звук и смену кадров." },
+    en: { label: "PACE", title: "Editing rhythm", description: "Keep momentum through cuts, pauses, sound and shot changes." },
+  },
+  message: {
+    ru: { label: "СМЫСЛ", title: "Смысл и подача", description: "Помогаем зрителю быстро понять идею и не потеряться." },
+    en: { label: "MESSAGE", title: "Message and delivery", description: "Help the viewer understand the idea quickly and stay oriented." },
+  },
+  polish: {
+    ru: { label: "ФИНАЛ", title: "Финальная упаковка", description: "Цвет, звук, титры и детали, которые делают видео собранным." },
+    en: { label: "POLISH", title: "Final polish", description: "Color, sound, titles and details that make the video feel finished." },
+  },
+};
+
 const defaultCopy = {
   ru: {
     nav: ["Работы", "Продукты", "Метод", "Условия", "Контакт"],
@@ -633,6 +652,14 @@ export function StudioLanding({
   const editorLinks = ((liveCopy as unknown as { _editor?: { links?: Partial<typeof profile> } })._editor?.links ?? {});
   const customBreakdownTracks = (liveCopy as unknown as { _editor?: { showreelTracks?: ShowreelTrack[] } })._editor?.showreelTracks;
   const breakdownTracks = Array.isArray(customBreakdownTracks) && customBreakdownTracks.length ? customBreakdownTracks : showreelTracks;
+  const localizedBreakdownTracks = useMemo(
+    () =>
+      breakdownTracks.map((track) => ({
+        ...track,
+        ...(breakdownTrackCopy[track.id]?.[lang] ?? {}),
+      })),
+    [breakdownTracks, lang],
+  );
   const links = { ...profile, ...editorLinks };
   const mainStyle = {
     "--accent": typeof editorStyles.accent === "string" ? editorStyles.accent : undefined,
@@ -851,7 +878,9 @@ export function StudioLanding({
             <ShowreelPlayer
               work={viewWork(showreel, lang)}
               button={t.showreelCta}
-              tracks={breakdownTracks}
+              tracks={localizedBreakdownTracks}
+              breakdownSummary={lang === "ru" ? "Хук, ритм, смысл, упаковка." : "Hook, pace, message, polish."}
+              seekLabel={lang === "ru" ? "Перейти к" : "Jump to"}
               editorMode={editorMode}
               editorSelectionKey={editorSelectionKey}
               onEditorSelect={onEditorSelect}
@@ -1471,6 +1500,8 @@ function ShowreelPlayer({
   work,
   button,
   tracks,
+  breakdownSummary,
+  seekLabel,
   editorMode = false,
   editorSelectionKey,
   onEditorSelect,
@@ -1478,6 +1509,8 @@ function ShowreelPlayer({
   work: Work;
   button: string;
   tracks: ShowreelTrack[];
+  breakdownSummary: string;
+  seekLabel: string;
   editorMode?: boolean;
   editorSelectionKey?: string;
   onEditorSelect?: (selection: EditorSelection) => void;
@@ -1634,7 +1667,7 @@ function ShowreelPlayer({
             <div className="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-5">
               <p className="font-mono text-[10px] uppercase text-accent sm:text-[11px]">{work.category}</p>
               <h3 className="mt-2 text-2xl font-semibold uppercase leading-none text-white sm:text-4xl">{work.title}</h3>
-              <p className="mt-2 max-w-sm text-xs leading-5 text-white/56 sm:text-sm">Подборка работ и направлений</p>
+              <p className="mt-2 max-w-sm text-xs leading-5 text-white/56 sm:text-sm">{work.description}</p>
             </div>
           </button>
         ) : null}
@@ -1642,10 +1675,10 @@ function ShowreelPlayer({
 
       <div className="border-t border-white/10 p-3 sm:p-3">
         <div className="mb-2 flex items-center justify-between gap-3">
-          <div>
-            <p className="font-mono text-[10px] uppercase text-accent sm:text-[11px]">Breakdown</p>
-            <p className="mt-1 text-xs leading-5 text-white/45">Хук, ритм, смысл, упаковка.</p>
-          </div>
+            <div>
+              <p className="font-mono text-[10px] uppercase text-accent sm:text-[11px]">Breakdown</p>
+              <p className="mt-1 text-xs leading-5 text-white/45">{breakdownSummary}</p>
+            </div>
           <button type="button" onClick={togglePlayback} className="inline-flex h-9 shrink-0 items-center justify-center gap-2 bg-white px-3 text-xs font-semibold text-black transition hover:bg-accent sm:px-4 sm:text-sm">
             {isPlaying ? <Pause size={15} fill="currentColor" /> : <Play size={15} fill="currentColor" />}
             {button}
@@ -1662,6 +1695,7 @@ function ShowreelPlayer({
               progress={progress}
               selected={selectedTrackId === track.id || editorSelectionKey === `breakdown:${track.id}`}
               editorMode={editorMode}
+              seekLabel={seekLabel}
               onSeek={seekToSegment}
             />
           ))}
