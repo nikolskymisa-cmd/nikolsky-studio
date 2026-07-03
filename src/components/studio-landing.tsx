@@ -114,6 +114,11 @@ export type EditorSelection =
       type: "work";
       label: string;
       index: number;
+    }
+  | {
+      type: "breakdown";
+      label: string;
+      trackId: string;
     };
 
 const CONTENT_STORAGE_KEY = "nikolsky-studio-content-v1";
@@ -406,7 +411,9 @@ const navHrefs = ["#work", "#products", "#method", "#terms", "#contact"];
 const waveformSeed = [22, 48, 30, 66, 36, 74, 26, 52, 60, 32, 78, 40, 56, 24, 70, 46];
 
 export function getEditorSelectionKey(selection: EditorSelection) {
-  return selection.type === "work" ? `work:${selection.index}` : `text:${selection.path.join(".")}`;
+  if (selection.type === "work") return `work:${selection.index}`;
+  if (selection.type === "breakdown") return `breakdown:${selection.trackId}`;
+  return `text:${selection.path.join(".")}`;
 }
 
 function VkIcon({ size = 16 }: { size?: number }) {
@@ -516,6 +523,8 @@ export function StudioLanding({
   const t = liveCopy[lang];
   const editorStyles = ((liveCopy as unknown as { _editor?: { styles?: Record<string, number | string> } })._editor?.styles ?? {});
   const editorLinks = ((liveCopy as unknown as { _editor?: { links?: Partial<typeof profile> } })._editor?.links ?? {});
+  const customBreakdownTracks = (liveCopy as unknown as { _editor?: { showreelTracks?: ShowreelTrack[] } })._editor?.showreelTracks;
+  const breakdownTracks = Array.isArray(customBreakdownTracks) && customBreakdownTracks.length ? customBreakdownTracks : showreelTracks;
   const links = { ...profile, ...editorLinks };
   const mainStyle = {
     "--accent": typeof editorStyles.accent === "string" ? editorStyles.accent : undefined,
@@ -702,14 +711,14 @@ export function StudioLanding({
             </p>
           </motion.div>
 
-          <div
-            onClickCapture={selectInEditor({ type: "work", label: "Главный шоурил", index: Math.max(0, liveWorks.findIndex((work) => work === showreel)) })}
-            className={editorClass({ type: "work", label: "Главный шоурил", index: Math.max(0, liveWorks.findIndex((work) => work === showreel)) })}
-            style={heroMediaStyle}
-          >
+          <div style={heroMediaStyle}>
             <ShowreelPlayer
               work={viewWork(showreel, lang)}
               button={t.showreelCta}
+              tracks={breakdownTracks}
+              editorMode={editorMode}
+              editorSelectionKey={editorSelectionKey}
+              onEditorSelect={onEditorSelect}
             />
           </div>
         </div>
@@ -1025,9 +1034,17 @@ function SectionHeader({ eyebrow, title, text }: { eyebrow: string; title: strin
 function ShowreelPlayer({
   work,
   button,
+  tracks,
+  editorMode = false,
+  editorSelectionKey,
+  onEditorSelect,
 }: {
   work: Work;
   button: string;
+  tracks: ShowreelTrack[];
+  editorMode?: boolean;
+  editorSelectionKey?: string;
+  onEditorSelect?: (selection: EditorSelection) => void;
 }) {
   const thumbnailUrl = getThumbnailUrl(work);
   const videoId = getYouTubeId(work.youtubeUrl);
@@ -1041,6 +1058,7 @@ function ShowreelPlayer({
   const [duration, setDuration] = useState(fallbackShowreelDuration);
   const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [selectedTrackId, setSelectedTrackId] = useState(tracks[0]?.id ?? "hook");
   const timelineDuration = durationKnown ? duration : fallbackShowreelDuration;
   const progress = clampPercent((currentTime / Math.max(timelineDuration, 1)) * 100);
 
@@ -1143,8 +1161,10 @@ function ShowreelPlayer({
     }
   };
 
-  const seekToSegment = (start: number) => {
+  const seekToSegment = (track: ShowreelTrack, start: number) => {
     const wasPlaying = isPlaying;
+    setSelectedTrackId(track.id);
+    onEditorSelect?.({ type: "breakdown", label: track.title, trackId: track.id });
     pendingSeekRef.current = start;
     autoplayOnReadyRef.current = wasPlaying;
     setCurrentTime(start);
@@ -1197,13 +1217,15 @@ function ShowreelPlayer({
         </div>
 
         <div className="grid gap-2">
-          {showreelTracks.map((track) => (
+          {tracks.map((track) => (
             <BreakdownTrackRow
               key={track.id}
               track={track}
               currentTime={currentTime}
               duration={timelineDuration}
               progress={progress}
+              selected={selectedTrackId === track.id || editorSelectionKey === `breakdown:${track.id}`}
+              editorMode={editorMode}
               onSeek={seekToSegment}
             />
           ))}
@@ -1218,42 +1240,60 @@ function BreakdownTrackRow({
   currentTime,
   duration,
   progress,
+  selected,
+  editorMode,
   onSeek,
 }: {
   track: ShowreelTrack;
   currentTime: number;
   duration: number;
   progress: number;
-  onSeek: (seconds: number) => void;
+  selected: boolean;
+  editorMode: boolean;
+  onSeek: (track: ShowreelTrack, seconds: number) => void;
 }) {
-  const active = track.segments.some((segment) => currentTime >= segment.start && currentTime <= segment.end);
+  const inSegment = track.segments.some((segment) => currentTime >= segment.start && currentTime <= segment.end);
+  const active = selected;
 
   return (
     <div
-      className={`grid gap-2 border p-2 transition sm:grid-cols-[132px_minmax(0,1fr)_190px] sm:items-center sm:gap-3 ${
+      className={`grid gap-2 border p-2 transition sm:grid-cols-[48px_112px_minmax(0,1fr)_190px] sm:items-center sm:gap-3 ${
         active
           ? "border-accent/60 bg-accent/[0.055] shadow-[0_0_28px_rgba(0,183,255,0.1)]"
           : "border-white/10 bg-white/[0.018]"
       }`}
     >
-      <button type="button" onClick={() => onSeek(track.segments[0]?.start ?? 0)} className="text-left">
-        <span className={`block font-mono text-[11px] uppercase ${active ? "text-accent" : "text-white/44"}`}>{track.label}</span>
-        <span className="mt-1 block text-xs font-semibold uppercase leading-4 text-white sm:text-sm">{track.title}</span>
+      <button
+        type="button"
+        onClick={() => onSeek(track, track.segments[0]?.start ?? 0)}
+        className={`grid size-10 place-items-center border transition ${
+          active ? "border-accent/65 text-accent shadow-[0_0_18px_rgba(0,183,255,0.18)]" : "border-white/10 text-white/38 hover:border-accent/45 hover:text-accent"
+        }`}
+        aria-label={`Перейти к ${track.title}`}
+      >
+        <BreakdownIcon icon={track.icon} />
+      </button>
+
+      <button type="button" onClick={() => onSeek(track, track.segments[0]?.start ?? 0)} className="text-left">
+        <span className={`block font-mono text-[10px] uppercase ${active ? "text-accent" : "text-white/44"}`}>{track.label}</span>
+        <span className="mt-1 block text-xs font-medium uppercase leading-4 text-white/88 sm:text-[13px]">{track.title}</span>
       </button>
 
       <div className="relative h-7 overflow-hidden border border-white/10 bg-black/28">
         <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-white/10" />
-        <span className="absolute bottom-0 top-0 z-20 w-px bg-accent shadow-[0_0_16px_rgba(0,183,255,0.75)] transition-[left] duration-200 ease-linear" style={{ left: `${progress}%` }} />
+        {selected ? (
+          <span className="absolute bottom-0 top-0 z-20 w-px bg-accent shadow-[0_0_16px_rgba(0,183,255,0.75)] transition-[left] duration-200 ease-linear" style={{ left: `${progress}%` }} />
+        ) : null}
         {track.segments.map((segment, index) => {
           const left = clampPercent((segment.start / duration) * 100);
           const width = clampPercent(((segment.end - segment.start) / duration) * 100);
-          const segmentActive = currentTime >= segment.start && currentTime <= segment.end;
+          const segmentActive = selected || (!selected && inSegment);
           return (
             <button
               key={`${track.id}-${index}`}
               type="button"
               title={`Перейти к ${track.label}`}
-              onClick={() => onSeek(segment.start)}
+              onClick={() => onSeek(track, segment.start)}
               className={`absolute top-1/2 h-4 -translate-y-1/2 transition ${
                 segmentActive ? "bg-accent shadow-[0_0_18px_rgba(0,183,255,0.55)]" : "bg-accent/24 hover:bg-accent/58"
               }`}
@@ -1265,6 +1305,40 @@ function BreakdownTrackRow({
 
       <p className={`text-xs leading-5 ${active ? "text-white/78" : "text-white/44"}`}>{track.description}</p>
     </div>
+  );
+}
+
+function BreakdownIcon({ icon }: { icon: ShowreelTrack["icon"] }) {
+  if (icon === "target") {
+    return (
+      <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.7">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
+      </svg>
+    );
+  }
+
+  if (icon === "pulse") {
+    return (
+      <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.7">
+        <path d="M4 12h3l2-6 4 13 2-7h5" />
+      </svg>
+    );
+  }
+
+  if (icon === "message") {
+    return (
+      <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.7">
+        <path d="M5 6h14v9H9l-4 4V6Z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M12 2l1.6 6.2L20 10l-6.4 1.8L12 18l-1.6-6.2L4 10l6.4-1.8L12 2Z" />
+      <path d="M18 15l.8 3.2L22 19l-3.2.8L18 23l-.8-3.2L14 19l3.2-.8L18 15Z" />
+    </svg>
   );
 }
 

@@ -24,6 +24,7 @@ import {
   type LandingCopy,
 } from "@/components/studio-landing";
 import { getThumbnailUrl } from "@/lib/youtube";
+import { showreelTracks, type ShowreelTrack } from "@/lib/showreel-breakdown";
 import { workCategories, type Work } from "@/types/work";
 
 const STORAGE_KEY = "nikolsky-studio-content-v1";
@@ -52,10 +53,11 @@ type EditorContent = Partial<LandingCopy> & Record<string, unknown> & {
       vkUrl?: string;
       email?: string;
     };
+    showreelTracks?: ShowreelTrack[];
   };
 };
 
-type EditorPanel = "hero" | "section" | "video" | "page" | "versions";
+type EditorPanel = "hero" | "section" | "breakdown" | "video" | "page" | "versions";
 
 type VersionItem = {
   id: string;
@@ -260,6 +262,8 @@ export function ContentEditor() {
     setSelection(nextSelection);
     if (nextSelection.type === "work") {
       setActivePanel("video");
+    } else if (nextSelection.type === "breakdown") {
+      setActivePanel("breakdown");
     } else {
       setActivePanel(isHeroSelection(nextSelection) ? "hero" : "section");
     }
@@ -443,6 +447,14 @@ export function ContentEditor() {
                 updateContent={updateContent}
               />
             ) : null}
+            {activePanel === "breakdown" ? (
+              <BreakdownPanel
+                content={content}
+                selection={selection}
+                onSelect={selectEditorItem}
+                updateContent={updateContent}
+              />
+            ) : null}
             {activePanel === "video" ? (
               <Inspector
                 selection={selection.type === "work" ? selection : { type: "work", label: works[0]?.titleRu ?? "Видео", index: 0 }}
@@ -491,13 +503,14 @@ function PanelTabs({
   const tabs: Array<{ id: EditorPanel; label: string }> = [
     { id: "hero", label: "Главный" },
     { id: "section", label: "Блок" },
+    { id: "breakdown", label: "Разбор" },
     { id: "video", label: "Видео" },
     { id: "page", label: "Страница" },
     { id: "versions", label: "Версии" },
   ];
 
   return (
-    <div className="grid grid-cols-5 gap-1 border border-white/10 bg-black/25 p-1">
+    <div className="grid grid-cols-6 gap-1 border border-white/10 bg-black/25 p-1">
       {tabs.map((tab) => (
         <button
           key={tab.id}
@@ -754,6 +767,87 @@ function SectionPanel({
         </Panel>
       ) : null}
     </>
+  );
+}
+
+function BreakdownPanel({
+  content,
+  selection,
+  onSelect,
+  updateContent,
+}: {
+  content: EditorContent;
+  selection: EditorSelection;
+  onSelect: (selection: EditorSelection) => void;
+  updateContent: (path: EditorPath, value: unknown) => void;
+}) {
+  const tracks = content._editor?.showreelTracks?.length ? content._editor.showreelTracks : showreelTracks;
+  const selectedTrackId = selection.type === "breakdown" ? selection.trackId : tracks[0]?.id;
+  const selectedIndex = Math.max(0, tracks.findIndex((track) => track.id === selectedTrackId));
+  const selectedTrack = tracks[selectedIndex] ?? tracks[0];
+
+  const setTracks = (nextTracks: ShowreelTrack[]) => updateContent(["_editor", "showreelTracks"], nextTracks);
+  const updateTrack = (patch: Partial<ShowreelTrack>) => {
+    setTracks(tracks.map((track, index) => (index === selectedIndex ? { ...track, ...patch } : track)));
+  };
+  const updateSegment = (segmentIndex: number, patch: Partial<{ start: number; end: number }>) => {
+    updateTrack({
+      segments: selectedTrack.segments.map((segment, index) => (index === segmentIndex ? { ...segment, ...patch } : segment)),
+    });
+  };
+
+  if (!selectedTrack) return null;
+
+  return (
+    <Panel title="Разбор шоурила" subtitle={selectedTrack.title}>
+      <div className="grid grid-cols-2 gap-2">
+        {tracks.map((track) => (
+          <button
+            key={track.id}
+            type="button"
+            onClick={() => onSelect({ type: "breakdown", label: track.title, trackId: track.id })}
+            className={`border px-3 py-2 text-left text-sm ${track.id === selectedTrack.id ? "border-accent bg-accent/10 text-white" : "border-white/10 bg-black/20 text-white/58"}`}
+          >
+            <span className="block font-mono text-[10px] uppercase text-accent">{track.label}</span>
+            {track.title}
+          </button>
+        ))}
+      </div>
+
+      <Field label="Короткий label" value={selectedTrack.label} onChange={(value) => updateTrack({ label: value })} />
+      <Field label="Название" value={selectedTrack.title} onChange={(value) => updateTrack({ title: value })} />
+      <Field area label="Описание" value={selectedTrack.description} onChange={(value) => updateTrack({ description: value })} />
+
+      <div className="grid gap-2 border-t border-white/10 pt-4">
+        <div className="flex items-center justify-between">
+          <p className="font-mono text-xs uppercase text-white/42">Сегменты</p>
+          <button
+            type="button"
+            onClick={() => updateTrack({ segments: [...selectedTrack.segments, { start: 0, end: 3 }] })}
+            className="h-8 bg-accent px-2 text-xs font-semibold text-black"
+          >
+            Добавить
+          </button>
+        </div>
+        {selectedTrack.segments.map((segment, index) => (
+          <div key={index} className="grid grid-cols-[1fr_1fr_auto] gap-2">
+            <NumberField label="Start, сек" value={segment.start} onChange={(value) => updateSegment(index, { start: value })} />
+            <NumberField label="End, сек" value={segment.end} onChange={(value) => updateSegment(index, { end: value })} />
+            <button
+              type="button"
+              onClick={() => updateTrack({ segments: selectedTrack.segments.filter((_, currentIndex) => currentIndex !== index) })}
+              className="mt-6 size-10 border border-red-400/30 text-red-200"
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <p className="text-sm leading-6 text-white/48">
+        Клик по дорожке в превью выбирает её здесь и перематывает видео к началу первого сегмента.
+      </p>
+    </Panel>
   );
 }
 
@@ -1111,6 +1205,14 @@ function Inspector({
           <Trash2 size={15} />
           Удалить видео
         </button>
+      </Panel>
+    );
+  }
+
+  if (selection.type !== "text") {
+    return (
+      <Panel title="Разбор" subtitle={selection.label}>
+        <p className="text-sm leading-6 text-white/48">Настройки этой дорожки находятся во вкладке «Разбор».</p>
       </Panel>
     );
   }
