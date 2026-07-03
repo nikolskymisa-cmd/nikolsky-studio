@@ -1635,11 +1635,9 @@ function ControlPanel({
 }) {
   return (
     <div
-      className={`group relative h-full overflow-hidden border border-white/10 bg-black/22 p-4 transition-[border-color,box-shadow,background-color] duration-200 hover:border-accent/60 hover:bg-accent/[0.025] hover:shadow-[0_0_0_1px_rgba(0,183,255,0.16),0_18px_56px_rgba(0,183,255,0.08)] sm:p-5 ${compact ? "sm:min-h-36" : "sm:min-h-44"}`}
+      className={`relative h-full overflow-hidden border border-white/10 bg-black/22 p-4 transition-colors duration-150 hover:border-accent/60 sm:p-5 ${compact ? "sm:min-h-36" : "sm:min-h-44"}`}
     >
-      <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/80 to-transparent" />
-      </div>
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/35 to-transparent" />
       <p className="mb-4 font-mono text-[11px] uppercase text-accent/80">{String(index + 1).padStart(2, "0")}</p>
       <h3 className="text-lg font-semibold uppercase leading-tight text-white sm:text-xl">{title}</h3>
       <p className="mt-3 text-sm leading-6 text-white/58">{text}</p>
@@ -1674,7 +1672,7 @@ function ProductPanel({
 }) {
   return (
     <article
-      className="group relative flex h-full min-h-[520px] flex-col overflow-hidden border border-white/10 bg-black/28 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.16)] transition-[border-color,box-shadow,background-color] duration-200 hover:border-accent/65 hover:bg-accent/[0.02] hover:shadow-[0_0_0_1px_rgba(0,183,255,0.17),0_24px_80px_rgba(0,183,255,0.08)] sm:p-6"
+      className="relative flex h-full min-h-[520px] flex-col overflow-hidden border border-white/10 bg-black/28 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.16)] transition-colors duration-150 hover:border-accent/65 sm:p-6"
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/70 to-transparent opacity-70" />
       <div className="mb-6 flex items-center justify-between gap-3 font-mono text-[11px] uppercase">

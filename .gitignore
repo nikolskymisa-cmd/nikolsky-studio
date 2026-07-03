@@ -42,3 +42,6 @@ next-env.d.ts
 
 # local visual editor versions
 data/.versions/
+
+# local screenshots / visual checks
+output/
