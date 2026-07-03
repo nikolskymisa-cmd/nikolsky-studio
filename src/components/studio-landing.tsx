@@ -18,6 +18,7 @@ import {
   Send,
   X,
 } from "lucide-react";
+import type { CSSProperties, MouseEvent } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import { Reveal } from "@/components/reveal";
@@ -32,7 +33,27 @@ type Filter = "All" | PortfolioCategory;
 
 type StudioLandingProps = {
   works: Work[];
+  editorMode?: boolean;
+  editorContent?: Partial<LandingCopy> & Record<string, unknown>;
+  editorWorks?: Work[];
+  editorSelectionKey?: string;
+  onEditorSelect?: (selection: EditorSelection) => void;
 };
+
+export type EditorPath = Array<string | number>;
+
+export type EditorSelection =
+  | {
+      type: "text";
+      label: string;
+      path: EditorPath;
+      area?: boolean;
+    }
+  | {
+      type: "work";
+      label: string;
+      index: number;
+    };
 
 const CONTENT_STORAGE_KEY = "nikolsky-studio-content-v1";
 const WORKS_STORAGE_KEY = "nikolsky-studio-works-v1";
@@ -293,6 +314,7 @@ const defaultCopy = {
 } as const;
 
 type LandingCopy = typeof defaultCopy;
+export type { LandingCopy };
 
 function mergeCopy<T>(base: T, override: unknown): T {
   if (!override || typeof override !== "object" || Array.isArray(override)) {
@@ -321,6 +343,10 @@ const copy = mergeCopy(defaultCopy, editableCopy) as LandingCopy;
 
 const navHrefs = ["#work", "#products", "#method", "#terms", "#contact"];
 const waveformSeed = [22, 48, 30, 66, 36, 74, 26, 52, 60, 32, 78, 40, 56, 24, 70, 46];
+
+export function getEditorSelectionKey(selection: EditorSelection) {
+  return selection.type === "work" ? `work:${selection.index}` : `text:${selection.path.join(".")}`;
+}
 
 function VkIcon({ size = 16 }: { size?: number }) {
   return (
@@ -397,7 +423,14 @@ function Waveform({ seed = 0, bars = 32, className = "" }: { seed?: number; bars
   );
 }
 
-export function StudioLanding({ works }: StudioLandingProps) {
+export function StudioLanding({
+  works,
+  editorMode = false,
+  editorContent,
+  editorWorks,
+  editorSelectionKey,
+  onEditorSelect,
+}: StudioLandingProps) {
   const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 24, restDelta: 0.001 });
@@ -406,10 +439,22 @@ export function StudioLanding({ works }: StudioLandingProps) {
   const [selectedWork, setSelectedWork] = useState<Work | null>(null);
   const [runtimeCopy, setRuntimeCopy] = useState<LandingCopy>(copy);
   const [runtimeWorks, setRuntimeWorks] = useState<Work[]>(works);
-  const t = runtimeCopy[lang];
+  const liveCopy = editorContent ? (mergeCopy(copy, editorContent) as LandingCopy) : runtimeCopy;
+  const liveWorks = editorWorks ?? runtimeWorks;
+  const t = liveCopy[lang];
+  const editorStyles = ((liveCopy as unknown as { _editor?: { styles?: Record<string, number | string> } })._editor?.styles ?? {});
+  const mainStyle = {
+    "--accent": typeof editorStyles.accent === "string" ? editorStyles.accent : undefined,
+  } as CSSProperties;
+  const heroTitleStyle = editorStyles.heroTitleSize
+    ? ({ fontSize: `clamp(2.25rem, ${Number(editorStyles.heroTitleSize) / 12}vw, ${Number(editorStyles.heroTitleSize) / 10}rem)` } as CSSProperties)
+    : undefined;
+  const bodyScaleStyle = editorStyles.bodyScale
+    ? ({ fontSize: `${Number(editorStyles.bodyScale)}%` } as CSSProperties)
+    : undefined;
 
-  const showreel = runtimeWorks.find((work) => work.featured) ?? runtimeWorks[0];
-  const portfolioWorks = useMemo(() => runtimeWorks.filter((work) => !work.featured), [runtimeWorks]);
+  const showreel = liveWorks.find((work) => work.featured) ?? liveWorks[0];
+  const portfolioWorks = useMemo(() => liveWorks.filter((work) => !work.featured), [liveWorks]);
   const filteredWorks =
     activeFilter === "All"
       ? portfolioWorks
@@ -420,6 +465,7 @@ export function StudioLanding({ works }: StudioLandingProps) {
   }, [lang]);
 
   useEffect(() => {
+    if (editorContent && editorWorks) return;
     const readEditorContent = () => {
       try {
         const raw = window.localStorage.getItem(CONTENT_STORAGE_KEY);
@@ -445,7 +491,22 @@ export function StudioLanding({ works }: StudioLandingProps) {
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
-  }, [works]);
+  }, [works, editorContent, editorWorks]);
+
+  const selectInEditor = (selection: EditorSelection) => (event: MouseEvent<HTMLElement>) => {
+    if (!editorMode) return;
+    event.preventDefault();
+    event.stopPropagation();
+    onEditorSelect?.(selection);
+  };
+
+  const editorClass = (selection: EditorSelection) => {
+    if (!editorMode) return "";
+    const active = editorSelectionKey === getEditorSelectionKey(selection);
+    return active
+      ? " ring-2 ring-accent ring-offset-2 ring-offset-black/80"
+      : " ring-1 ring-white/10 hover:ring-accent/70";
+  };
 
   useEffect(() => {
     if (!selectedWork) {
@@ -462,7 +523,7 @@ export function StudioLanding({ works }: StudioLandingProps) {
   }, [selectedWork]);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-background text-foreground">
+    <main className="relative min-h-screen overflow-hidden bg-background text-foreground" style={mainStyle}>
       <StudioBackground />
       <motion.div
         aria-hidden
@@ -470,43 +531,75 @@ export function StudioLanding({ works }: StudioLandingProps) {
         style={{ scaleX }}
       />
 
-      <Header lang={lang} setLang={setLang} nav={t.nav} projectCta={t.projectCta} />
+      <Header lang={lang} setLang={setLang} nav={t.nav} projectCta={t.projectCta} editorMode={editorMode} />
 
-      <section id="top" className="relative mx-auto w-full max-w-7xl px-4 pb-8 pt-28 sm:px-6 sm:pt-24 lg:px-8">
+      <section id="top" className="relative mx-auto w-full max-w-7xl px-4 pb-8 pt-28 sm:px-6 sm:pt-24 lg:px-8" style={bodyScaleStyle}>
         <div className="relative z-10 grid gap-6 lg:min-h-[640px] lg:grid-cols-[minmax(0,1fr)_470px] lg:items-center lg:gap-8 xl:min-h-[680px] xl:grid-cols-[minmax(0,1fr)_520px]">
           <motion.div
             initial={false}
             animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="mb-4 font-mono text-[11px] uppercase leading-5 text-accent sm:mb-5 sm:text-xs">{t.label}</p>
-            <h1 className="max-w-4xl text-[2.36rem] font-semibold uppercase leading-[0.9] text-white min-[380px]:text-[2.65rem] sm:text-[5.5rem] sm:leading-[0.84] md:text-[6.4rem] lg:text-[5.05rem] xl:text-[5.45rem]">
+            <p
+              onClickCapture={selectInEditor({ type: "text", label: "Направление под логотипом", path: ["ru", "label"] })}
+              className={`mb-4 font-mono text-[11px] uppercase leading-5 text-accent sm:mb-5 sm:text-xs${editorClass({ type: "text", label: "Направление под логотипом", path: ["ru", "label"] })}`}
+            >
+              {t.label}
+            </p>
+            <h1
+              onClickCapture={selectInEditor({ type: "text", label: "Главный заголовок", path: ["ru", "heroTitle"] })}
+              className={`max-w-4xl text-[2.36rem] font-semibold uppercase leading-[0.9] text-white min-[380px]:text-[2.65rem] sm:text-[5.5rem] sm:leading-[0.84] md:text-[6.4rem] lg:text-[5.05rem] xl:text-[5.45rem]${editorClass({ type: "text", label: "Главный заголовок", path: ["ru", "heroTitle"] })}`}
+              style={heroTitleStyle}
+            >
               {t.heroTitle}
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-white/72 sm:mt-7 sm:text-xl sm:leading-8">{t.heroSub}</p>
+            <p
+              onClickCapture={selectInEditor({ type: "text", label: "Подзаголовок первого экрана", path: ["ru", "heroSub"], area: true })}
+              className={`mt-5 max-w-2xl text-base leading-7 text-white/72 sm:mt-7 sm:text-xl sm:leading-8${editorClass({ type: "text", label: "Подзаголовок первого экрана", path: ["ru", "heroSub"], area: true })}`}
+            >
+              {t.heroSub}
+            </p>
             <div className="mt-7 grid grid-cols-2 gap-2.5 sm:mt-9 sm:flex sm:flex-row sm:gap-3">
-              <a href="#work" className="inline-flex h-[50px] items-center justify-center gap-2 bg-accent px-4 text-sm font-semibold text-black shadow-[0_0_34px_rgba(0,183,255,0.16)] transition hover:bg-white sm:h-14 sm:px-7 sm:text-[15px]">
+              <a
+                href="#work"
+                onClickCapture={selectInEditor({ type: "text", label: "Кнопка смотреть работы", path: ["ru", "casesCta"] })}
+                className={`inline-flex h-[50px] items-center justify-center gap-2 bg-accent px-4 text-sm font-semibold text-black shadow-[0_0_34px_rgba(0,183,255,0.16)] transition hover:bg-white sm:h-14 sm:px-7 sm:text-[15px]${editorClass({ type: "text", label: "Кнопка смотреть работы", path: ["ru", "casesCta"] })}`}
+              >
                 <CirclePlay size={17} />
                 {t.casesCta}
               </a>
-              <a href={profile.telegramUrl} target="_blank" rel="noreferrer" className="inline-flex h-[50px] items-center justify-center gap-2 border border-white/16 bg-white/[0.035] px-4 text-sm font-semibold text-white transition hover:border-accent hover:text-accent sm:h-14 sm:px-7 sm:text-[15px]">
+              <a
+                href={profile.telegramUrl}
+                target="_blank"
+                rel="noreferrer"
+                onClickCapture={selectInEditor({ type: "text", label: "Кнопка обсудить проект", path: ["ru", "projectCta"] })}
+                className={`inline-flex h-[50px] items-center justify-center gap-2 border border-white/16 bg-white/[0.035] px-4 text-sm font-semibold text-white transition hover:border-accent hover:text-accent sm:h-14 sm:px-7 sm:text-[15px]${editorClass({ type: "text", label: "Кнопка обсудить проект", path: ["ru", "projectCta"] })}`}
+              >
                 <Send size={17} />
                 {t.projectCta}
               </a>
             </div>
-            <p className="mt-5 max-w-2xl border-l border-accent/55 pl-3 text-sm leading-6 text-white/58 sm:mt-6 sm:pl-4">
+            <p
+              onClickCapture={selectInEditor({ type: "text", label: "Строка доверия под кнопками", path: ["ru", "trust"], area: true })}
+              className={`mt-5 max-w-2xl border-l border-accent/55 pl-3 text-sm leading-6 text-white/58 sm:mt-6 sm:pl-4${editorClass({ type: "text", label: "Строка доверия под кнопками", path: ["ru", "trust"], area: true })}`}
+            >
               {t.trust}
             </p>
           </motion.div>
 
-          <ShowreelPlayer
-            work={viewWork(showreel, lang)}
-            label={t.showreelLabel}
-            button={t.showreelCta}
-            tracks={t.tracks}
-            safeFrame={t.safeFrame}
-            onPlay={() => setSelectedWork(showreel)}
-          />
+          <div
+            onClickCapture={selectInEditor({ type: "work", label: "Главный шоурил", index: Math.max(0, liveWorks.findIndex((work) => work === showreel)) })}
+            className={editorClass({ type: "work", label: "Главный шоурил", index: Math.max(0, liveWorks.findIndex((work) => work === showreel)) })}
+          >
+            <ShowreelPlayer
+              work={viewWork(showreel, lang)}
+              label={t.showreelLabel}
+              button={t.showreelCta}
+              tracks={t.tracks}
+              safeFrame={t.safeFrame}
+              onPlay={() => setSelectedWork(showreel)}
+            />
+          </div>
         </div>
       </section>
 
@@ -582,14 +675,27 @@ export function StudioLanding({ works }: StudioLandingProps) {
           <motion.div layout className="grid gap-3">
             <AnimatePresence mode="popLayout">
               {filteredWorks.map((work, index) => (
-                <CasePanel
+                <div
                   key={work.id ?? work.title}
-                  work={work}
-                  lang={lang}
-                  index={index}
-                  labels={{ task: t.task, done: t.done, open: t.openCase, youtube: t.youtube }}
-                  onSelect={setSelectedWork}
-                />
+                  onClickCapture={selectInEditor({
+                    type: "work",
+                    label: `Работа: ${getWorkTitle(work, "ru")}`,
+                    index: Math.max(0, liveWorks.findIndex((item) => item === work)),
+                  })}
+                  className={editorClass({
+                    type: "work",
+                    label: `Работа: ${getWorkTitle(work, "ru")}`,
+                    index: Math.max(0, liveWorks.findIndex((item) => item === work)),
+                  })}
+                >
+                  <CasePanel
+                    work={work}
+                    lang={lang}
+                    index={index}
+                    labels={{ task: t.task, done: t.done, open: t.openCase, youtube: t.youtube }}
+                    onSelect={setSelectedWork}
+                  />
+                </div>
               ))}
             </AnimatePresence>
           </motion.div>
@@ -687,14 +793,16 @@ function Header({
   setLang,
   nav,
   projectCta,
+  editorMode = false,
 }: {
   lang: Lang;
   setLang: (lang: Lang) => void;
   nav: readonly string[];
   projectCta: string;
+  editorMode?: boolean;
 }) {
   return (
-    <header className="fixed inset-x-0 top-0 z-40 border-b border-white/[0.1] bg-[#030506]/91 backdrop-blur-xl">
+    <header className={`${editorMode ? "sticky top-0" : "fixed inset-x-0 top-0"} z-40 border-b border-white/[0.1] bg-[#030506]/91 backdrop-blur-xl`}>
       <nav className="mx-auto flex h-[60px] w-full max-w-7xl items-center justify-between px-4 sm:h-[68px] sm:px-6 lg:px-8">
         <a href="#top" className="flex items-center gap-3" aria-label="Nikolsky Studio">
           <span className="grid size-9 place-items-center border border-white/20 bg-white/[0.055] font-mono text-xs font-semibold text-white">NS</span>

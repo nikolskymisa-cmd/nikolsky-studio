@@ -1,20 +1,28 @@
 "use client";
 
 import {
-  ArrowUpRight,
+  ArrowDown,
+  ArrowUp,
   Check,
-  ExternalLink,
   GitBranch,
+  History,
+  Monitor,
   Plus,
   RefreshCw,
   Save,
-  Star,
   Trash2,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import seedContent from "../../data/landing-content.json";
 import seedWorks from "../../data/works.json";
+import {
+  getEditorSelectionKey,
+  StudioLanding,
+  type EditorPath,
+  type EditorSelection,
+  type LandingCopy,
+} from "@/components/studio-landing";
 import { getThumbnailUrl } from "@/lib/youtube";
 import { workCategories, type Work } from "@/types/work";
 
@@ -22,50 +30,58 @@ const STORAGE_KEY = "nikolsky-studio-content-v1";
 const WORKS_STORAGE_KEY = "nikolsky-studio-works-v1";
 const ADMIN_API = "http://127.0.0.1:4317";
 
-type Pair = [string, string];
-type Product = {
-  code: string;
-  title: string;
-  audience: string;
-  text: string;
-  includes: string[];
-  cta: string;
-};
-type EditorContent = typeof seedContent & {
-  ru: typeof seedContent.ru & {
-    products: Product[];
-    stats: Pair[];
-    positionCards: Pair[];
-    methodSteps: Pair[];
-    terms: Pair[];
+type EditorContent = Partial<LandingCopy> & Record<string, unknown> & {
+  _editor?: {
+    styles?: {
+      accent?: string;
+      heroTitleSize?: number;
+      bodyScale?: number;
+    };
   };
 };
-type Path = Array<string | number>;
-type TextSelection = {
-  type: "text";
-  label: string;
-  path: Path;
-  area?: boolean;
-};
-type WorkSelection = {
-  type: "work";
-  index: number;
-};
-type Selection = TextSelection | WorkSelection;
 
-function cloneContent(): EditorContent {
-  return JSON.parse(JSON.stringify(seedContent)) as EditorContent;
-}
+type VersionItem = {
+  id: string;
+  name: string;
+  createdAt: string;
+};
 
-function cloneWorks(): Work[] {
-  return JSON.parse(JSON.stringify(seedWorks)) as Work[];
-}
+type AdminResponse = {
+  ok?: boolean;
+  message?: string;
+  content?: EditorContent;
+  works?: Work[];
+  versions?: VersionItem[];
+};
+
+const textFields: Array<EditorSelection & { type: "text" }> = [
+  { type: "text", label: "Направление в hero", path: ["ru", "label"] },
+  { type: "text", label: "Главный заголовок", path: ["ru", "heroTitle"] },
+  { type: "text", label: "Подзаголовок hero", path: ["ru", "heroSub"], area: true },
+  { type: "text", label: "Кнопка смотреть работы", path: ["ru", "casesCta"] },
+  { type: "text", label: "Кнопка обсудить проект", path: ["ru", "projectCta"] },
+  { type: "text", label: "Строка доверия", path: ["ru", "trust"], area: true },
+  { type: "text", label: "Позиционирование: лейбл", path: ["ru", "positionEyebrow"] },
+  { type: "text", label: "Позиционирование: заголовок", path: ["ru", "positionTitle"], area: true },
+  { type: "text", label: "Позиционирование: текст", path: ["ru", "positionText"], area: true },
+  { type: "text", label: "Услуги: заголовок", path: ["ru", "productsTitle"] },
+  { type: "text", label: "Шоурил: заголовок", path: ["ru", "reelTitle"] },
+  { type: "text", label: "Шоурил: текст", path: ["ru", "reelText"], area: true },
+  { type: "text", label: "Работы: заголовок", path: ["ru", "casesTitle"] },
+  { type: "text", label: "Работы: текст", path: ["ru", "casesText"], area: true },
+  { type: "text", label: "Метод: заголовок", path: ["ru", "methodTitle"] },
+  { type: "text", label: "Условия: заголовок", path: ["ru", "termsTitle"] },
+  { type: "text", label: "Условия: текст", path: ["ru", "termsText"], area: true },
+  { type: "text", label: "Контакт: заголовок", path: ["ru", "contactTitle"], area: true },
+  { type: "text", label: "Контакт: текст", path: ["ru", "contactText"], area: true },
+  { type: "text", label: "Футер", path: ["ru", "footer"], area: true },
+];
 
 function clone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
 }
 
-function getAt(source: unknown, path: Path): unknown {
+function getAt(source: unknown, path: EditorPath): unknown {
   return path.reduce<unknown>((current, key) => {
     if (current && typeof current === "object") {
       return (current as Record<string | number, unknown>)[key];
@@ -74,13 +90,18 @@ function getAt(source: unknown, path: Path): unknown {
   }, source);
 }
 
-function setAt<T>(source: T, path: Path, value: unknown): T {
+function setAt<T>(source: T, path: EditorPath, value: unknown): T {
   const next = clone(source) as Record<string | number, unknown>;
-  let cursor: Record<string | number, unknown> = next;
+  let cursor = next;
 
-  path.slice(0, -1).forEach((key) => {
+  path.slice(0, -1).forEach((key, index) => {
+    const nextKey = path[index + 1];
+    if (!cursor[key] || typeof cursor[key] !== "object") {
+      cursor[key] = typeof nextKey === "number" ? [] : {};
+    }
     cursor = cursor[key] as Record<string | number, unknown>;
   });
+
   cursor[path[path.length - 1]] = value;
   return next as T;
 }
@@ -94,12 +115,20 @@ function makeWork(): Work {
     youtubeUrl: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID",
     thumbnail: "auto",
     descriptionRu: "Короткое описание ролика.",
-    taskRu: "Какую задачу решал ролик.",
+    taskRu: "Какая задача была у ролика.",
     formatRu: "Reels / 9:16",
     workDoneRu: ["монтаж", "субтитры", "акценты"],
     whyItWorksRu: "Почему эта версия работает.",
     deliverablesRu: ["финальный ролик"],
+    featured: false,
   };
+}
+
+async function getAdmin(path: string) {
+  const response = await fetch(`${ADMIN_API}${path}`);
+  const data = (await response.json()) as AdminResponse;
+  if (!response.ok || !data.ok) throw new Error(data.message || "Локальная админка не ответила.");
+  return data;
 }
 
 async function postAdmin(path: string, body: unknown) {
@@ -108,42 +137,85 @@ async function postAdmin(path: string, body: unknown) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  const data = (await response.json()) as { ok?: boolean; message?: string; output?: string };
-  if (!response.ok || !data.ok) {
-    throw new Error(data.message || "Локальная команда не выполнена.");
-  }
+  const data = (await response.json()) as AdminResponse;
+  if (!response.ok || !data.ok) throw new Error(data.message || "Локальная команда не выполнена.");
   return data;
 }
 
 export function ContentEditor() {
-  const [content, setContent] = useState<EditorContent>(() => cloneContent());
-  const [works, setWorks] = useState<Work[]>(() => cloneWorks());
-  const [selection, setSelection] = useState<Selection>({ type: "text", label: "Главный заголовок", path: ["ru", "heroTitle"], area: false });
+  const [content, setContent] = useState<EditorContent>(() => clone(seedContent) as unknown as EditorContent);
+  const [works, setWorks] = useState<Work[]>(() => clone(seedWorks) as Work[]);
+  const [selection, setSelection] = useState<EditorSelection>(textFields[1]);
+  const [versions, setVersions] = useState<VersionItem[]>([]);
+  const [versionName, setVersionName] = useState("");
   const [status, setStatus] = useState("Готово");
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const mounted = useRef(false);
 
-  const ru = content.ru;
-  const featuredIndex = works.findIndex((work) => work.featured);
-  const showreel = works[featuredIndex >= 0 ? featuredIndex : 0];
-
-  useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
-    window.localStorage.setItem(WORKS_STORAGE_KEY, JSON.stringify(works));
-  }, [content, works]);
-
+  const selectionKey = useMemo(() => getEditorSelectionKey(selection), [selection]);
   const selectedText = useMemo(() => {
     if (selection.type !== "text") return "";
     const value = getAt(content, selection.path);
     return typeof value === "string" ? value : "";
   }, [content, selection]);
 
-  const markDirty = () => setDirty(true);
+  const refreshVersions = useCallback(async () => {
+    try {
+      const data = await getAdmin("/versions");
+      setVersions(data.versions ?? []);
+    } catch {
+      setVersions([]);
+    }
+  }, []);
 
-  const selectText = (label: string, path: Path, area = false) => {
-    setSelection({ type: "text", label, path, area });
-  };
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await getAdmin("/content");
+        if (data.content) setContent(data.content);
+        if (data.works) setWorks(data.works);
+        setStatus("Контент загружен из файлов");
+      } catch {
+        setStatus("Admin API не запущен. Открой через ярлык или npm run dev.");
+      }
+      void refreshVersions();
+    };
+    void load();
+  }, [refreshVersions]);
+
+  useEffect(() => {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
+    window.localStorage.setItem(WORKS_STORAGE_KEY, JSON.stringify(works));
+  }, [content, works]);
+
+  const saveToFiles = useCallback(async (message = "Сохранено") => {
+    setSaving(true);
+    setStatus("Сохраняю...");
+    try {
+      await postAdmin("/save", { content, works });
+      setDirty(false);
+      setStatus(message);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Не получилось сохранить.");
+    } finally {
+      setSaving(false);
+    }
+  }, [content, works]);
+
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    if (!dirty) return;
+    const timer = window.setTimeout(() => {
+      void saveToFiles("Автосохранено");
+    }, 700);
+    return () => window.clearTimeout(timer);
+  }, [dirty, saveToFiles]);
+
+  const markDirty = () => setDirty(true);
 
   const updateText = (value: string) => {
     if (selection.type !== "text") return;
@@ -151,7 +223,7 @@ export function ContentEditor() {
     markDirty();
   };
 
-  const updateContent = (path: Path, value: unknown) => {
+  const updateContent = (path: EditorPath, value: unknown) => {
     setContent((current) => setAt(current, path, value));
     markDirty();
   };
@@ -168,13 +240,25 @@ export function ContentEditor() {
   const addWork = () => {
     const next = makeWork();
     setWorks((current) => [...current, next]);
-    setSelection({ type: "work", index: works.length });
+    setSelection({ type: "work", label: "Новая работа", index: works.length });
     markDirty();
   };
 
   const removeWork = (index: number) => {
     setWorks((current) => current.filter((_, i) => i !== index));
-    setSelection({ type: "text", label: "Работы", path: ["ru", "casesTitle"] });
+    setSelection(textFields[1]);
+    markDirty();
+  };
+
+  const moveWork = (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= works.length) return;
+    setWorks((current) => {
+      const next = [...current];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+    setSelection({ type: "work", label: "Работа", index: target });
     markDirty();
   };
 
@@ -183,32 +267,38 @@ export function ContentEditor() {
     markDirty();
   };
 
-  const saveToFiles = useCallback(async (message = "Сохранено в data") => {
+  const createVersion = async () => {
     setSaving(true);
-    setStatus("Сохраняю...");
     try {
-      await postAdmin("/save", { content, works });
-      setDirty(false);
-      setStatus(message);
-    } catch {
-      setStatus("Admin API не запущен. Перезапусти npm run dev.");
+      await postAdmin("/version", {
+        name: versionName.trim() || `Версия ${new Date().toLocaleString("ru-RU")}`,
+        content,
+        works,
+      });
+      setVersionName("");
+      setStatus("Версия сохранена");
+      await refreshVersions();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Не получилось сохранить версию.");
     } finally {
       setSaving(false);
     }
-  }, [content, works]);
+  };
 
-  useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true;
-      return;
+  const restoreVersion = async (id: string) => {
+    setSaving(true);
+    try {
+      const data = await postAdmin("/restore", { id });
+      if (data.content) setContent(data.content);
+      if (data.works) setWorks(data.works);
+      setDirty(false);
+      setStatus("Версия восстановлена");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Не получилось восстановить версию.");
+    } finally {
+      setSaving(false);
     }
-    if (!dirty) return;
-
-    const timer = window.setTimeout(() => {
-      void saveToFiles("Автосохранено");
-    }, 700);
-    return () => window.clearTimeout(timer);
-  }, [dirty, saveToFiles]);
+  };
 
   const publish = async () => {
     setSaving(true);
@@ -225,28 +315,19 @@ export function ContentEditor() {
     }
   };
 
-  const resetLocal = () => {
-    setContent(cloneContent());
-    setWorks(cloneWorks());
-    window.localStorage.removeItem(STORAGE_KEY);
-    window.localStorage.removeItem(WORKS_STORAGE_KEY);
-    setDirty(true);
-    setStatus("Сброшено к файлам проекта");
-  };
-
   return (
     <main className="min-h-screen bg-[#030506] text-white">
-      <header className="sticky top-0 z-30 border-b border-white/10 bg-[#05080b]/96 backdrop-blur">
-        <div className="mx-auto flex max-w-[1720px] flex-wrap items-center justify-between gap-3 px-4 py-3">
+      <header className="sticky top-0 z-[80] border-b border-white/10 bg-[#05080b]/96 backdrop-blur">
+        <div className="mx-auto flex max-w-[1920px] flex-wrap items-center justify-between gap-3 px-4 py-3">
           <div>
-            <p className="font-mono text-xs uppercase text-accent">Nikolsky local admin</p>
-            <h1 className="text-xl font-semibold uppercase">Кликни элемент, измени справа</h1>
+            <p className="font-mono text-xs uppercase text-accent">Nikolsky visual editor</p>
+            <h1 className="text-lg font-semibold uppercase sm:text-xl">Редактируй прямо на сайте</h1>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill text={dirty ? `${status} / есть изменения` : status} active={dirty || saving} />
             <a href="/" target="_blank" className="inline-flex h-10 items-center gap-2 border border-white/12 px-3 text-sm text-white/72">
-              <ExternalLink size={15} />
-              Сайт
+              <Monitor size={15} />
+              Открыть сайт
             </a>
             <button type="button" onClick={() => saveToFiles()} className="inline-flex h-10 items-center gap-2 bg-white px-3 text-sm font-semibold text-black">
               <Save size={15} />
@@ -260,170 +341,150 @@ export function ContentEditor() {
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-[1720px] gap-4 p-4 xl:grid-cols-[minmax(0,1fr)_430px]">
-        <section className="grid gap-4">
-          <AdminHero ru={ru} selectText={selectText} showreel={showreel} showreelIndex={featuredIndex >= 0 ? featuredIndex : 0} selectWork={(index) => setSelection({ type: "work", index })} />
-
-          <AdminSection title="Смысл">
-            <ClickText label="Лейбл" selected={selection} path={["ru", "positionEyebrow"]} onSelect={selectText}>
-              {ru.positionEyebrow}
-            </ClickText>
-            <ClickText label="Заголовок" selected={selection} path={["ru", "positionTitle"]} area onSelect={selectText}>
-              {ru.positionTitle}
-            </ClickText>
-            <ClickText label="Текст" selected={selection} path={["ru", "positionText"]} area onSelect={selectText}>
-              {ru.positionText}
-            </ClickText>
-            <div className="grid gap-2 md:grid-cols-3">
-              {ru.positionCards.map(([title, text], index) => (
-                <MiniCard key={index}>
-                  <ClickText label={`Карточка ${index + 1}: заголовок`} selected={selection} path={["ru", "positionCards", index, 0]} onSelect={selectText}>
-                    {title}
-                  </ClickText>
-                  <ClickText label={`Карточка ${index + 1}: текст`} selected={selection} path={["ru", "positionCards", index, 1]} area onSelect={selectText}>
-                    {text}
-                  </ClickText>
-                </MiniCard>
-              ))}
-            </div>
-          </AdminSection>
-
-          <AdminSection
-            title="Видео и портфолио"
-            action={
-              <button type="button" onClick={addWork} className="inline-flex h-9 items-center gap-2 bg-accent px-3 text-sm font-semibold text-black">
-                <Plus size={15} />
-                Добавить видео
-              </button>
-            }
-          >
-            <ClickText label="Заголовок блока работ" selected={selection} path={["ru", "casesTitle"]} onSelect={selectText}>
-              {ru.casesTitle}
-            </ClickText>
-            <ClickText label="Описание блока работ" selected={selection} path={["ru", "casesText"]} area onSelect={selectText}>
-              {ru.casesText}
-            </ClickText>
-            <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
-              {works.map((work, index) => (
-                <WorkAdminCard
-                  key={work.id ?? index}
-                  work={work}
-                  active={selection.type === "work" && selection.index === index}
-                  onSelect={() => setSelection({ type: "work", index })}
-                  onFeatured={() => makeFeatured(index)}
-                  onRemove={() => removeWork(index)}
-                />
-              ))}
-            </div>
-          </AdminSection>
-
-          <AdminSection title="Услуги">
-            <ClickText label="Заголовок услуг" selected={selection} path={["ru", "productsTitle"]} onSelect={selectText}>
-              {ru.productsTitle}
-            </ClickText>
-            <div className="grid gap-3 lg:grid-cols-3">
-              {ru.products.map((product, index) => (
-                <MiniCard key={product.code}>
-                  <ClickText label={`Услуга ${index + 1}: название`} selected={selection} path={["ru", "products", index, "title"]} onSelect={selectText}>
-                    {product.title}
-                  </ClickText>
-                  <ClickText label={`Услуга ${index + 1}: для кого`} selected={selection} path={["ru", "products", index, "audience"]} area onSelect={selectText}>
-                    {product.audience}
-                  </ClickText>
-                  <ClickText label={`Услуга ${index + 1}: описание`} selected={selection} path={["ru", "products", index, "text"]} area onSelect={selectText}>
-                    {product.text}
-                  </ClickText>
-                  <div className="grid gap-1">
-                    {product.includes.map((item, itemIndex) => (
-                      <ClickText key={itemIndex} label={`Услуга ${index + 1}: пункт ${itemIndex + 1}`} selected={selection} path={["ru", "products", index, "includes", itemIndex]} onSelect={selectText}>
-                        {item}
-                      </ClickText>
-                    ))}
-                  </div>
-                </MiniCard>
-              ))}
-            </div>
-          </AdminSection>
-
-          <AdminSection title="Метод и условия">
-            <TwoColumnPairs title="Метод" pairs={ru.methodSteps} root={["ru", "methodSteps"]} selection={selection} selectText={selectText} />
-            <TwoColumnPairs title="Условия" pairs={ru.terms} root={["ru", "terms"]} selection={selection} selectText={selectText} />
-          </AdminSection>
-
-          <AdminSection title="Контакт">
-            <ClickText label="Заголовок контакта" selected={selection} path={["ru", "contactTitle"]} area onSelect={selectText}>
-              {ru.contactTitle}
-            </ClickText>
-            <ClickText label="Текст контакта" selected={selection} path={["ru", "contactText"]} area onSelect={selectText}>
-              {ru.contactText}
-            </ClickText>
-            <ClickText label="Футер" selected={selection} path={["ru", "footer"]} area onSelect={selectText}>
-              {ru.footer}
-            </ClickText>
-          </AdminSection>
+      <div className="grid min-h-[calc(100vh-66px)] xl:grid-cols-[minmax(0,1fr)_420px]">
+        <section className="relative h-[calc(100vh-66px)] overflow-y-auto border-r border-white/10 bg-black">
+          <StudioLanding
+            works={works}
+            editorMode
+            editorContent={content}
+            editorWorks={works}
+            editorSelectionKey={selectionKey}
+            onEditorSelect={setSelection}
+          />
         </section>
 
-        <aside className="xl:sticky xl:top-[86px] xl:h-[calc(100vh-104px)]">
-          <Inspector
-            selection={selection}
-            textValue={selectedText}
-            works={works}
-            onTextChange={updateText}
-            onWorkChange={updateWork}
-            onWorkListChange={updateWorkList}
-            onFeatured={makeFeatured}
-            onRemove={removeWork}
-            onReset={resetLocal}
-            setSelection={setSelection}
-            updateContent={updateContent}
-          />
+        <aside className="h-[calc(100vh-66px)] overflow-y-auto bg-[#070a0d] p-4">
+          <div className="grid gap-4">
+            <StructurePanel selection={selection} onSelect={setSelection} works={works} addWork={addWork} moveWork={moveWork} />
+            <StylePanel content={content} updateContent={updateContent} />
+            <Inspector
+              selection={selection}
+              textValue={selectedText}
+              works={works}
+              onTextChange={updateText}
+              onWorkChange={updateWork}
+              onWorkListChange={updateWorkList}
+              onFeatured={makeFeatured}
+              onRemove={removeWork}
+              onMove={moveWork}
+            />
+            <VersionsPanel
+              versions={versions}
+              versionName={versionName}
+              setVersionName={setVersionName}
+              createVersion={createVersion}
+              restoreVersion={restoreVersion}
+            />
+          </div>
         </aside>
       </div>
     </main>
   );
 }
 
-function AdminHero({
-  ru,
-  showreel,
-  showreelIndex,
-  selectText,
-  selectWork,
+function StructurePanel({
+  selection,
+  onSelect,
+  works,
+  addWork,
+  moveWork,
 }: {
-  ru: EditorContent["ru"];
-  showreel?: Work;
-  showreelIndex: number;
-  selectText: (label: string, path: Path, area?: boolean) => void;
-  selectWork: (index: number) => void;
+  selection: EditorSelection;
+  onSelect: (selection: EditorSelection) => void;
+  works: Work[];
+  addWork: () => void;
+  moveWork: (index: number, direction: -1 | 1) => void;
 }) {
   return (
-    <AdminSection title="Первый экран">
-      <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
-        <div className="border border-white/10 bg-white/[0.025] p-4">
-          <ClickText label="Техническая строка" path={["ru", "eyebrow"]} onSelect={selectText}>{ru.eyebrow}</ClickText>
-          <ClickText label="Направление" path={["ru", "label"]} onSelect={selectText}>{ru.label}</ClickText>
-          <ClickText label="Главный заголовок" path={["ru", "heroTitle"]} onSelect={selectText}>
-            <span className="text-4xl font-semibold uppercase leading-none">{ru.heroTitle}</span>
-          </ClickText>
-          <ClickText label="Подзаголовок" path={["ru", "heroSub"]} area onSelect={selectText}>{ru.heroSub}</ClickText>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <ClickText label="Кнопка работ" path={["ru", "casesCta"]} onSelect={selectText}>{ru.casesCta}</ClickText>
-            <ClickText label="Кнопка связи" path={["ru", "projectCta"]} onSelect={selectText}>{ru.projectCta}</ClickText>
-          </div>
-          <ClickText label="Строка доверия" path={["ru", "trust"]} area onSelect={selectText}>{ru.trust}</ClickText>
-        </div>
-        {showreel ? (
-          <button type="button" onClick={() => selectWork(showreelIndex)} className="group overflow-hidden border border-accent/40 bg-white/[0.025] text-left">
-            <div className="aspect-video bg-cover bg-center" style={{ backgroundImage: `url(${getThumbnailUrl(showreel)})` }} />
-            <div className="p-4">
-              <p className="font-mono text-xs uppercase text-accent">Главный шоурил</p>
-              <h3 className="mt-2 text-2xl font-semibold uppercase">{showreel.titleRu ?? showreel.title}</h3>
-              <p className="mt-2 break-all text-sm text-white/50">{showreel.youtubeUrl}</p>
-            </div>
+    <Panel title="Страница" subtitle="Кликни элемент на сайте или выбери здесь">
+      <div className="grid gap-2">
+        {textFields.map((field) => (
+          <button
+            key={getEditorSelectionKey(field)}
+            type="button"
+            onClick={() => onSelect(field)}
+            className={`border px-3 py-2 text-left text-sm transition ${
+              getEditorSelectionKey(selection) === getEditorSelectionKey(field)
+                ? "border-accent bg-accent/10 text-white"
+                : "border-white/10 bg-black/20 text-white/62 hover:border-accent/55"
+            }`}
+          >
+            {field.label}
           </button>
-        ) : null}
+        ))}
       </div>
-    </AdminSection>
+
+      <div className="border-t border-white/10 pt-4">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <p className="font-mono text-xs uppercase text-white/42">Видео и работы</p>
+          <button type="button" onClick={addWork} className="inline-flex h-8 items-center gap-1 bg-accent px-2 text-xs font-semibold text-black">
+            <Plus size={13} />
+            Добавить
+          </button>
+        </div>
+        <div className="grid gap-2">
+          {works.map((work, index) => (
+            <div key={work.id ?? index} className="grid grid-cols-[1fr_auto_auto] gap-1">
+              <button
+                type="button"
+                onClick={() => onSelect({ type: "work", label: work.titleRu ?? work.title, index })}
+                className={`border px-3 py-2 text-left text-sm ${
+                  selection.type === "work" && selection.index === index
+                    ? "border-accent bg-accent/10 text-white"
+                    : "border-white/10 bg-black/20 text-white/62"
+                }`}
+              >
+                {work.featured ? "★ " : ""}
+                {work.titleRu ?? work.title}
+              </button>
+              <button type="button" onClick={() => moveWork(index, -1)} className="grid size-9 place-items-center border border-white/10 text-white/54">
+                <ArrowUp size={14} />
+              </button>
+              <button type="button" onClick={() => moveWork(index, 1)} className="grid size-9 place-items-center border border-white/10 text-white/54">
+                <ArrowDown size={14} />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+function StylePanel({
+  content,
+  updateContent,
+}: {
+  content: EditorContent;
+  updateContent: (path: EditorPath, value: unknown) => void;
+}) {
+  const styles = content._editor?.styles ?? {};
+  return (
+    <Panel title="Внешний вид" subtitle="Базовые настройки без кода">
+      <label className="grid gap-2">
+        <span className="text-xs uppercase text-white/48">Акцентный цвет</span>
+        <input
+          type="color"
+          value={typeof styles.accent === "string" ? styles.accent : "#00b7ff"}
+          onChange={(event) => updateContent(["_editor", "styles", "accent"], event.target.value)}
+          className="h-10 w-full border border-white/10 bg-black"
+        />
+      </label>
+      <RangeField
+        label="Размер главного заголовка"
+        value={Number(styles.heroTitleSize ?? 64)}
+        min={42}
+        max={86}
+        onChange={(value) => updateContent(["_editor", "styles", "heroTitleSize"], value)}
+      />
+      <RangeField
+        label="Масштаб текста первого экрана"
+        value={Number(styles.bodyScale ?? 100)}
+        min={90}
+        max={118}
+        onChange={(value) => updateContent(["_editor", "styles", "bodyScale"], value)}
+      />
+    </Panel>
   );
 }
 
@@ -436,10 +497,9 @@ function Inspector({
   onWorkListChange,
   onFeatured,
   onRemove,
-  onReset,
-  updateContent,
+  onMove,
 }: {
-  selection: Selection;
+  selection: EditorSelection;
   textValue: string;
   works: Work[];
   onTextChange: (value: string) => void;
@@ -447,22 +507,20 @@ function Inspector({
   onWorkListChange: (index: number, key: "workDoneRu" | "deliverablesRu", value: string[]) => void;
   onFeatured: (index: number) => void;
   onRemove: (index: number) => void;
-  onReset: () => void;
-  setSelection: (selection: Selection) => void;
-  updateContent: (path: Path, value: unknown) => void;
+  onMove: (index: number, direction: -1 | 1) => void;
 }) {
   if (selection.type === "work") {
     const work = works[selection.index];
     if (!work) return null;
     return (
-      <Panel title="Редактирование видео" subtitle={`Видео ${selection.index + 1}`}>
+      <Panel title="Работа / видео" subtitle={work.titleRu ?? work.title}>
         <div className="aspect-video border border-white/12 bg-cover bg-center" style={{ backgroundImage: `url(${getThumbnailUrl(work)})` }} />
         <Field label="Название на русском" value={work.titleRu ?? ""} onChange={(value) => onWorkChange(selection.index, { titleRu: value })} />
         <Field label="Название EN / fallback" value={work.title} onChange={(value) => onWorkChange(selection.index, { title: value })} />
         <Field label="YouTube ссылка" value={work.youtubeUrl} onChange={(value) => onWorkChange(selection.index, { youtubeUrl: value })} />
-        <Field label="Превью карточки" hint="auto или прямая ссылка на картинку" value={work.thumbnail ?? "auto"} onChange={(value) => onWorkChange(selection.index, { thumbnail: value || "auto" })} />
-        <label className="block">
-          <span className="mb-2 block text-xs uppercase text-white/48">Категория</span>
+        <Field label="Превью" hint="auto или прямая ссылка на картинку" value={work.thumbnail ?? "auto"} onChange={(value) => onWorkChange(selection.index, { thumbnail: value || "auto" })} />
+        <label className="grid gap-2">
+          <span className="text-xs uppercase text-white/48">Категория</span>
           <select
             className="h-11 w-full border border-white/10 bg-black/35 px-3 text-sm text-white outline-none"
             value={work.category}
@@ -479,15 +537,10 @@ function Inspector({
         <StringList label="Что сделано" value={work.workDoneRu ?? []} onChange={(value) => onWorkListChange(selection.index, "workDoneRu", value)} />
         <Field area label="Почему работает" value={work.whyItWorksRu ?? ""} onChange={(value) => onWorkChange(selection.index, { whyItWorksRu: value })} />
         <StringList label="Что отдаю" value={work.deliverablesRu ?? []} onChange={(value) => onWorkListChange(selection.index, "deliverablesRu", value)} />
-        <div className="grid grid-cols-2 gap-2">
-          <button type="button" onClick={() => onFeatured(selection.index)} className="inline-flex h-10 items-center justify-center gap-2 border border-accent/40 text-sm text-accent">
-            <Star size={15} />
-            Главный
-          </button>
-          <a href={work.youtubeUrl} target="_blank" className="inline-flex h-10 items-center justify-center gap-2 border border-white/12 text-sm text-white/70">
-            <ArrowUpRight size={15} />
-            YouTube
-          </a>
+        <div className="grid grid-cols-3 gap-2">
+          <button type="button" onClick={() => onMove(selection.index, -1)} className="h-10 border border-white/12 text-sm text-white/68">Выше</button>
+          <button type="button" onClick={() => onMove(selection.index, 1)} className="h-10 border border-white/12 text-sm text-white/68">Ниже</button>
+          <button type="button" onClick={() => onFeatured(selection.index)} className="h-10 border border-accent/40 text-sm text-accent">Шоурил</button>
         </div>
         <button type="button" onClick={() => onRemove(selection.index)} className="inline-flex h-10 items-center justify-center gap-2 border border-red-400/35 text-sm text-red-200">
           <Trash2 size={15} />
@@ -498,158 +551,65 @@ function Inspector({
   }
 
   return (
-    <Panel title="Редактирование текста" subtitle={selection.label}>
+    <Panel title="Текст" subtitle={selection.label}>
       <Field area={selection.area ?? textValue.length > 80} label={selection.label} value={textValue} onChange={onTextChange} />
-      <button type="button" onClick={onReset} className="inline-flex h-10 items-center justify-center gap-2 border border-white/12 text-sm text-white/62">
-        <RefreshCw size={15} />
-        Сбросить к файлам
-      </button>
       <p className="text-sm leading-6 text-white/48">
-        Выделяй текст или видео слева. Изменения автоматически пишутся в JSON и сразу видны на локальном сайте.
+        Текст меняется сразу в настоящем лендинге слева и автоматически сохраняется в JSON.
       </p>
-      <QuickStats updateContent={updateContent} />
     </Panel>
   );
 }
 
-function QuickStats({ updateContent }: { updateContent: (path: Path, value: unknown) => void }) {
-  const stats = cloneContent().ru.stats;
-  return (
-    <div className="border-t border-white/10 pt-4">
-      <p className="mb-2 font-mono text-xs uppercase text-white/40">Подсказка</p>
-      <p className="text-sm leading-6 text-white/48">
-        Метрики тоже редактируются на canvas слева. При необходимости можно менять массивы прямо в JSON, но для обычной работы это не нужно.
-      </p>
-      <button type="button" onClick={() => updateContent(["ru", "stats"], stats)} className="mt-3 hidden">
-        reset stats
-      </button>
-    </div>
-  );
-}
-
-function AdminSection({ title, children, action }: { title: string; children: React.ReactNode; action?: React.ReactNode }) {
-  return (
-    <section className="border border-white/10 bg-[#06090b] p-4">
-      <div className="mb-4 flex items-center justify-between gap-3 border-b border-white/10 pb-3">
-        <h2 className="font-mono text-xs uppercase text-accent">{title}</h2>
-        {action}
-      </div>
-      <div className="grid gap-3">{children}</div>
-    </section>
-  );
-}
-
-function MiniCard({ children }: { children: React.ReactNode }) {
-  return <div className="grid gap-2 border border-white/10 bg-white/[0.02] p-3">{children}</div>;
-}
-
-function ClickText({
-  label,
-  path,
-  selected,
-  area,
-  onSelect,
-  children,
+function VersionsPanel({
+  versions,
+  versionName,
+  setVersionName,
+  createVersion,
+  restoreVersion,
 }: {
-  label: string;
-  path: Path;
-  selected?: Selection;
-  area?: boolean;
-  onSelect: (label: string, path: Path, area?: boolean) => void;
-  children: React.ReactNode;
-}) {
-  const active = selected?.type === "text" && JSON.stringify(selected.path) === JSON.stringify(path);
-  return (
-    <button
-      type="button"
-      onClick={() => onSelect(label, path, area)}
-      className={`block w-full border p-2 text-left transition ${
-        active ? "border-accent bg-accent/10" : "border-white/10 bg-black/20 hover:border-accent/55"
-      }`}
-    >
-      <span className="mb-1 block font-mono text-[10px] uppercase text-white/36">{label}</span>
-      <span className="block text-sm leading-6 text-white/78">{children}</span>
-    </button>
-  );
-}
-
-function WorkAdminCard({
-  work,
-  active,
-  onSelect,
-  onFeatured,
-  onRemove,
-}: {
-  work: Work;
-  active: boolean;
-  onSelect: () => void;
-  onFeatured: () => void;
-  onRemove: () => void;
+  versions: VersionItem[];
+  versionName: string;
+  setVersionName: (value: string) => void;
+  createVersion: () => void;
+  restoreVersion: (id: string) => void;
 }) {
   return (
-    <article className={`overflow-hidden border ${active ? "border-accent" : "border-white/10"} bg-white/[0.02]`}>
-      <button type="button" onClick={onSelect} className="block w-full text-left">
-        <div className="relative aspect-video bg-cover bg-center" style={{ backgroundImage: `url(${getThumbnailUrl(work)})` }}>
-          {work.featured ? <span className="absolute left-3 top-3 bg-accent px-2 py-1 font-mono text-[10px] uppercase text-black">Шоурил</span> : null}
-        </div>
-        <div className="p-3">
-          <p className="font-mono text-[10px] uppercase text-accent">{work.category}</p>
-          <h3 className="mt-1 text-lg font-semibold uppercase">{work.titleRu ?? work.title}</h3>
-          <p className="mt-2 line-clamp-2 text-sm leading-5 text-white/52">{work.taskRu ?? work.descriptionRu ?? work.youtubeUrl}</p>
-        </div>
-      </button>
-      <div className="grid grid-cols-2 border-t border-white/10">
-        <button type="button" onClick={onFeatured} className="inline-flex h-10 items-center justify-center gap-2 border-r border-white/10 text-sm text-white/70">
-          <Star size={14} />
-          Главный
-        </button>
-        <button type="button" onClick={onRemove} className="inline-flex h-10 items-center justify-center gap-2 text-sm text-red-200">
-          <Trash2 size={14} />
-          Удалить
+    <Panel title="Версии" subtitle="Снимок перед экспериментами">
+      <div className="grid grid-cols-[1fr_auto] gap-2">
+        <input
+          className="h-10 border border-white/10 bg-black/35 px-3 text-sm text-white outline-none focus:border-accent"
+          value={versionName}
+          onChange={(event) => setVersionName(event.target.value)}
+          placeholder="Например: до правок hero"
+        />
+        <button type="button" onClick={createVersion} className="inline-flex h-10 items-center gap-2 bg-white px-3 text-sm font-semibold text-black">
+          <History size={15} />
+          Снимок
         </button>
       </div>
-    </article>
-  );
-}
-
-function TwoColumnPairs({
-  title,
-  pairs,
-  root,
-  selection,
-  selectText,
-}: {
-  title: string;
-  pairs: Pair[];
-  root: Path;
-  selection: Selection;
-  selectText: (label: string, path: Path, area?: boolean) => void;
-}) {
-  return (
-    <div>
-      <p className="mb-2 font-mono text-xs uppercase text-white/38">{title}</p>
-      <div className="grid gap-2 md:grid-cols-2">
-        {pairs.map(([heading, text], index) => (
-          <MiniCard key={index}>
-            <ClickText label={`${title} ${index + 1}: заголовок`} selected={selection} path={[...root, index, 0]} onSelect={selectText}>
-              {heading}
-            </ClickText>
-            <ClickText label={`${title} ${index + 1}: текст`} selected={selection} path={[...root, index, 1]} area onSelect={selectText}>
-              {text}
-            </ClickText>
-          </MiniCard>
-        ))}
+      <div className="grid gap-2">
+        {versions.length ? versions.map((version) => (
+          <button
+            key={version.id}
+            type="button"
+            onClick={() => restoreVersion(version.id)}
+            className="border border-white/10 bg-black/20 px-3 py-2 text-left text-sm text-white/66 hover:border-accent/60"
+          >
+            <span className="block text-white">{version.name}</span>
+            <span className="font-mono text-[11px] uppercase text-white/38">{new Date(version.createdAt).toLocaleString("ru-RU")}</span>
+          </button>
+        )) : <p className="text-sm text-white/42">Версий пока нет.</p>}
       </div>
-    </div>
+    </Panel>
   );
 }
 
 function Panel({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <section className="grid max-h-full gap-4 overflow-y-auto border border-white/10 bg-[#06090b] p-4">
+    <section className="grid gap-4 border border-white/10 bg-[#06090b] p-4">
       <div className="border-b border-white/10 pb-3">
         <p className="font-mono text-xs uppercase text-accent">{title}</p>
-        {subtitle ? <h2 className="mt-1 text-xl font-semibold uppercase">{subtitle}</h2> : null}
+        {subtitle ? <h2 className="mt-1 text-lg font-semibold uppercase leading-tight">{subtitle}</h2> : null}
       </div>
       {children}
     </section>
@@ -671,14 +631,38 @@ function Field({
 }) {
   const className = "w-full border border-white/10 bg-black/35 px-3 py-2 text-sm text-white outline-none focus:border-accent";
   return (
-    <label className="block">
-      <span className="mb-2 block text-xs uppercase text-white/48">{label}</span>
+    <label className="grid gap-2">
+      <span className="text-xs uppercase text-white/48">{label}</span>
       {area ? (
         <textarea className={`${className} min-h-28 resize-y leading-6`} value={value} onChange={(event) => onChange(event.target.value)} />
       ) : (
         <input className={className} value={value} onChange={(event) => onChange(event.target.value)} />
       )}
-      {hint ? <span className="mt-1 block text-xs text-white/34">{hint}</span> : null}
+      {hint ? <span className="text-xs text-white/34">{hint}</span> : null}
+    </label>
+  );
+}
+
+function RangeField({
+  label,
+  value,
+  min,
+  max,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <label className="grid gap-2">
+      <span className="flex items-center justify-between text-xs uppercase text-white/48">
+        <span>{label}</span>
+        <span className="font-mono text-accent">{value}</span>
+      </span>
+      <input type="range" min={min} max={max} value={value} onChange={(event) => onChange(Number(event.target.value))} />
     </label>
   );
 }

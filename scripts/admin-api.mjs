@@ -1,6 +1,6 @@
 import { execFile } from "node:child_process";
 import { createServer } from "node:http";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { promisify } from "node:util";
 
@@ -8,6 +8,7 @@ const exec = promisify(execFile);
 const root = process.cwd();
 const port = Number(process.env.ADMIN_API_PORT || 4317);
 const allowedOrigins = new Set(["http://127.0.0.1:3000", "http://localhost:3000"]);
+const versionsDir = join(root, "data", ".versions");
 
 const send = (response, status, data) => {
   response.writeHead(status, response.localsHeaders);
@@ -24,6 +25,36 @@ const readBody = async (request) => {
 const runGit = async (args) => {
   const { stdout, stderr } = await exec("git", args, { cwd: root });
   return `${stdout}${stderr}`.trim();
+};
+
+const readContentFiles = async () => {
+  const [content, works] = await Promise.all([
+    readFile(join(root, "data", "landing-content.json"), "utf8"),
+    readFile(join(root, "data", "works.json"), "utf8"),
+  ]);
+  return { content: JSON.parse(content), works: JSON.parse(works) };
+};
+
+const writeContentFiles = async ({ content, works }) => {
+  await Promise.all([
+    writeFile(join(root, "data", "landing-content.json"), `${JSON.stringify(content, null, 2)}\n`, "utf8"),
+    writeFile(join(root, "data", "works.json"), `${JSON.stringify(works, null, 2)}\n`, "utf8"),
+  ]);
+};
+
+const readVersions = async () => {
+  await mkdir(versionsDir, { recursive: true });
+  const files = await readdir(versionsDir);
+  const versions = await Promise.all(
+    files
+      .filter((file) => file.endsWith(".json"))
+      .map(async (file) => {
+        const raw = await readFile(join(versionsDir, file), "utf8");
+        const data = JSON.parse(raw);
+        return { id: file.replace(/\.json$/, ""), name: data.name, createdAt: data.createdAt };
+      }),
+  );
+  return versions.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
 };
 
 const server = createServer(async (request, response) => {
@@ -43,20 +74,41 @@ const server = createServer(async (request, response) => {
     }
 
     if (request.method === "GET" && request.url === "/content") {
-      const [content, works] = await Promise.all([
-        readFile(join(root, "data", "landing-content.json"), "utf8"),
-        readFile(join(root, "data", "works.json"), "utf8"),
-      ]);
-      return send(response, 200, { ok: true, content: JSON.parse(content), works: JSON.parse(works) });
+      const { content, works } = await readContentFiles();
+      return send(response, 200, { ok: true, content, works });
     }
 
     if (request.method === "POST" && request.url === "/save") {
       const body = await readBody(request);
-      await Promise.all([
-        writeFile(join(root, "data", "landing-content.json"), `${JSON.stringify(body.content, null, 2)}\n`, "utf8"),
-        writeFile(join(root, "data", "works.json"), `${JSON.stringify(body.works, null, 2)}\n`, "utf8"),
-      ]);
+      await writeContentFiles(body);
       return send(response, 200, { ok: true, message: "Сохранено в data/*.json" });
+    }
+
+    if (request.method === "GET" && request.url === "/versions") {
+      const versions = await readVersions();
+      return send(response, 200, { ok: true, versions });
+    }
+
+    if (request.method === "POST" && request.url === "/version") {
+      const body = await readBody(request);
+      const snapshot = {
+        name: body.name || "Версия без названия",
+        createdAt: new Date().toISOString(),
+        content: body.content,
+        works: body.works,
+      };
+      await mkdir(versionsDir, { recursive: true });
+      const id = snapshot.createdAt.replace(/[:.]/g, "-");
+      await writeFile(join(versionsDir, `${id}.json`), `${JSON.stringify(snapshot, null, 2)}\n`, "utf8");
+      return send(response, 200, { ok: true, id, message: "Версия сохранена" });
+    }
+
+    if (request.method === "POST" && request.url === "/restore") {
+      const body = await readBody(request);
+      const raw = await readFile(join(versionsDir, `${body.id}.json`), "utf8");
+      const snapshot = JSON.parse(raw);
+      await writeContentFiles({ content: snapshot.content, works: snapshot.works });
+      return send(response, 200, { ok: true, content: snapshot.content, works: snapshot.works, message: "Версия восстановлена" });
     }
 
     if (request.method === "POST" && request.url === "/publish") {
