@@ -28,4 +28,11 @@ process.on("SIGINT", () => stopAll(0));
 process.on("SIGTERM", () => stopAll(0));
 
 start("admin-api", [join(root, "scripts", "admin-api.mjs")]);
-start("next", [join(root, "node_modules", "next", "dist", "bin", "next"), "dev"]);
+start("next", [
+  join(root, "node_modules", "next", "dist", "bin", "next"),
+  "dev",
+  "-H",
+  "127.0.0.1",
+  "-p",
+  "3000",
+]);
