@@ -3,6 +3,15 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: ["main"]
+    paths-ignore:
+      - ".agents/**"
+      - ".github/**"
+      - ".vscode/**"
+      - "AGENTS.md"
+      - "DEEPSEEK_HANDOFF.md"
+      - "README.md"
+      - "open-editor.ps1"
+      - "skills-lock.json"
   workflow_dispatch:
 
 permissions:
