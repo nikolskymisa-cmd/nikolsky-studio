@@ -23,7 +23,7 @@ const readBody = async (request) => {
 };
 
 const runGit = async (args) => {
-  const { stdout, stderr } = await exec("git", args, { cwd: root });
+  const { stdout, stderr } = await exec("git", args, { cwd: root, maxBuffer: 1024 * 1024 * 10 });
   return `${stdout}${stderr}`.trim();
 };
 
@@ -112,13 +112,19 @@ const server = createServer(async (request, response) => {
     }
 
     if (request.method === "POST" && request.url === "/publish") {
-      const changed = await runGit(["status", "--porcelain", "--", "data/landing-content.json", "data/works.json"]);
-      if (!changed) return send(response, 200, { ok: true, message: "Изменений в data нет. GitHub уже актуален." });
+      await runGit(["pull", "--rebase", "--autostash"]);
 
-      await runGit(["add", "data/landing-content.json", "data/works.json"]);
-      await runGit(["commit", "-m", "Update portfolio content"]);
+      const changed = await runGit(["status", "--porcelain"]);
+      if (!changed) return send(response, 200, { ok: true, message: "Изменений нет. GitHub уже актуален." });
+
+      await runGit(["add", "-A"]);
+      const stagedFiles = await runGit(["diff", "--cached", "--name-only"]);
+      if (!stagedFiles) return send(response, 200, { ok: true, message: "Изменений для коммита нет. GitHub уже актуален." });
+
+      await runGit(["commit", "-m", "Publish local site changes"]);
       const output = await runGit(["push"]);
-      return send(response, 200, { ok: true, message: "Запушено. GitHub Pages пересобирается.", output });
+      const files = stagedFiles.split(/\r?\n/).filter(Boolean).length;
+      return send(response, 200, { ok: true, message: `Запушено ${files} файл(ов). GitHub Pages пересобирается.`, output });
     }
 
     return send(response, 404, { ok: false, message: "Не найдено" });
