@@ -504,8 +504,8 @@ export function StudioLanding({
     if (!editorMode) return "";
     const active = editorSelectionKey === getEditorSelectionKey(selection);
     return active
-      ? " ring-2 ring-accent ring-offset-2 ring-offset-black/80"
-      : " ring-1 ring-white/10 hover:ring-accent/70";
+      ? " cursor-pointer ring-2 ring-accent ring-offset-2 ring-offset-black/80"
+      : " cursor-pointer ring-1 ring-white/10 hover:ring-accent/70";
   };
 
   useEffect(() => {

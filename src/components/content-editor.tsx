@@ -151,6 +151,7 @@ export function ContentEditor() {
   const [status, setStatus] = useState("Готово");
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [inspectorOpen, setInspectorOpen] = useState(true);
   const mounted = useRef(false);
 
   const selectionKey = useMemo(() => getEditorSelectionKey(selection), [selection]);
@@ -329,6 +330,10 @@ export function ContentEditor() {
               <Monitor size={15} />
               Открыть сайт
             </a>
+            <button type="button" onClick={addWork} className="inline-flex h-10 items-center gap-2 border border-accent/45 px-3 text-sm font-semibold text-accent">
+              <Plus size={15} />
+              Видео
+            </button>
             <button type="button" onClick={() => saveToFiles()} className="inline-flex h-10 items-center gap-2 bg-white px-3 text-sm font-semibold text-black">
               <Save size={15} />
               Сохранить
@@ -341,22 +346,35 @@ export function ContentEditor() {
         </div>
       </header>
 
-      <div className="grid min-h-[calc(100vh-66px)] xl:grid-cols-[minmax(0,1fr)_420px]">
-        <section className="relative h-[calc(100vh-66px)] overflow-y-auto border-r border-white/10 bg-black">
+      <div className="grid min-h-[calc(100vh-66px)] lg:grid-cols-[minmax(0,1fr)_430px]">
+        <section className="relative h-[calc(100vh-66px)] overflow-y-auto border-r border-white/10 bg-black pb-[72vh] lg:pb-0">
           <StudioLanding
             works={works}
             editorMode
             editorContent={content}
             editorWorks={works}
             editorSelectionKey={selectionKey}
-            onEditorSelect={setSelection}
+            onEditorSelect={(nextSelection) => {
+              setSelection(nextSelection);
+              setInspectorOpen(true);
+            }}
           />
         </section>
 
-        <aside className="h-[calc(100vh-66px)] overflow-y-auto bg-[#070a0d] p-4">
+        <aside
+          className={`fixed inset-x-0 bottom-0 z-[90] max-h-[72vh] overflow-y-auto border-t border-white/12 bg-[#070a0d] p-4 shadow-[0_-24px_70px_rgba(0,0,0,0.55)] transition lg:sticky lg:top-[66px] lg:h-[calc(100vh-66px)] lg:max-h-none lg:border-l lg:border-t-0 lg:shadow-none ${
+            inspectorOpen ? "translate-y-0" : "translate-y-[calc(100%-52px)] lg:translate-y-0"
+          }`}
+        >
           <div className="grid gap-4">
-            <StructurePanel selection={selection} onSelect={setSelection} works={works} addWork={addWork} moveWork={moveWork} />
-            <StylePanel content={content} updateContent={updateContent} />
+            <button
+              type="button"
+              onClick={() => setInspectorOpen((current) => !current)}
+              className="flex h-10 items-center justify-between border border-accent/35 bg-accent/10 px-3 text-left lg:hidden"
+            >
+              <span className="font-mono text-xs uppercase text-accent">Панель редактирования</span>
+              <span className="text-sm text-white/72">{inspectorOpen ? "Свернуть" : "Открыть"}</span>
+            </button>
             <Inspector
               selection={selection}
               textValue={selectedText}
@@ -368,6 +386,17 @@ export function ContentEditor() {
               onRemove={removeWork}
               onMove={moveWork}
             />
+            <StructurePanel
+              selection={selection}
+              onSelect={(nextSelection) => {
+                setSelection(nextSelection);
+                setInspectorOpen(true);
+              }}
+              works={works}
+              addWork={addWork}
+              moveWork={moveWork}
+            />
+            <StylePanel content={content} updateContent={updateContent} />
             <VersionsPanel
               versions={versions}
               versionName={versionName}
