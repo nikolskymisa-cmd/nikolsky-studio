@@ -157,6 +157,7 @@ function makeWork(): Work {
     whyItWorksRu: "Почему эта версия работает.",
     deliverablesRu: ["финальный ролик"],
     featured: false,
+    priority: 0,
   };
 }
 
@@ -1069,6 +1070,12 @@ function Inspector({
         <Field label="Название EN / fallback" value={work.title} onChange={(value) => onWorkChange(selection.index, { title: value })} />
         <Field label="YouTube ссылка" value={work.youtubeUrl} onChange={(value) => onWorkChange(selection.index, { youtubeUrl: value })} />
         <Field label="Превью" hint="auto или прямая ссылка на картинку" value={work.thumbnail ?? "auto"} onChange={(value) => onWorkChange(selection.index, { thumbnail: value || "auto" })} />
+        <NumberField
+          label="Приоритет показа"
+          hint="Чем выше число, тем выше ролик в выборе для первого экрана. Главное видео всё равно задаётся кнопкой ниже."
+          value={Number(work.priority ?? 0)}
+          onChange={(value) => onWorkChange(selection.index, { priority: value })}
+        />
         <label className="grid gap-2">
           <span className="text-xs uppercase text-white/48">Категория</span>
           <select
@@ -1090,8 +1097,16 @@ function Inspector({
         <div className="grid grid-cols-3 gap-2">
           <button type="button" onClick={() => onMove(selection.index, -1)} className="h-10 border border-white/12 text-sm text-white/68">Выше</button>
           <button type="button" onClick={() => onMove(selection.index, 1)} className="h-10 border border-white/12 text-sm text-white/68">Ниже</button>
-          <button type="button" onClick={() => onFeatured(selection.index)} className="h-10 border border-accent/40 text-sm text-accent">Шоурил</button>
         </div>
+        <button
+          type="button"
+          onClick={() => onFeatured(selection.index)}
+          className={`inline-flex h-10 items-center justify-center border text-sm font-semibold ${
+            work.featured ? "border-accent bg-accent text-black" : "border-accent/40 text-accent"
+          }`}
+        >
+          {work.featured ? "Показывается на первом экране" : "Поставить на первый экран"}
+        </button>
         <button type="button" onClick={() => onRemove(selection.index)} className="inline-flex h-10 items-center justify-center gap-2 border border-red-400/35 text-sm text-red-200">
           <Trash2 size={15} />
           Удалить видео
@@ -1189,6 +1204,31 @@ function Field({
         <input className={className} value={value} onChange={(event) => onChange(event.target.value)} />
       )}
       {hint ? <span className="text-xs text-white/34">{hint}</span> : null}
+    </label>
+  );
+}
+
+function NumberField({
+  label,
+  value,
+  onChange,
+  hint,
+}: {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  hint?: string;
+}) {
+  return (
+    <label className="grid gap-2">
+      <span className="text-xs uppercase text-white/48">{label}</span>
+      <input
+        type="number"
+        className="w-full border border-white/10 bg-black/35 px-3 py-2 text-sm text-white outline-none focus:border-accent"
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value || 0))}
+      />
+      {hint ? <span className="text-xs leading-5 text-white/34">{hint}</span> : null}
     </label>
   );
 }

@@ -553,7 +553,15 @@ export function StudioLanding({
       left: editorStyles[`${key}X`] ? `${Number(editorStyles[`${key}X`])}px` : undefined,
     }) as CSSProperties;
 
-  const showreel = liveWorks.find((work) => work.featured) ?? liveWorks[0];
+  const showreel = useMemo(() => {
+    return [...liveWorks].sort((a, b) => {
+      const featuredDiff = Number(Boolean(b.featured)) - Number(Boolean(a.featured));
+      if (featuredDiff) return featuredDiff;
+      const priorityDiff = Number(b.priority ?? 0) - Number(a.priority ?? 0);
+      if (priorityDiff) return priorityDiff;
+      return Number(b.category === "Showreel") - Number(a.category === "Showreel");
+    })[0];
+  }, [liveWorks]);
   const portfolioWorks = useMemo(() => liveWorks.filter((work) => !work.featured), [liveWorks]);
   const filteredWorks =
     activeFilter === "All"
@@ -701,7 +709,6 @@ export function StudioLanding({
           >
             <ShowreelPlayer
               work={viewWork(showreel, lang)}
-              label={t.showreelLabel}
               button={t.showreelCta}
             />
           </div>
@@ -1017,11 +1024,9 @@ function SectionHeader({ eyebrow, title, text }: { eyebrow: string; title: strin
 
 function ShowreelPlayer({
   work,
-  label,
   button,
 }: {
   work: Work;
-  label: string;
   button: string;
 }) {
   const thumbnailUrl = getThumbnailUrl(work);
@@ -1093,9 +1098,10 @@ function ShowreelPlayer({
 
   useEffect(() => {
     if (!playerActive) return;
-    let frame = 0;
+    let disposed = false;
 
     const tick = () => {
+      if (disposed) return;
       const player = playerRef.current;
       if (player) {
         const apiDuration = player.getDuration();
@@ -1108,11 +1114,14 @@ function ShowreelPlayer({
 
         if (Number.isFinite(apiTime)) setCurrentTime(apiTime);
       }
-      frame = window.requestAnimationFrame(tick);
     };
 
-    frame = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(frame);
+    tick();
+    const timer = window.setInterval(tick, 220);
+    return () => {
+      disposed = true;
+      window.clearInterval(timer);
+    };
   }, [playerActive]);
 
   const togglePlayback = () => {
@@ -1154,11 +1163,6 @@ function ShowreelPlayer({
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
       className="relative border border-white/12 bg-[#05080b]/92 shadow-[0_24px_70px_rgba(0,0,0,0.38)] sm:shadow-[0_30px_90px_rgba(0,0,0,0.44)]"
     >
-      <div className="flex items-center justify-between border-b border-white/10 px-3 py-2.5 font-mono text-[10px] uppercase text-white/42 sm:px-4 sm:py-3 sm:text-[11px]">
-        <span>{label}</span>
-        <span>{durationKnown ? `${formatSeconds(currentTime)} / ${formatSeconds(duration)}` : "--:--"}</span>
-      </div>
-
       <div className="relative aspect-video w-full overflow-hidden bg-black">
         {playerActive && videoId ? <div id={playerHostId} className="absolute inset-0 h-full w-full" /> : null}
         {!playerActive ? (
@@ -1180,13 +1184,13 @@ function ShowreelPlayer({
         ) : null}
       </div>
 
-      <div className="border-t border-white/10 p-3 sm:p-4">
-        <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="border-t border-white/10 p-3 sm:p-3">
+        <div className="mb-2 flex items-center justify-between gap-3">
           <div>
             <p className="font-mono text-[10px] uppercase text-accent sm:text-[11px]">Breakdown</p>
-            <p className="mt-1 text-xs leading-5 text-white/45 sm:text-sm">Как собирается внимание: хук, ритм, смысл, упаковка.</p>
+            <p className="mt-1 text-xs leading-5 text-white/45">Хук, ритм, смысл, упаковка.</p>
           </div>
-          <button type="button" onClick={togglePlayback} className="inline-flex h-10 shrink-0 items-center justify-center gap-2 bg-white px-4 text-sm font-semibold text-black transition hover:bg-accent">
+          <button type="button" onClick={togglePlayback} className="inline-flex h-9 shrink-0 items-center justify-center gap-2 bg-white px-3 text-xs font-semibold text-black transition hover:bg-accent sm:px-4 sm:text-sm">
             {isPlaying ? <Pause size={15} fill="currentColor" /> : <Play size={15} fill="currentColor" />}
             {button}
           </button>
@@ -1226,7 +1230,7 @@ function BreakdownTrackRow({
 
   return (
     <div
-      className={`grid gap-2 border p-3 transition sm:grid-cols-[92px_minmax(0,1fr)_150px] sm:items-center ${
+      className={`grid gap-2 border p-2 transition sm:grid-cols-[132px_minmax(0,1fr)_190px] sm:items-center sm:gap-3 ${
         active
           ? "border-accent/60 bg-accent/[0.055] shadow-[0_0_28px_rgba(0,183,255,0.1)]"
           : "border-white/10 bg-white/[0.018]"
@@ -1234,12 +1238,12 @@ function BreakdownTrackRow({
     >
       <button type="button" onClick={() => onSeek(track.segments[0]?.start ?? 0)} className="text-left">
         <span className={`block font-mono text-[11px] uppercase ${active ? "text-accent" : "text-white/44"}`}>{track.label}</span>
-        <span className="mt-1 block text-sm font-semibold uppercase leading-4 text-white">{track.title}</span>
+        <span className="mt-1 block text-xs font-semibold uppercase leading-4 text-white sm:text-sm">{track.title}</span>
       </button>
 
-      <div className="relative h-8 overflow-hidden border border-white/10 bg-black/28">
+      <div className="relative h-7 overflow-hidden border border-white/10 bg-black/28">
         <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-white/10" />
-        <span className="absolute bottom-0 top-0 z-20 w-px bg-accent shadow-[0_0_16px_rgba(0,183,255,0.75)]" style={{ left: `${progress}%` }} />
+        <span className="absolute bottom-0 top-0 z-20 w-px bg-accent shadow-[0_0_16px_rgba(0,183,255,0.75)] transition-[left] duration-200 ease-linear" style={{ left: `${progress}%` }} />
         {track.segments.map((segment, index) => {
           const left = clampPercent((segment.start / duration) * 100);
           const width = clampPercent(((segment.end - segment.start) / duration) * 100);
@@ -1259,7 +1263,7 @@ function BreakdownTrackRow({
         })}
       </div>
 
-      <p className={`text-xs leading-5 sm:text-[13px] ${active ? "text-white/78" : "text-white/44"}`}>{track.description}</p>
+      <p className={`text-xs leading-5 ${active ? "text-white/78" : "text-white/44"}`}>{track.description}</p>
     </div>
   );
 }

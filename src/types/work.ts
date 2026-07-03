@@ -28,4 +28,5 @@ export type Work = {
   deliverables?: string[];
   deliverablesRu?: string[];
   featured?: boolean;
+  priority?: number;
 };
