@@ -33,6 +33,7 @@ const ADMIN_API = "http://127.0.0.1:4317";
 type EditorContent = Partial<LandingCopy> & Record<string, unknown> & {
   _editor?: {
     styles?: {
+      [key: string]: number | string | undefined;
       accent?: string;
       heroTitleSize?: number;
       bodyScale?: number;
@@ -45,10 +46,16 @@ type EditorContent = Partial<LandingCopy> & Record<string, unknown> & {
       ctaPadding?: number;
       ctaFontSize?: number;
     };
+    links?: {
+      telegramUrl?: string;
+      instagramUrl?: string;
+      vkUrl?: string;
+      email?: string;
+    };
   };
 };
 
-type EditorPanel = "hero" | "video" | "page" | "versions";
+type EditorPanel = "hero" | "section" | "video" | "page" | "versions";
 
 type VersionItem = {
   id: string;
@@ -86,6 +93,25 @@ const textFields: Array<EditorSelection & { type: "text" }> = [
   { type: "text", label: "Контакт: текст", path: ["ru", "contactText"], area: true },
   { type: "text", label: "Футер", path: ["ru", "footer"], area: true },
 ];
+
+const heroFields = textFields.slice(0, 6);
+
+function isHeroSelection(selection: EditorSelection) {
+  return selection.type === "text" && heroFields.some((field) => getEditorSelectionKey(field) === getEditorSelectionKey(selection));
+}
+
+function getSectionKey(selection: EditorSelection) {
+  if (selection.type !== "text") return "page";
+  const key = String(selection.path[1] ?? "");
+  if (key.startsWith("position")) return "position";
+  if (key.startsWith("products")) return "products";
+  if (key.startsWith("reel") || key === "chapters" || key === "showreelCta" || key === "showreelLabel" || key === "tracks") return "reel";
+  if (key.startsWith("cases") || key === "all" || key === "openCase" || key === "youtube") return "cases";
+  if (key.startsWith("method")) return "method";
+  if (key.startsWith("terms")) return "terms";
+  if (key.startsWith("contact") || key === "footer" || key === "email" || key === "vk") return "contact";
+  return "page";
+}
 
 function clone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
@@ -231,7 +257,11 @@ export function ContentEditor() {
 
   const selectEditorItem = (nextSelection: EditorSelection) => {
     setSelection(nextSelection);
-    setActivePanel(nextSelection.type === "work" ? "video" : "hero");
+    if (nextSelection.type === "work") {
+      setActivePanel("video");
+    } else {
+      setActivePanel(isHeroSelection(nextSelection) ? "hero" : "section");
+    }
     setInspectorOpen(true);
   };
 
@@ -403,6 +433,15 @@ export function ContentEditor() {
                 updateContent={updateContent}
               />
             ) : null}
+            {activePanel === "section" ? (
+              <SectionPanel
+                content={content}
+                selection={selection}
+                selectedText={selectedText}
+                onTextChange={updateText}
+                updateContent={updateContent}
+              />
+            ) : null}
             {activePanel === "video" ? (
               <Inspector
                 selection={selection.type === "work" ? selection : { type: "work", label: works[0]?.titleRu ?? "Видео", index: 0 }}
@@ -450,13 +489,14 @@ function PanelTabs({
 }) {
   const tabs: Array<{ id: EditorPanel; label: string }> = [
     { id: "hero", label: "Главный" },
+    { id: "section", label: "Блок" },
     { id: "video", label: "Видео" },
     { id: "page", label: "Страница" },
     { id: "versions", label: "Версии" },
   ];
 
   return (
-    <div className="grid grid-cols-4 gap-1 border border-white/10 bg-black/25 p-1">
+    <div className="grid grid-cols-5 gap-1 border border-white/10 bg-black/25 p-1">
       {tabs.map((tab) => (
         <button
           key={tab.id}
@@ -600,6 +640,295 @@ function HeroPanel({
         </label>
       </Panel>
     </>
+  );
+}
+
+function SectionPanel({
+  content,
+  selection,
+  selectedText,
+  onTextChange,
+  updateContent,
+}: {
+  content: EditorContent;
+  selection: EditorSelection;
+  selectedText: string;
+  onTextChange: (value: string) => void;
+  updateContent: (path: EditorPath, value: unknown) => void;
+}) {
+  const section = getSectionKey(selection);
+  const styles = content._editor?.styles ?? {};
+  const titles: Record<string, string> = {
+    position: "Позиционирование",
+    products: "Продукты",
+    reel: "Шоурил-блок",
+    cases: "Работы",
+    method: "Метод",
+    terms: "Условия",
+    contact: "Контакт",
+    page: "Блок",
+  };
+  const xKey = `${section}X`;
+
+  return (
+    <>
+      <Panel title={titles[section] ?? "Блок"} subtitle="Редактируется только выбранная секция">
+        {selection.type === "text" ? (
+          <Field area={selection.area ?? selectedText.length > 80} label={selection.label} value={selectedText} onChange={onTextChange} />
+        ) : null}
+        <RangeField
+          label="Блок влево / вправо"
+          value={Number(styles[xKey] ?? 0)}
+          min={-160}
+          max={160}
+          onChange={(value) => updateContent(["_editor", "styles", xKey], value)}
+        />
+      </Panel>
+
+      {section === "position" ? (
+        <Panel title="Тексты блока" subtitle="Заголовок и карточки">
+          <ContentField content={content} path={["ru", "positionEyebrow"]} label="Лейбл" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "positionTitle"]} label="Заголовок" area updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "positionText"]} label="Описание" area updateContent={updateContent} />
+          <PairList title="Карточки" root={["ru", "positionCards"]} content={content} updateContent={updateContent} />
+        </Panel>
+      ) : null}
+
+      {section === "products" ? (
+        <Panel title="Продукты" subtitle="Карточки услуг">
+          <ContentField content={content} path={["ru", "productsEyebrow"]} label="Лейбл" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "productsTitle"]} label="Заголовок" area updateContent={updateContent} />
+          <ProductList content={content} updateContent={updateContent} />
+        </Panel>
+      ) : null}
+
+      {section === "reel" ? (
+        <Panel title="Шоурил-блок" subtitle="Текст под большим превью и таймлайн">
+          <ContentField content={content} path={["ru", "reelEyebrow"]} label="Лейбл" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "reelTitle"]} label="Заголовок" area updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "reelText"]} label="Описание" area updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "showreelCta"]} label="Кнопка" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "chapters"]} label="Заголовок таймлайна" updateContent={updateContent} />
+          <EditableStringList title="Треки первого экрана" root={["ru", "tracks"]} content={content} updateContent={updateContent} />
+        </Panel>
+      ) : null}
+
+      {section === "cases" ? (
+        <Panel title="Работы" subtitle="Заголовок секции и кнопки кейсов">
+          <ContentField content={content} path={["ru", "casesEyebrow"]} label="Лейбл" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "casesTitle"]} label="Заголовок" area updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "casesText"]} label="Описание" area updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "openCase"]} label="Кнопка открыть кейс" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "youtube"]} label="Кнопка YouTube" updateContent={updateContent} />
+          <p className="text-sm leading-6 text-white/48">Сами ролики редактируются во вкладке «Видео»: кликни по карточке работы.</p>
+        </Panel>
+      ) : null}
+
+      {section === "method" ? (
+        <Panel title="Метод" subtitle="Шаги работы">
+          <ContentField content={content} path={["ru", "methodEyebrow"]} label="Лейбл" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "methodTitle"]} label="Заголовок" area updateContent={updateContent} />
+          <PairList title="Шаги" root={["ru", "methodSteps"]} content={content} updateContent={updateContent} />
+        </Panel>
+      ) : null}
+
+      {section === "terms" ? (
+        <Panel title="Условия" subtitle="Правила работы и оплаты">
+          <ContentField content={content} path={["ru", "termsEyebrow"]} label="Лейбл" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "termsTitle"]} label="Заголовок" area updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "termsText"]} label="Описание" area updateContent={updateContent} />
+          <PairList title="Карточки условий" root={["ru", "terms"]} content={content} updateContent={updateContent} />
+        </Panel>
+      ) : null}
+
+      {section === "contact" ? (
+        <Panel title="Контакты" subtitle="Текст, ссылки и футер">
+          <ContentField content={content} path={["ru", "contactEyebrow"]} label="Лейбл" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "contactTitle"]} label="Заголовок" area updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "contactText"]} label="Описание" area updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "email"]} label="Текст кнопки email" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "vk"]} label="Текст кнопки VK" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "footer"]} label="Футер" area updateContent={updateContent} />
+          <LinkSettings content={content} updateContent={updateContent} />
+        </Panel>
+      ) : null}
+    </>
+  );
+}
+
+function ContentField({
+  content,
+  path,
+  label,
+  area,
+  updateContent,
+}: {
+  content: EditorContent;
+  path: EditorPath;
+  label: string;
+  area?: boolean;
+  updateContent: (path: EditorPath, value: unknown) => void;
+}) {
+  const value = getAt(content, path);
+  return (
+    <Field
+      label={label}
+      area={area ?? String(value ?? "").length > 80}
+      value={typeof value === "string" ? value : ""}
+      onChange={(nextValue) => updateContent(path, nextValue)}
+    />
+  );
+}
+
+function PairList({
+  title,
+  root,
+  content,
+  updateContent,
+}: {
+  title: string;
+  root: EditorPath;
+  content: EditorContent;
+  updateContent: (path: EditorPath, value: unknown) => void;
+}) {
+  const value = getAt(content, root);
+  const pairs = Array.isArray(value) ? (value as string[][]) : [];
+  const updatePair = (index: number, field: 0 | 1, nextValue: string) => {
+    updateContent(root, pairs.map((pair, i) => (i === index ? [field === 0 ? nextValue : pair[0] ?? "", field === 1 ? nextValue : pair[1] ?? ""] : pair)));
+  };
+  const movePair = (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= pairs.length) return;
+    const next = [...pairs];
+    [next[index], next[target]] = [next[target], next[index]];
+    updateContent(root, next);
+  };
+
+  return (
+    <div className="grid gap-3 border-t border-white/10 pt-4">
+      <div className="flex items-center justify-between gap-2">
+        <p className="font-mono text-xs uppercase text-white/42">{title}</p>
+        <button type="button" onClick={() => updateContent(root, [...pairs, ["Новый заголовок", "Новый текст"]])} className="h-8 bg-accent px-2 text-xs font-semibold text-black">
+          Добавить
+        </button>
+      </div>
+      {pairs.map((pair, index) => (
+        <div key={index} className="grid gap-2 border border-white/10 bg-black/20 p-3">
+          <div className="flex items-center justify-between">
+            <span className="font-mono text-[11px] uppercase text-accent">Пункт {index + 1}</span>
+            <div className="flex gap-1">
+              <button type="button" onClick={() => movePair(index, -1)} className="size-8 border border-white/10 text-white/60">↑</button>
+              <button type="button" onClick={() => movePair(index, 1)} className="size-8 border border-white/10 text-white/60">↓</button>
+              <button type="button" onClick={() => updateContent(root, pairs.filter((_, i) => i !== index))} className="size-8 border border-red-400/30 text-red-200">×</button>
+            </div>
+          </div>
+          <Field label="Заголовок" value={pair[0] ?? ""} onChange={(nextValue) => updatePair(index, 0, nextValue)} />
+          <Field area label="Текст" value={pair[1] ?? ""} onChange={(nextValue) => updatePair(index, 1, nextValue)} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function EditableStringList({
+  title,
+  root,
+  content,
+  updateContent,
+}: {
+  title: string;
+  root: EditorPath;
+  content: EditorContent;
+  updateContent: (path: EditorPath, value: unknown) => void;
+}) {
+  const value = getAt(content, root);
+  const items = Array.isArray(value) ? (value as string[]) : [];
+  return <StringList label={title} value={items} onChange={(nextValue) => updateContent(root, nextValue)} />;
+}
+
+function ProductList({
+  content,
+  updateContent,
+}: {
+  content: EditorContent;
+  updateContent: (path: EditorPath, value: unknown) => void;
+}) {
+  type ProductDraft = {
+    code: string;
+    title: string;
+    audience: string;
+    text: string;
+    includes: string[];
+    cta: string;
+  };
+  const value = getAt(content, ["ru", "products"]);
+  const products = Array.isArray(value) ? (value as ProductDraft[]) : [];
+  const updateProduct = (index: number, patch: Partial<ProductDraft>) => {
+    updateContent(["ru", "products"], products.map((product, i) => (i === index ? { ...product, ...patch } : product)));
+  };
+  const moveProduct = (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= products.length) return;
+    const next = [...products];
+    [next[index], next[target]] = [next[target], next[index]];
+    updateContent(["ru", "products"], next);
+  };
+
+  return (
+    <div className="grid gap-3 border-t border-white/10 pt-4">
+      <div className="flex items-center justify-between gap-2">
+        <p className="font-mono text-xs uppercase text-white/42">Карточки продуктов</p>
+        <button
+          type="button"
+          onClick={() =>
+            updateContent(["ru", "products"], [
+              ...products,
+              { code: `P${String(products.length + 1).padStart(2, "0")}`, title: "Новая услуга", audience: "Для кого услуга.", text: "Описание услуги.", includes: ["Новый пункт"], cta: "Обсудить" },
+            ])
+          }
+          className="h-8 bg-accent px-2 text-xs font-semibold text-black"
+        >
+          Добавить
+        </button>
+      </div>
+      {products.map((product, index) => (
+        <div key={`${product.code}-${index}`} className="grid gap-2 border border-white/10 bg-black/20 p-3">
+          <div className="flex items-center justify-between">
+            <span className="font-mono text-[11px] uppercase text-accent">{product.code || `P${index + 1}`}</span>
+            <div className="flex gap-1">
+              <button type="button" onClick={() => moveProduct(index, -1)} className="size-8 border border-white/10 text-white/60">↑</button>
+              <button type="button" onClick={() => moveProduct(index, 1)} className="size-8 border border-white/10 text-white/60">↓</button>
+              <button type="button" onClick={() => updateContent(["ru", "products"], products.filter((_, i) => i !== index))} className="size-8 border border-red-400/30 text-red-200">×</button>
+            </div>
+          </div>
+          <Field label="Код" value={product.code ?? ""} onChange={(nextValue) => updateProduct(index, { code: nextValue })} />
+          <Field label="Название" value={product.title ?? ""} onChange={(nextValue) => updateProduct(index, { title: nextValue })} />
+          <Field area label="Для кого" value={product.audience ?? ""} onChange={(nextValue) => updateProduct(index, { audience: nextValue })} />
+          <Field area label="Описание" value={product.text ?? ""} onChange={(nextValue) => updateProduct(index, { text: nextValue })} />
+          <StringList label="Что входит" value={product.includes ?? []} onChange={(nextValue) => updateProduct(index, { includes: nextValue })} />
+          <Field label="Кнопка" value={product.cta ?? ""} onChange={(nextValue) => updateProduct(index, { cta: nextValue })} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function LinkSettings({
+  content,
+  updateContent,
+}: {
+  content: EditorContent;
+  updateContent: (path: EditorPath, value: unknown) => void;
+}) {
+  const links = content._editor?.links ?? {};
+  return (
+    <div className="grid gap-3 border-t border-white/10 pt-4">
+      <p className="font-mono text-xs uppercase text-white/42">Ссылки</p>
+      <Field label="Telegram URL" value={links.telegramUrl ?? ""} onChange={(value) => updateContent(["_editor", "links", "telegramUrl"], value)} />
+      <Field label="Instagram URL" value={links.instagramUrl ?? ""} onChange={(value) => updateContent(["_editor", "links", "instagramUrl"], value)} />
+      <Field label="VK URL" value={links.vkUrl ?? ""} onChange={(value) => updateContent(["_editor", "links", "vkUrl"], value)} />
+      <Field label="Email" value={links.email ?? ""} onChange={(value) => updateContent(["_editor", "links", "email"], value)} />
+    </div>
   );
 }
 

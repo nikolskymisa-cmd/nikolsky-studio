@@ -443,6 +443,8 @@ export function StudioLanding({
   const liveWorks = editorWorks ?? runtimeWorks;
   const t = liveCopy[lang];
   const editorStyles = ((liveCopy as unknown as { _editor?: { styles?: Record<string, number | string> } })._editor?.styles ?? {});
+  const editorLinks = ((liveCopy as unknown as { _editor?: { links?: Partial<typeof profile> } })._editor?.links ?? {});
+  const links = { ...profile, ...editorLinks };
   const mainStyle = {
     "--accent": typeof editorStyles.accent === "string" ? editorStyles.accent : undefined,
   } as CSSProperties;
@@ -473,6 +475,11 @@ export function StudioLanding({
     paddingInline: editorStyles.ctaPadding ? `${Number(editorStyles.ctaPadding)}px` : undefined,
     fontSize: editorStyles.ctaFontSize ? `${Number(editorStyles.ctaFontSize)}px` : undefined,
   } as CSSProperties;
+  const blockStyle = (key: string) =>
+    ({
+      position: "relative",
+      left: editorStyles[`${key}X`] ? `${Number(editorStyles[`${key}X`])}px` : undefined,
+    }) as CSSProperties;
 
   const showreel = liveWorks.find((work) => work.featured) ?? liveWorks[0];
   const portfolioWorks = useMemo(() => liveWorks.filter((work) => !work.featured), [liveWorks]);
@@ -552,7 +559,7 @@ export function StudioLanding({
         style={{ scaleX }}
       />
 
-      <Header lang={lang} setLang={setLang} nav={t.nav} projectCta={t.projectCta} editorMode={editorMode} />
+      <Header lang={lang} setLang={setLang} nav={t.nav} projectCta={t.projectCta} contactUrl={links.telegramUrl} editorMode={editorMode} />
 
       <section id="top" className="relative mx-auto w-full max-w-7xl px-4 pb-8 pt-28 sm:px-6 sm:pt-24 lg:px-8" style={bodyScaleStyle}>
         <div
@@ -596,7 +603,7 @@ export function StudioLanding({
                 {t.casesCta}
               </a>
               <a
-                href={profile.telegramUrl}
+                href={links.telegramUrl}
                 target="_blank"
                 rel="noreferrer"
                 onClickCapture={selectInEditor({ type: "text", label: "Кнопка обсудить проект", path: ["ru", "projectCta"] })}
@@ -633,30 +640,55 @@ export function StudioLanding({
       </section>
 
       <section className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <Reveal className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.85fr_1.15fr]">
-          <SectionHeader eyebrow={t.positionEyebrow} title={t.positionTitle} text={t.positionText} />
+        <Reveal className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.85fr_1.15fr]" style={blockStyle("position")}>
+          <div
+            onClickCapture={selectInEditor({ type: "text", label: "Позиционирование", path: ["ru", "positionTitle"], area: true })}
+            className={editorClass({ type: "text", label: "Позиционирование", path: ["ru", "positionTitle"], area: true })}
+          >
+            <SectionHeader eyebrow={t.positionEyebrow} title={t.positionTitle} text={t.positionText} />
+          </div>
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
             {t.positionCards.map(([title, text], index) => (
-              <ControlPanel key={title} index={index} title={title} text={text} blockLabel={t.blockLabel} />
+              <div
+                key={title}
+                onClickCapture={selectInEditor({ type: "text", label: `Позиционирование: карточка ${index + 1}`, path: ["ru", "positionCards", index, 0] })}
+                className={editorClass({ type: "text", label: `Позиционирование: карточка ${index + 1}`, path: ["ru", "positionCards", index, 0] })}
+              >
+                <ControlPanel index={index} title={title} text={text} blockLabel={t.blockLabel} />
+              </div>
             ))}
           </div>
         </Reveal>
       </section>
 
       <section id="products" className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <Reveal className="mx-auto max-w-7xl">
-          <SectionHeader eyebrow={t.productsEyebrow} title={t.productsTitle} />
+        <Reveal className="mx-auto max-w-7xl" style={blockStyle("products")}>
+          <div
+            onClickCapture={selectInEditor({ type: "text", label: "Продукты: заголовок", path: ["ru", "productsTitle"] })}
+            className={editorClass({ type: "text", label: "Продукты: заголовок", path: ["ru", "productsTitle"] })}
+          >
+            <SectionHeader eyebrow={t.productsEyebrow} title={t.productsTitle} />
+          </div>
           <div className="mt-8 grid gap-3 lg:grid-cols-3">
-            {t.products.map((product) => (
-              <ProductPanel key={product.code} product={product} label={t.productLabel} />
+            {t.products.map((product, index) => (
+              <div
+                key={product.code}
+                onClickCapture={selectInEditor({ type: "text", label: `Продукт ${index + 1}`, path: ["ru", "products", index, "title"] })}
+                className={editorClass({ type: "text", label: `Продукт ${index + 1}`, path: ["ru", "products", index, "title"] })}
+              >
+                <ProductPanel product={product} label={t.productLabel} contactUrl={links.telegramUrl} />
+              </div>
             ))}
           </div>
         </Reveal>
       </section>
 
       <section className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <Reveal className="mx-auto max-w-7xl">
-          <div className="grid overflow-hidden border border-white/12 bg-[#05080b]/88 lg:grid-cols-[0.78fr_1.22fr]">
+        <Reveal className="mx-auto max-w-7xl" style={blockStyle("reel")}>
+          <div
+            className={`grid overflow-hidden border border-white/12 bg-[#05080b]/88 lg:grid-cols-[0.78fr_1.22fr]${editorClass({ type: "text", label: "Шоурил-блок", path: ["ru", "reelTitle"] })}`}
+            onClickCapture={selectInEditor({ type: "text", label: "Шоурил-блок", path: ["ru", "reelTitle"] })}
+          >
             <button type="button" onClick={() => setSelectedWork(showreel)} className="group relative min-h-[320px] overflow-hidden border-b border-white/10 text-left sm:min-h-[420px] lg:border-b-0 lg:border-r">
               <div className="absolute inset-0 bg-cover bg-center opacity-[0.52]" style={{ backgroundImage: `url(${getThumbnailUrl(showreel)})` }} />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,6,0.18),rgba(3,5,6,0.88)),radial-gradient(circle_at_45%_34%,rgba(0,183,255,0.18),transparent_30%)]" />
@@ -680,9 +712,14 @@ export function StudioLanding({
       </section>
 
       <section id="work" className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <Reveal className="mx-auto max-w-7xl">
+        <Reveal className="mx-auto max-w-7xl" style={blockStyle("cases")}>
           <div className="mb-8 grid gap-6 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
-            <SectionHeader eyebrow={t.casesEyebrow} title={t.casesTitle} text={t.casesText} />
+            <div
+              onClickCapture={selectInEditor({ type: "text", label: "Работы: заголовок", path: ["ru", "casesTitle"] })}
+              className={editorClass({ type: "text", label: "Работы: заголовок", path: ["ru", "casesTitle"] })}
+            >
+              <SectionHeader eyebrow={t.casesEyebrow} title={t.casesTitle} text={t.casesText} />
+            </div>
             <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 lg:mx-0 lg:flex-wrap lg:justify-end lg:overflow-visible lg:px-0">
               {(["All", ...workCategories] as Filter[]).map((filter) => (
                 <button
@@ -732,11 +769,20 @@ export function StudioLanding({
       </section>
 
       <section id="method" className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <Reveal className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-          <SectionHeader eyebrow={t.methodEyebrow} title={t.methodTitle} />
+        <Reveal className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr]" style={blockStyle("method")}>
+          <div
+            onClickCapture={selectInEditor({ type: "text", label: "Метод", path: ["ru", "methodTitle"] })}
+            className={editorClass({ type: "text", label: "Метод", path: ["ru", "methodTitle"] })}
+          >
+            <SectionHeader eyebrow={t.methodEyebrow} title={t.methodTitle} />
+          </div>
           <div className="grid border border-white/10 bg-white/[0.02]">
             {t.methodSteps.map(([title, text], index) => (
-              <div key={title} className="grid gap-3 border-b border-white/10 p-4 last:border-b-0 sm:grid-cols-[112px_1fr] sm:gap-4 sm:p-5">
+              <div
+                key={title}
+                onClickCapture={selectInEditor({ type: "text", label: `Метод: шаг ${index + 1}`, path: ["ru", "methodSteps", index, 0] })}
+                className={`grid gap-3 border-b border-white/10 p-4 last:border-b-0 sm:grid-cols-[112px_1fr] sm:gap-4 sm:p-5${editorClass({ type: "text", label: `Метод: шаг ${index + 1}`, path: ["ru", "methodSteps", index, 0] })}`}
+              >
                 <span className="font-mono text-xs uppercase text-accent">{t.stepLabel} {String(index + 1).padStart(2, "0")}</span>
                 <div>
                   <h3 className="text-lg font-semibold uppercase text-white sm:text-xl">{title}</h3>
@@ -749,12 +795,23 @@ export function StudioLanding({
       </section>
 
       <section id="terms" className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <Reveal className="mx-auto max-w-7xl">
+        <Reveal className="mx-auto max-w-7xl" style={blockStyle("terms")}>
           <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr]">
-            <SectionHeader eyebrow={t.termsEyebrow} title={t.termsTitle} text={t.termsText} />
+            <div
+              onClickCapture={selectInEditor({ type: "text", label: "Условия", path: ["ru", "termsTitle"] })}
+              className={editorClass({ type: "text", label: "Условия", path: ["ru", "termsTitle"] })}
+            >
+              <SectionHeader eyebrow={t.termsEyebrow} title={t.termsTitle} text={t.termsText} />
+            </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {t.terms.map(([title, text], index) => (
-                <ControlPanel key={title} index={index} title={title} text={text} blockLabel={t.blockLabel} compact />
+                <div
+                  key={title}
+                  onClickCapture={selectInEditor({ type: "text", label: `Условия: карточка ${index + 1}`, path: ["ru", "terms", index, 0] })}
+                  className={editorClass({ type: "text", label: `Условия: карточка ${index + 1}`, path: ["ru", "terms", index, 0] })}
+                >
+                  <ControlPanel index={index} title={title} text={text} blockLabel={t.blockLabel} compact />
+                </div>
               ))}
             </div>
           </div>
@@ -762,9 +819,9 @@ export function StudioLanding({
       </section>
 
       <section id="contact" className="scene-section relative px-4 pb-8 pt-12 sm:px-6 sm:pt-16 lg:px-8 lg:pt-20">
-        <Reveal className="mx-auto max-w-7xl border border-white/12 bg-white/[0.025] p-4 sm:p-8">
+        <Reveal className={`mx-auto max-w-7xl border border-white/12 bg-white/[0.025] p-4 sm:p-8${editorClass({ type: "text", label: "Контакт", path: ["ru", "contactTitle"], area: true })}`} style={blockStyle("contact")}>
           <div className="grid gap-10 lg:grid-cols-[1fr_430px] lg:items-end">
-            <div>
+            <div onClickCapture={selectInEditor({ type: "text", label: "Контакт", path: ["ru", "contactTitle"], area: true })}>
               <p className="mb-5 font-mono text-xs uppercase text-accent">{t.contactEyebrow}</p>
               <h2 className="max-w-5xl text-[2rem] font-semibold uppercase leading-[0.98] text-white sm:text-6xl sm:leading-[0.92]">
                 {t.contactTitle}
@@ -772,27 +829,30 @@ export function StudioLanding({
               <p className="mt-4 max-w-2xl text-sm leading-6 text-white/62 sm:mt-5 sm:text-base sm:leading-7">{t.contactText}</p>
             </div>
             <div className="grid gap-3">
-              <a href={profile.telegramUrl} target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center gap-2 bg-accent px-6 text-sm font-semibold text-black transition hover:bg-white">
+              <a href={links.telegramUrl} target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center gap-2 bg-accent px-6 text-sm font-semibold text-black transition hover:bg-white">
                 <Send size={17} />
                 Telegram
               </a>
               <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                <a href={`mailto:${profile.email}`} className="flex h-11 items-center justify-center gap-2 border border-white/14 text-sm font-semibold text-white/72 hover:text-accent">
+                <a href={`mailto:${links.email}`} className="flex h-11 items-center justify-center gap-2 border border-white/14 text-sm font-semibold text-white/72 hover:text-accent">
                   <Mail size={16} />
                   {t.email}
                 </a>
-                <a href={profile.instagramUrl} target="_blank" rel="noreferrer" className="flex h-11 items-center justify-center gap-2 border border-white/14 text-sm font-semibold text-white/72 hover:text-accent">
+                <a href={links.instagramUrl} target="_blank" rel="noreferrer" className="flex h-11 items-center justify-center gap-2 border border-white/14 text-sm font-semibold text-white/72 hover:text-accent">
                   IG
                   <ArrowUpRight size={14} />
                 </a>
-                <a href={profile.vkUrl} target="_blank" rel="noreferrer" className="flex h-11 items-center justify-center gap-2 border border-white/14 text-sm font-semibold text-white/72 hover:text-accent">
+                <a href={links.vkUrl} target="_blank" rel="noreferrer" className="flex h-11 items-center justify-center gap-2 border border-white/14 text-sm font-semibold text-white/72 hover:text-accent">
                   <VkIcon size={16} />
                   {t.vk}
                 </a>
               </div>
             </div>
           </div>
-          <footer className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-5 font-mono text-xs uppercase text-white/34 sm:flex-row sm:justify-between">
+          <footer
+            onClickCapture={selectInEditor({ type: "text", label: "Футер", path: ["ru", "footer"], area: true })}
+            className={`mt-12 flex flex-col gap-3 border-t border-white/10 pt-5 font-mono text-xs uppercase text-white/34 sm:flex-row sm:justify-between${editorClass({ type: "text", label: "Футер", path: ["ru", "footer"], area: true })}`}
+          >
             <span>{profile.studioName}</span>
             <span>{t.footer}</span>
           </footer>
@@ -803,6 +863,7 @@ export function StudioLanding({
         work={selectedWork}
         lang={lang}
         onClose={() => setSelectedWork(null)}
+        contactUrl={links.telegramUrl}
         labels={{
           close: t.closeVideo,
           open: t.openYoutube,
@@ -822,12 +883,14 @@ function Header({
   setLang,
   nav,
   projectCta,
+  contactUrl,
   editorMode = false,
 }: {
   lang: Lang;
   setLang: (lang: Lang) => void;
   nav: readonly string[];
   projectCta: string;
+  contactUrl: string;
   editorMode?: boolean;
 }) {
   return (
@@ -863,10 +926,10 @@ function Header({
               </button>
             ))}
           </div>
-          <a href={profile.telegramUrl} target="_blank" rel="noreferrer" aria-label="Telegram" className="grid size-9 place-items-center bg-white text-black transition hover:bg-accent sm:hidden">
+          <a href={contactUrl} target="_blank" rel="noreferrer" aria-label="Telegram" className="grid size-9 place-items-center bg-white text-black transition hover:bg-accent sm:hidden">
             <Send size={15} />
           </a>
-          <a href={profile.telegramUrl} target="_blank" rel="noreferrer" className="hidden h-10 items-center justify-center gap-2 bg-white px-4 text-sm font-semibold text-black transition hover:bg-accent sm:inline-flex">
+          <a href={contactUrl} target="_blank" rel="noreferrer" className="hidden h-10 items-center justify-center gap-2 bg-white px-4 text-sm font-semibold text-black transition hover:bg-accent sm:inline-flex">
             <Send size={15} />
             {projectCta}
           </a>
@@ -1004,6 +1067,7 @@ function ControlPanel({
 function ProductPanel({
   product,
   label,
+  contactUrl,
 }: {
   product: {
     code: string;
@@ -1014,6 +1078,7 @@ function ProductPanel({
     cta: string;
   };
   label: string;
+  contactUrl: string;
 }) {
   return (
     <article className="group flex flex-col border border-white/10 bg-white/[0.025] p-4 transition hover:border-accent/70 sm:p-5 lg:min-h-[540px]">
@@ -1032,7 +1097,7 @@ function ProductPanel({
           </div>
         ))}
       </div>
-      <a href={profile.telegramUrl} target="_blank" rel="noreferrer" className="mt-6 inline-flex h-11 items-center justify-center gap-2 bg-white px-4 text-sm font-semibold text-black transition group-hover:bg-accent sm:mt-auto">
+      <a href={contactUrl} target="_blank" rel="noreferrer" className="mt-6 inline-flex h-11 items-center justify-center gap-2 bg-white px-4 text-sm font-semibold text-black transition group-hover:bg-accent sm:mt-auto">
         {product.cta}
         <ArrowUpRight size={15} />
       </a>
@@ -1154,11 +1219,13 @@ function WorkModal({
   work,
   lang,
   onClose,
+  contactUrl,
   labels,
 }: {
   work: Work | null;
   lang: Lang;
   onClose: () => void;
+  contactUrl: string;
   labels: {
     close: string;
     open: string;
@@ -1218,7 +1285,7 @@ function WorkModal({
               <ModalList label={labels.done} items={displayWork.workDone ?? []} />
               <ModalBlock label={labels.why} text={displayWork.whyItWorks} />
               <ModalList label={labels.deliverables} items={displayWork.deliverables ?? []} />
-              <a href={profile.telegramUrl} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center justify-center gap-2 bg-accent px-5 text-sm font-semibold text-black transition hover:bg-white">
+              <a href={contactUrl} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center justify-center gap-2 bg-accent px-5 text-sm font-semibold text-black transition hover:bg-white">
                 {labels.project}
                 <Send size={16} />
               </a>
