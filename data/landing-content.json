@@ -179,15 +179,18 @@
   },
   "_editor": {
     "styles": {
-      "accent": "#00a1e6",
-      "heroTitleSize": 55,
+      "accent": "#00b3ff",
+      "heroTitleSize": 54,
       "bodyScale": 104,
       "heroTextX": -1,
-      "heroMediaScale": 100,
-      "heroGap": 35,
-      "ctaHeight": 57,
-      "heroMediaX": 0,
-      "casesX": 2
+      "heroMediaScale": 102,
+      "heroGap": 12,
+      "ctaHeight": 61,
+      "heroMediaX": 1,
+      "casesX": 2,
+      "heroSubtitleSize": 21,
+      "ctaPadding": 33,
+      "ctaFontSize": 15
     }
   }
 }
