@@ -459,10 +459,13 @@ export function StudioLanding({
     columnGap: editorStyles.heroGap ? `${Number(editorStyles.heroGap)}px` : undefined,
   } as CSSProperties;
   const heroTextStyle = {
-    transform: editorStyles.heroTextX ? `translateX(${Number(editorStyles.heroTextX)}px)` : undefined,
+    position: "relative",
+    left: editorStyles.heroTextX ? `${Number(editorStyles.heroTextX)}px` : undefined,
   } as CSSProperties;
   const heroMediaStyle = {
-    transform: `translateX(${Number(editorStyles.heroMediaX ?? 0)}px) scale(${Number(editorStyles.heroMediaScale ?? 100) / 100})`,
+    position: "relative",
+    left: editorStyles.heroMediaX ? `${Number(editorStyles.heroMediaX)}px` : undefined,
+    transform: `scale(${Number(editorStyles.heroMediaScale ?? 100) / 100})`,
     transformOrigin: "center",
   } as CSSProperties;
   const ctaStyle = {
