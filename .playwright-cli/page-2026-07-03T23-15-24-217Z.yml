@@ -1,0 +1,655 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - navigation [ref=e5]:
+      - link "Nikolsky Studio" [ref=e6] [cursor=pointer]:
+        - /url: "#top"
+        - generic [ref=e7]: NS
+        - generic [ref=e8]:
+          - generic [ref=e9]: Nikolsky Studio
+          - generic [ref=e10]: Video Editing / Motion
+      - generic [ref=e11]:
+        - link "Работы" [ref=e12] [cursor=pointer]:
+          - /url: "#work"
+        - link "Форматы" [ref=e13] [cursor=pointer]:
+          - /url: "#products"
+        - link "Процесс" [ref=e14] [cursor=pointer]:
+          - /url: "#method"
+        - link "FAQ" [ref=e15] [cursor=pointer]:
+          - /url: "#terms"
+        - link "Контакт" [ref=e16] [cursor=pointer]:
+          - /url: "#contact"
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - button "ru" [pressed] [ref=e19]
+          - button "en" [ref=e20]
+        - link "Обсудить проект" [ref=e21] [cursor=pointer]:
+          - /url: https://t.me/mishanikolsky
+          - img [ref=e22]
+          - text: Обсудить проект
+    - generic [ref=e26]:
+      - generic [ref=e27]:
+        - paragraph [ref=e28]: Моушн-дизайн / видеомонтаж / постпродакшн
+        - heading "Режиссирую внимание." [level=1] [ref=e29]
+        - paragraph [ref=e30]: Собираю исходники в Reels, YouTube-выпуски, курсы и продуктовые ролики — с понятной структурой, чистым темпом и подачей под задачу.
+        - generic [ref=e31]:
+          - link "Смотреть работы" [ref=e32] [cursor=pointer]:
+            - /url: "#work"
+            - img [ref=e33]
+            - text: Смотреть работы
+          - link "Обсудить проект" [ref=e36] [cursor=pointer]:
+            - /url: https://t.me/mishanikolsky
+            - img [ref=e37]
+            - text: Обсудить проект
+        - paragraph [ref=e40]: 6–7 лет в монтаже · Reels / YouTube / Motion / Courses · работа по предоплате
+      - generic [ref=e42]:
+        - button "Шоурил Шоурил Nikolsky Studio Подборка работ и направлений" [ref=e44]:
+          - img [ref=e50]
+          - generic [ref=e52]:
+            - paragraph [ref=e53]: Шоурил
+            - heading "Шоурил Nikolsky Studio" [level=3] [ref=e54]
+            - paragraph [ref=e55]: Подборка работ и направлений
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - generic [ref=e58]:
+              - paragraph [ref=e59]: Breakdown
+              - paragraph [ref=e60]: Хук, ритм, смысл, упаковка.
+            - button "Смотреть шоурил" [ref=e61]:
+              - img [ref=e62]
+              - text: Смотреть шоурил
+          - generic [ref=e64]:
+            - generic [ref=e65]:
+              - button "Перейти к Первые секунды" [ref=e66]:
+                - img [ref=e67]
+              - button "ХУК Первые секунды" [ref=e70]:
+                - generic [ref=e71]: ХУК
+                - generic [ref=e72]: Первые секунды
+              - button "Перейти к ХУК" [ref=e76]
+              - paragraph [ref=e77]: Цепляем внимание и задаём тон ролика.
+            - generic [ref=e78]:
+              - button "Перейти к Ритм монтажа" [ref=e79]:
+                - img [ref=e80]
+              - button "РИТМ Ритм монтажа" [ref=e82]:
+                - generic [ref=e83]: РИТМ
+                - generic [ref=e84]: Ритм монтажа
+              - button "Перейти к РИТМ" [ref=e87]
+              - paragraph [ref=e88]: Держим динамику через резы, паузы, звук и смену кадров.
+            - generic [ref=e89]:
+              - button "Перейти к Смысл и подача" [ref=e90]:
+                - img [ref=e91]
+              - button "СМЫСЛ Смысл и подача" [ref=e93]:
+                - generic [ref=e94]: СМЫСЛ
+                - generic [ref=e95]: Смысл и подача
+              - button "Перейти к СМЫСЛ" [ref=e98]
+              - paragraph [ref=e99]: Помогаем зрителю быстро понять идею и не потеряться.
+            - generic [ref=e100]:
+              - button "Перейти к Финальная упаковка" [ref=e101]:
+                - img [ref=e102]
+              - button "ФИНАЛ Финальная упаковка" [ref=e105]:
+                - generic [ref=e106]: ФИНАЛ
+                - generic [ref=e107]: Финальная упаковка
+              - button "Перейти к ФИНАЛ" [ref=e110]
+              - paragraph [ref=e111]: Цвет, звук, титры и детали, которые делают видео собранным.
+    - generic [ref=e113]:
+      - generic [ref=e114]:
+        - generic [ref=e116]:
+          - paragraph [ref=e117]: SELECTED WORKS
+          - heading "РАБОТЫ" [level=2] [ref=e118]
+          - paragraph [ref=e119]: "Выберите формат и посмотрите примеры: сложные Reels, регулярная нарезка, product motion, курсы, motion shorts и рекламные креативы."
+        - generic [ref=e120]:
+          - button "Все" [ref=e121]
+          - button "Reels Pro" [ref=e122]
+          - button "Reels Volume" [ref=e123]
+          - button "Product Motion" [ref=e124]
+          - button "Courses" [ref=e125]
+          - button "Motion Shorts" [ref=e126]
+          - button "Ads / UGC" [ref=e127]
+      - generic [ref=e128]:
+        - article [ref=e130]:
+          - button "00:03:00" [ref=e131]:
+            - generic [ref=e135]:
+              - generic [ref=e136]: 00:03:00
+              - img [ref=e138]
+          - generic [ref=e140]:
+            - generic [ref=e141]:
+              - img [ref=e142]
+              - generic [ref=e144]: Шоурил
+              - generic [ref=e145]: /
+              - generic [ref=e146]: Шоурил / 16:9
+            - heading "Шоурил Nikolsky Studio" [level=3] [ref=e147]
+            - generic [ref=e148]:
+              - paragraph [ref=e149]: Задача
+              - paragraph [ref=e150]: Показать диапазон работ без ощущения случайной нарезки.
+            - generic [ref=e151]:
+              - generic [ref=e152]: структура
+              - generic [ref=e153]: ритм
+              - generic [ref=e154]: motion
+              - generic [ref=e155]: sound design
+          - generic [ref=e156]:
+            - paragraph [ref=e157]: Что сделано
+            - generic [ref=e187]:
+              - button "Открыть кейс" [ref=e188]:
+                - text: Открыть кейс
+                - img [ref=e189]
+              - link "YouTube" [ref=e192] [cursor=pointer]:
+                - /url: https://youtu.be/Yob34ciuJrw
+                - text: YouTube
+                - img [ref=e193]
+        - article [ref=e197]:
+          - button "00:11:11" [ref=e198]:
+            - generic [ref=e202]:
+              - generic [ref=e203]: 00:11:11
+              - img [ref=e205]
+          - generic [ref=e207]:
+            - generic [ref=e208]:
+              - img [ref=e209]
+              - generic [ref=e211]: Reels Pro
+              - generic [ref=e212]: /
+              - generic [ref=e213]: Reels Pro / 9:16
+            - heading "REELS PRO ДЛЯ ЭКСПЕРТА" [level=3] [ref=e214]
+            - generic [ref=e215]:
+              - paragraph [ref=e216]: Задача
+              - paragraph [ref=e217]: Собрать экспертный ролик с сильным началом, ритмом и визуальной подачей.
+            - generic [ref=e218]:
+              - generic [ref=e219]: структура
+              - generic [ref=e220]: хук
+              - generic [ref=e221]: субтитры
+              - generic [ref=e222]: motion
+              - generic [ref=e223]: B-roll
+          - generic [ref=e224]:
+            - paragraph [ref=e225]: Что сделано
+            - generic [ref=e255]:
+              - button "Открыть кейс" [ref=e256]:
+                - text: Открыть кейс
+                - img [ref=e257]
+              - link "YouTube" [ref=e260] [cursor=pointer]:
+                - /url: https://youtube.com/shorts/NRr-_TY2X7E
+                - text: YouTube
+                - img [ref=e261]
+        - article [ref=e265]:
+          - button "00:19:22" [ref=e266]:
+            - generic [ref=e270]:
+              - generic [ref=e271]: 00:19:22
+              - img [ref=e273]
+          - generic [ref=e275]:
+            - generic [ref=e276]:
+              - img [ref=e277]
+              - generic [ref=e279]: Product Motion
+              - generic [ref=e280]: /
+              - generic [ref=e281]: Product motion / 16:9
+            - heading "PRODUCT MOTION / CRYPTO EXPLAINER" [level=3] [ref=e282]
+            - generic [ref=e283]:
+              - paragraph [ref=e284]: Задача
+              - paragraph [ref=e285]: Объяснить продукт или функцию через динамичный 16:9 motion-ролик.
+            - generic [ref=e286]:
+              - generic [ref=e287]: motion design
+              - generic [ref=e288]: UI-анимация
+              - generic [ref=e289]: структура
+              - generic [ref=e290]: титры
+              - generic [ref=e291]: экспорт 16:9
+          - generic [ref=e292]:
+            - paragraph [ref=e293]: Что сделано
+            - generic [ref=e323]:
+              - button "Открыть кейс" [ref=e324]:
+                - text: Открыть кейс
+                - img [ref=e325]
+              - link "YouTube" [ref=e328] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=ScMzIvxBSi4
+                - text: YouTube
+                - img [ref=e329]
+        - article [ref=e333]:
+          - button "00:27:09" [ref=e334]:
+            - generic [ref=e338]:
+              - generic [ref=e339]: 00:27:09
+              - img [ref=e341]
+          - generic [ref=e343]:
+            - generic [ref=e344]:
+              - img [ref=e345]
+              - generic [ref=e347]: Motion Shorts
+              - generic [ref=e348]: /
+              - generic [ref=e349]: Motion short / 9:16
+            - heading "MOTION SHORT" [level=3] [ref=e350]
+            - generic [ref=e351]:
+              - paragraph [ref=e352]: Задача
+              - paragraph [ref=e353]: Сделать короткий vertical motion-ролик с быстрым visual hook.
+            - generic [ref=e354]:
+              - generic [ref=e355]: motion loop
+              - generic [ref=e356]: текст
+              - generic [ref=e357]: ритм
+              - generic [ref=e358]: visual hook
+              - generic [ref=e359]: экспорт 9:16
+          - generic [ref=e360]:
+            - paragraph [ref=e361]: Что сделано
+            - generic [ref=e391]:
+              - button "Открыть кейс" [ref=e392]:
+                - text: Открыть кейс
+                - img [ref=e393]
+              - link "YouTube" [ref=e396] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=aqz-KE-bpKQ
+                - text: YouTube
+                - img [ref=e397]
+        - article [ref=e401]:
+          - button "00:35:20" [ref=e402]:
+            - generic [ref=e406]:
+              - generic [ref=e407]: 00:35:20
+              - img [ref=e409]
+          - generic [ref=e411]:
+            - generic [ref=e412]:
+              - img [ref=e413]
+              - generic [ref=e415]: Courses
+              - generic [ref=e416]: /
+              - generic [ref=e417]: Урок курса / 16:9
+            - heading "МОНТАЖ МОДУЛЯ КУРСА" [level=3] [ref=e418]
+            - generic [ref=e419]:
+              - paragraph [ref=e420]: Задача
+              - paragraph [ref=e421]: Собрать обучающий урок так, чтобы его было легко смотреть и понимать.
+            - generic [ref=e422]:
+              - generic [ref=e423]: чистка пауз
+              - generic [ref=e424]: структура
+              - generic [ref=e425]: звук
+              - generic [ref=e426]: титры
+              - generic [ref=e427]: экспорт урока
+          - generic [ref=e428]:
+            - paragraph [ref=e429]: Что сделано
+            - generic [ref=e459]:
+              - button "Открыть кейс" [ref=e460]:
+                - text: Открыть кейс
+                - img [ref=e461]
+              - link "YouTube" [ref=e464] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=YE7VzlLtp-4
+                - text: YouTube
+                - img [ref=e465]
+        - article [ref=e469]:
+          - button "00:43:07" [ref=e470]:
+            - generic [ref=e474]:
+              - generic [ref=e475]: 00:43:07
+              - img [ref=e477]
+          - generic [ref=e479]:
+            - generic [ref=e480]:
+              - img [ref=e481]
+              - generic [ref=e483]: Ads / UGC
+              - generic [ref=e484]: /
+              - generic [ref=e485]: Ad creative / 9:16
+            - heading "ADS / UGC КРЕАТИВ" [level=3] [ref=e486]
+            - generic [ref=e487]:
+              - paragraph [ref=e488]: Задача
+              - paragraph [ref=e489]: Собрать рекламный ролик с понятным оффером и быстрой подачей.
+            - generic [ref=e490]:
+              - generic [ref=e491]: хук
+              - generic [ref=e492]: оффер
+              - generic [ref=e493]: монтаж
+              - generic [ref=e494]: субтитры
+              - generic [ref=e495]: варианты подачи
+          - generic [ref=e496]:
+            - paragraph [ref=e497]: Что сделано
+            - generic [ref=e527]:
+              - button "Открыть кейс" [ref=e528]:
+                - text: Открыть кейс
+                - img [ref=e529]
+              - link "YouTube" [ref=e532] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=M7lc1UVf-VE
+                - text: YouTube
+                - img [ref=e533]
+        - article [ref=e537]:
+          - button "00:51:18" [ref=e538]:
+            - generic [ref=e542]:
+              - generic [ref=e543]: 00:51:18
+              - img [ref=e545]
+          - generic [ref=e547]:
+            - generic [ref=e548]:
+              - img [ref=e549]
+              - generic [ref=e551]: Reels Volume
+              - generic [ref=e552]: /
+              - generic [ref=e553]: Reels Volume / 9:16
+            - heading "REELS VOLUME НАРЕЗКА" [level=3] [ref=e554]
+            - generic [ref=e555]:
+              - paragraph [ref=e556]: Задача
+              - paragraph [ref=e557]: Нарезать мысли из длинного материала в короткие ролики для регулярной публикации.
+            - generic [ref=e558]:
+              - generic [ref=e559]: нарезка
+              - generic [ref=e560]: субтитры
+              - generic [ref=e561]: B-roll
+              - generic [ref=e562]: переходы
+              - generic [ref=e563]: звуки
+          - generic [ref=e564]:
+            - paragraph [ref=e565]: Что сделано
+            - generic [ref=e595]:
+              - button "Открыть кейс" [ref=e596]:
+                - text: Открыть кейс
+                - img [ref=e597]
+              - link "YouTube" [ref=e600] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+                - text: YouTube
+                - img [ref=e601]
+    - generic [ref=e605]:
+      - generic [ref=e607]:
+        - paragraph [ref=e608]: Услуги и цены
+        - heading "Форматы работы" [level=2] [ref=e609]
+        - paragraph [ref=e610]: "Выберите задачу: Reels Pro, пакетная нарезка, Product Motion, Courses, Motion Shorts или Ads / UGC."
+      - generic [ref=e611]:
+        - article [ref=e613]:
+          - generic [ref=e614]:
+            - generic [ref=e615]: REELS PRO
+            - generic [ref=e616]: формат
+          - heading "Reels Pro" [level=3] [ref=e617]
+          - generic [ref=e618]:
+            - paragraph [ref=e619]: Для кого
+            - paragraph [ref=e620]: Для экспертов, брендов и имиджевых роликов.
+          - paragraph [ref=e621]: "Сложный короткий монтаж: хук, структура, субтитры, B-roll, motion-вставки, tracking и After Effects."
+          - generic [ref=e622]:
+            - paragraph [ref=e623]: Что получает клиент
+            - generic [ref=e624]:
+              - generic [ref=e625]:
+                - img [ref=e626]
+                - generic [ref=e628]: структура и хук
+              - generic [ref=e629]:
+                - img [ref=e630]
+                - generic [ref=e632]: субтитры / акценты
+              - generic [ref=e633]:
+                - img [ref=e634]
+                - generic [ref=e636]: motion / B-roll
+              - generic [ref=e637]:
+                - img [ref=e638]
+                - generic [ref=e640]: экспорт 9:16
+          - generic [ref=e641]:
+            - generic [ref=e642]:
+              - generic [ref=e643]:
+                - paragraph [ref=e644]: Цена
+                - paragraph [ref=e645]: от 3 000–7 000 ₽ / ролик
+              - generic [ref=e646]:
+                - paragraph [ref=e647]: Срок
+                - paragraph [ref=e648]: сложный motion — по оценке
+            - link "Обсудить Reels Pro" [ref=e649] [cursor=pointer]:
+              - /url: https://t.me/mishanikolsky
+              - text: Обсудить Reels Pro
+              - img [ref=e650]
+        - article [ref=e654]:
+          - generic [ref=e655]:
+            - generic [ref=e656]: REELS VOLUME
+            - generic [ref=e657]: формат
+          - heading "Reels Volume" [level=3] [ref=e658]
+          - generic [ref=e659]:
+            - paragraph [ref=e660]: Для кого
+            - paragraph [ref=e661]: Для регулярного контента и пакетной нарезки.
+          - paragraph [ref=e662]: Нарезаю мысли из длинных видео в короткие ролики с чистыми субтитрами, B-roll, переходами и звуковыми акцентами.
+          - generic [ref=e663]:
+            - paragraph [ref=e664]: Что получает клиент
+            - generic [ref=e665]:
+              - generic [ref=e666]:
+                - img [ref=e667]
+                - generic [ref=e669]: нарезка смыслов
+              - generic [ref=e670]:
+                - img [ref=e671]
+                - generic [ref=e673]: лёгкие субтитры
+              - generic [ref=e674]:
+                - img [ref=e675]
+                - generic [ref=e677]: B-roll / переходы
+              - generic [ref=e678]:
+                - img [ref=e679]
+                - generic [ref=e681]: экспорт под площадки
+          - generic [ref=e682]:
+            - generic [ref=e683]:
+              - generic [ref=e684]:
+                - paragraph [ref=e685]: Цена
+                - paragraph [ref=e686]: от 700–1 200 ₽ / ролик
+              - generic [ref=e687]:
+                - paragraph [ref=e688]: Срок
+                - paragraph [ref=e689]: пакетами от 10 роликов
+            - link "Обсудить Reels Volume" [ref=e690] [cursor=pointer]:
+              - /url: https://t.me/mishanikolsky
+              - text: Обсудить Reels Volume
+              - img [ref=e691]
+        - article [ref=e695]:
+          - generic [ref=e696]:
+            - generic [ref=e697]: PRODUCT MOTION
+            - generic [ref=e698]: формат
+          - heading "Product Motion" [level=3] [ref=e699]
+          - generic [ref=e700]:
+            - paragraph [ref=e701]: Для кого
+            - paragraph [ref=e702]: Для SaaS, tech, crypto и запусков.
+          - paragraph [ref=e703]: "Упаковываю продукт или функцию в motion-ролик: UI-анимация, продуктовая структура, 16:9 и понятная подача."
+          - generic [ref=e704]:
+            - paragraph [ref=e705]: Что получает клиент
+            - generic [ref=e706]:
+              - generic [ref=e707]:
+                - img [ref=e708]
+                - generic [ref=e710]: структура объяснения
+              - generic [ref=e711]:
+                - img [ref=e712]
+                - generic [ref=e714]: UI-анимация
+              - generic [ref=e715]:
+                - img [ref=e716]
+                - generic [ref=e718]: motion design
+              - generic [ref=e719]:
+                - img [ref=e720]
+                - generic [ref=e722]: экспорт 16:9
+          - generic [ref=e723]:
+            - generic [ref=e724]:
+              - generic [ref=e725]:
+                - paragraph [ref=e726]: Цена
+                - paragraph [ref=e727]: от 150–300 ₽ / сек
+              - generic [ref=e728]:
+                - paragraph [ref=e729]: Срок
+                - paragraph [ref=e730]: минимальный проект — от 12 000 ₽
+            - link "Обсудить Product Motion" [ref=e731] [cursor=pointer]:
+              - /url: https://t.me/mishanikolsky
+              - text: Обсудить Product Motion
+              - img [ref=e732]
+        - article [ref=e736]:
+          - generic [ref=e737]:
+            - generic [ref=e738]: COURSES
+            - generic [ref=e739]: формат
+          - heading "Courses" [level=3] [ref=e740]
+          - generic [ref=e741]:
+            - paragraph [ref=e742]: Для кого
+            - paragraph [ref=e743]: Для курсов, уроков и образовательного контента.
+          - paragraph [ref=e744]: "Собираю уроки в понятную структуру: чистка пауз, звук, титры, слайды и аккуратная подача."
+          - generic [ref=e745]:
+            - paragraph [ref=e746]: Что получает клиент
+            - generic [ref=e747]:
+              - generic [ref=e748]:
+                - img [ref=e749]
+                - generic [ref=e751]: чистка пауз
+              - generic [ref=e752]:
+                - img [ref=e753]
+                - generic [ref=e755]: структура урока
+              - generic [ref=e756]:
+                - img [ref=e757]
+                - generic [ref=e759]: звук / титры
+              - generic [ref=e760]:
+                - img [ref=e761]
+                - generic [ref=e763]: экспорт урока
+          - generic [ref=e764]:
+            - generic [ref=e765]:
+              - generic [ref=e766]:
+                - paragraph [ref=e767]: Цена
+                - paragraph [ref=e768]: от 1 500–3 000 ₽ / урок
+              - generic [ref=e769]:
+                - paragraph [ref=e770]: Срок
+                - paragraph [ref=e771]: курс целиком — по оценке
+            - link "Обсудить Courses" [ref=e772] [cursor=pointer]:
+              - /url: https://t.me/mishanikolsky
+              - text: Обсудить Courses
+              - img [ref=e773]
+        - article [ref=e777]:
+          - generic [ref=e778]:
+            - generic [ref=e779]: MOTION SHORTS
+            - generic [ref=e780]: формат
+          - heading "Motion Shorts" [level=3] [ref=e781]
+          - generic [ref=e782]:
+            - paragraph [ref=e783]: Для кого
+            - paragraph [ref=e784]: Для коротких visual hooks и вертикальных motion-роликов.
+          - paragraph [ref=e785]: Делаю короткие 5–10 секундные vertical motion-ролики под быстрый визуальный вход и удержание.
+          - generic [ref=e786]:
+            - paragraph [ref=e787]: Что получает клиент
+            - generic [ref=e788]:
+              - generic [ref=e789]:
+                - img [ref=e790]
+                - generic [ref=e792]: visual hook
+              - generic [ref=e793]:
+                - img [ref=e794]
+                - generic [ref=e796]: motion loop
+              - generic [ref=e797]:
+                - img [ref=e798]
+                - generic [ref=e800]: ритм и текст
+              - generic [ref=e801]:
+                - img [ref=e802]
+                - generic [ref=e804]: экспорт 9:16
+          - generic [ref=e805]:
+            - generic [ref=e806]:
+              - generic [ref=e807]:
+                - paragraph [ref=e808]: Цена
+                - paragraph [ref=e809]: от 3 000–8 000 ₽ / ролик
+              - generic [ref=e810]:
+                - paragraph [ref=e811]: Срок
+                - paragraph [ref=e812]: по задаче
+            - link "Обсудить Motion Shorts" [ref=e813] [cursor=pointer]:
+              - /url: https://t.me/mishanikolsky
+              - text: Обсудить Motion Shorts
+              - img [ref=e814]
+        - article [ref=e818]:
+          - generic [ref=e819]:
+            - generic [ref=e820]: ADS / UGC
+            - generic [ref=e821]: формат
+          - heading "Ads / UGC" [level=3] [ref=e822]
+          - generic [ref=e823]:
+            - paragraph [ref=e824]: Для кого
+            - paragraph [ref=e825]: Для бизнеса, продукта или личного бренда.
+          - paragraph [ref=e826]: Собираю рекламные и UGC-style ролики с быстрым смыслом, понятным оффером и несколькими вариантами подачи.
+          - generic [ref=e827]:
+            - paragraph [ref=e828]: Что получает клиент
+            - generic [ref=e829]:
+              - generic [ref=e830]:
+                - img [ref=e831]
+                - generic [ref=e833]: хук и оффер
+              - generic [ref=e834]:
+                - img [ref=e835]
+                - generic [ref=e837]: монтаж под задачу
+              - generic [ref=e838]:
+                - img [ref=e839]
+                - generic [ref=e841]: субтитры
+              - generic [ref=e842]:
+                - img [ref=e843]
+                - generic [ref=e845]: варианты подачи
+          - generic [ref=e846]:
+            - generic [ref=e847]:
+              - generic [ref=e848]:
+                - paragraph [ref=e849]: Цена
+                - paragraph [ref=e850]: от 3 000–10 000 ₽ / креатив
+              - generic [ref=e851]:
+                - paragraph [ref=e852]: Срок
+                - paragraph [ref=e853]: по задаче
+            - link "Обсудить Ads / UGC" [ref=e854] [cursor=pointer]:
+              - /url: https://t.me/mishanikolsky
+              - text: Обсудить Ads / UGC
+              - img [ref=e855]
+      - paragraph [ref=e858]: Финальная стоимость зависит от объёма исходников, сложности motion, дедлайна и количества правок.
+      - generic [ref=e860]:
+        - generic [ref=e861]:
+          - text: "01"
+          - paragraph [ref=e862]: 6–7 лет в монтаже
+        - generic [ref=e863]:
+          - text: "02"
+          - paragraph [ref=e864]: Reels / YouTube / Motion / Courses
+        - generic [ref=e865]:
+          - text: "03"
+          - paragraph [ref=e866]: работа по предоплате
+        - generic [ref=e867]:
+          - text: "04"
+          - paragraph [ref=e868]: короткий тест 5–10 секунд
+        - generic [ref=e869]:
+          - text: "05"
+          - paragraph [ref=e870]: прямой контакт со специалистом
+    - generic [ref=e872]:
+      - generic [ref=e874]:
+        - paragraph [ref=e875]: Процесс
+        - heading "Как проходит работа" [level=2] [ref=e876]
+        - paragraph [ref=e877]: От исходников и оценки — до финального файла.
+      - generic [ref=e879]:
+        - generic [ref=e882]:
+          - generic [ref=e883]:
+            - paragraph [ref=e884]: workflow path
+            - heading "От исходников к финалу" [level=3] [ref=e885]
+            - paragraph [ref=e886]: "Вы понимаете, что происходит на каждом этапе: сроки, оплата, правки и выдача фиксируются заранее."
+          - generic [ref=e890]:
+            - button "01 / Задача" [pressed] [ref=e891]:
+              - img [ref=e894]
+              - generic [ref=e897]: 01 / Задача
+            - button "02 / Оценка" [ref=e898]:
+              - img [ref=e901]
+              - generic [ref=e908]: 02 / Оценка
+            - button "03 / Предоплата" [ref=e909]:
+              - img [ref=e912]
+              - generic [ref=e915]: 03 / Предоплата
+            - button "04 / Монтаж" [ref=e916]:
+              - img [ref=e919]
+              - generic [ref=e925]: 04 / Монтаж
+            - button "05 / Правки" [ref=e926]:
+              - img [ref=e929]
+              - generic [ref=e934]: 05 / Правки
+            - button "06 / Выдача" [ref=e935]:
+              - img [ref=e938]
+              - generic [ref=e941]: 06 / Выдача
+        - generic [ref=e942]:
+          - generic [ref=e943]:
+            - img [ref=e945]
+            - generic [ref=e948]:
+              - paragraph [ref=e949]: Шаг 01
+              - heading "Задача" [level=3] [ref=e950]
+          - paragraph [ref=e951]: Вы присылаете материал, формат, дедлайн и пример желаемой подачи.
+          - generic [ref=e952]:
+            - generic [ref=e953]: срок фиксируем
+            - generic [ref=e954]: правки согласуем
+            - generic [ref=e955]: выдача под площадку
+    - generic [ref=e957]:
+      - generic [ref=e959]:
+        - paragraph [ref=e960]: Условия
+        - heading "Условия работы" [level=2] [ref=e961]
+        - paragraph [ref=e962]: Сначала фиксируем оплату, сроки, правки и формат выдачи. FAQ открывается отдельно, чтобы не перегружать страницу.
+      - generic [ref=e963]:
+        - generic [ref=e965]:
+          - paragraph [ref=e966]: "01"
+          - heading "Небольшие задачи" [level=3] [ref=e967]
+          - paragraph [ref=e968]: 100% предоплата до старта.
+        - generic [ref=e970]:
+          - paragraph [ref=e971]: "02"
+          - heading "Средние проекты" [level=3] [ref=e972]
+          - paragraph [ref=e973]: 50% до старта, 50% перед финальной выдачей.
+        - generic [ref=e975]:
+          - paragraph [ref=e976]: "03"
+          - heading "Большие проекты" [level=3] [ref=e977]
+          - paragraph [ref=e978]: Работа по этапам / milestones.
+        - generic [ref=e980]:
+          - paragraph [ref=e981]: "04"
+          - heading "Тест" [level=3] [ref=e982]
+          - paragraph [ref=e983]: Бесплатно только 5–10 секунд.
+      - button "Открыть FAQ" [ref=e985]:
+        - text: Открыть FAQ
+        - img [ref=e986]
+    - generic [ref=e990]:
+      - generic [ref=e991]:
+        - generic [ref=e992]:
+          - paragraph [ref=e993]: Контакт
+          - heading "Давайте соберём ваш материал в сильное видео." [level=2] [ref=e994]
+          - paragraph [ref=e995]: Напишите, какой материал у вас есть, какой формат нужен и какой дедлайн. Я подскажу, как лучше собрать ролик и сколько это будет стоить.
+        - generic [ref=e996]:
+          - link "Telegram" [ref=e997] [cursor=pointer]:
+            - /url: https://t.me/mishanikolsky
+            - img [ref=e998]
+            - text: Telegram
+          - generic [ref=e1001]:
+            - link "Почта" [ref=e1002] [cursor=pointer]:
+              - /url: mailto:hello@nikolsky.studio
+              - img [ref=e1003]
+              - text: Почта
+            - link "IG" [ref=e1006] [cursor=pointer]:
+              - /url: https://instagram.com/nikolsky.studio
+              - text: IG
+              - img [ref=e1007]
+            - link "VK" [ref=e1010] [cursor=pointer]:
+              - /url: https://vk.com/nikolsky
+              - img [ref=e1011]
+              - text: VK
+      - generic [ref=e1013]:
+        - generic [ref=e1014]: Nikolsky Studio
+        - generic [ref=e1015]: Видео только через YouTube / без бэкенда / без локального хранения
+  - alert [ref=e1016]

@@ -105,7 +105,7 @@ function getSectionKey(selection: EditorSelection) {
   if (selection.type !== "text") return "page";
   const key = String(selection.path[1] ?? "");
   if (key.startsWith("position")) return "position";
-  if (key.startsWith("products") || key === "priceLabel" || key === "deadlineLabel" || key === "includedLabel" || key === "problems" || key === "problemsLabel") return "products";
+  if (key.startsWith("products") || key === "priceLabel" || key === "deadlineLabel" || key === "includedLabel" || key === "pricingNote" || key === "problems" || key === "problemsLabel") return "products";
   if (key.startsWith("reel") || key === "chapters" || key === "showreelCta" || key === "showreelLabel" || key === "tracks") return "reel";
   if (key.startsWith("cases") || key === "all" || key === "openCase" || key === "youtube") return "cases";
   if (key.startsWith("method")) return "method";
@@ -715,6 +715,7 @@ function SectionPanel({
           <ContentField content={content} path={["ru", "priceLabel"]} label="Лейбл цены" updateContent={updateContent} />
           <ContentField content={content} path={["ru", "deadlineLabel"]} label="Лейбл срока" updateContent={updateContent} />
           <ContentField content={content} path={["ru", "includedLabel"]} label="Лейбл пунктов" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "pricingNote"]} label="Примечание к цене" area updateContent={updateContent} />
           <ContentField content={content} path={["ru", "problemsLabel"]} label="Лейбл проблем" updateContent={updateContent} />
           <EditableStringList title="Что обычно исправляю" root={["ru", "problems"]} content={content} updateContent={updateContent} />
           <ProductList content={content} updateContent={updateContent} />
@@ -996,8 +997,8 @@ function ProductList({
                 audience: "Для кого услуга.",
                 text: "Описание услуги.",
                 fit: "Кому подходит",
-                price: "от £___",
-                timeline: "Срок после оценки исходников",
+                price: "от ₽___",
+                timeline: "срок после оценки исходников",
                 includes: ["Новый пункт"],
                 cta: "Обсудить",
               },

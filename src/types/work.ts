@@ -1,9 +1,10 @@
 export const workCategories = [
-  "Reels",
-  "Motion Design",
-  "SaaS / Crypto",
+  "Reels Pro",
+  "Reels Volume",
+  "Product Motion",
   "Courses",
-  "YouTube",
+  "Motion Shorts",
+  "Ads / UGC",
 ] as const;
 
 export type PortfolioCategory = (typeof workCategories)[number];

@@ -134,11 +134,39 @@ const WORKS_STORAGE_KEY = "nikolsky-studio-works-v1";
 
 const categoryLabels: Record<string, Record<Lang, string>> = {
   Showreel: { ru: "Шоурил", en: "Showreel" },
-  Reels: { ru: "Reels", en: "Reels" },
-  "Motion Design": { ru: "Motion", en: "Motion" },
-  "SaaS / Crypto": { ru: "SaaS / Crypto", en: "SaaS / Crypto" },
-  Courses: { ru: "Курсы", en: "Courses" },
-  YouTube: { ru: "YouTube", en: "YouTube" },
+  "Reels Pro": { ru: "Reels Pro", en: "Reels Pro" },
+  "Reels Volume": { ru: "Reels Volume", en: "Reels Volume" },
+  "Product Motion": { ru: "Product Motion", en: "Product Motion" },
+  Courses: { ru: "Courses", en: "Courses" },
+  "Motion Shorts": { ru: "Motion Shorts", en: "Motion Shorts" },
+  "Ads / UGC": { ru: "Ads / UGC", en: "Ads / UGC" },
+};
+
+const categoryDescriptions: Partial<Record<PortfolioCategory, Record<Lang, string>>> = {
+  "Reels Pro": {
+    ru: "Сложный монтаж коротких роликов: структура, хук, удержание, дорогие субтитры, motion-вставки, tracking и After Effects.",
+    en: "Advanced short-form editing: structure, hook, retention, premium captions, motion inserts, tracking and After Effects.",
+  },
+  "Reels Volume": {
+    ru: "Пакетная нарезка для регулярного контента: мысли из длинных видео, лёгкие субтитры, B-roll, переходы и звуковые акценты.",
+    en: "Batch short-form editing for regular content: ideas from long videos, clean captions, B-roll, simple transitions and sound accents.",
+  },
+  "Product Motion": {
+    ru: "Motion-ролики для SaaS, crypto, tech и запусков: продуктовая упаковка, UI-анимация, 16:9, объяснение функции или сервиса.",
+    en: "Motion videos for SaaS, crypto, tech and launches: product packaging, UI animation, 16:9, feature or service explanation.",
+  },
+  Courses: {
+    ru: "Монтаж курсов, уроков и образовательного контента: чистка, структура, звук, титры и понятная подача.",
+    en: "Editing for courses, lessons and educational content: cleanup, structure, sound, titles and clear delivery.",
+  },
+  "Motion Shorts": {
+    ru: "Короткие vertical motion-ролики 5–10 секунд под быстрый visual hook, удержание и репосты.",
+    en: "Short vertical motion videos, 5–10 seconds, built for a fast visual hook, retention and shares.",
+  },
+  "Ads / UGC": {
+    ru: "Рекламные и UGC-style ролики для бизнеса, продукта или личного бренда: быстрый смысл, понятный оффер, несколько вариантов подачи.",
+    en: "Ad and UGC-style videos for business, products or personal brands: quick message, clear offer and multiple creative angles.",
+  },
 };
 
 const defaultCopy = {
@@ -226,10 +254,10 @@ const defaultCopy = {
     reelTitle: "Шоурил Nikolsky Studio",
     reelText: "Короткий обзор работ и направлений: Reels, YouTube, курсы и продуктовые ролики.",
     chapters: "Разделы таймлайна",
-    casesEyebrow: "Работы",
-    casesTitle: "Работы",
+    casesEyebrow: "SELECTED WORKS",
+    casesTitle: "РАБОТЫ",
     casesText:
-      "Подборка проектов в разных форматах. Каждый проект — это конкретная задача: удержание внимания, понятная подача, продуктовая упаковка или работа с длинным форматом.",
+      "Выберите формат и посмотрите примеры: сложные Reels, регулярная нарезка, product motion, курсы, motion shorts и рекламные креативы.",
     all: "Все",
     task: "Задача",
     done: "Что сделано",
@@ -266,7 +294,7 @@ const defaultCopy = {
     footer: "Видео только через YouTube / без бэкенда / без локального хранения",
   },
   en: {
-    nav: ["Work", "Products", "Method", "Terms", "Contact"],
+    nav: ["Works", "Products", "Method", "Terms", "Contact"],
     label: "Motion design / video editor / attention director",
     eyebrow: "Nikolsky Control Room",
     rec: "Reels · YouTube · Motion",
@@ -300,62 +328,112 @@ const defaultCopy = {
       ["No Unified Style", "I package the delivery through captions, B-roll, sound, motion elements, and visual accents."],
     ],
     productsEyebrow: "Products",
-    productsTitle: "Do not choose editing. Choose the task.",
+    productsTitle: "Work formats",
+    productsText: "Choose the task: Reels Pro, batch short-form editing, Product Motion, Courses, Motion Shorts or Ads / UGC.",
+    pricingNote: "Final price depends on footage volume, motion complexity, deadline and number of revisions.",
     products: [
       {
-        code: "P01",
-        title: "Short-form Engine",
-        audience: "For experts, creators, brands, and businesses.",
-        text: "I turn long recordings, talking heads, podcasts, and shoots into Reels / Shorts / TikTok that hook fast and feel systematic.",
+        code: "REELS PRO",
+        title: "Reels Pro",
+        audience: "For experts, brands, and premium image-led videos.",
+        text: "Advanced short-form editing: hook, structure, captions, B-roll, motion inserts, tracking and After Effects.",
+        price: "from ₽3,000–7,000 / video",
+        timeline: "complex motion — after review",
         includes: [
-          "strong fragment selection",
-          "retention-first editing",
-          "captions and accents",
-          "B-roll / motion elements",
-          "export for Reels / Shorts / TikTok",
+          "structure and hook",
+          "captions / accents",
+          "motion / B-roll",
+          "9:16 export",
         ],
-        cta: "Discuss short-form",
+        cta: "Discuss Reels Pro",
       },
       {
-        code: "P02",
-        title: "Sales / Launch Motion",
-        audience: "For SaaS, crypto, tech, launches, products, and decks.",
-        text: "I build dynamic product videos, promos, and motion clips that explain product value quickly.",
+        code: "REELS VOLUME",
+        title: "Reels Volume",
+        audience: "For regular content and batch short-form editing.",
+        text: "I turn long-form ideas into short clips with clean captions, B-roll, simple transitions and sound accents.",
+        price: "from ₽700–1,200 / video",
+        timeline: "packages from 10 videos",
         includes: [
-          "video structure",
-          "edit / motion rhythm",
-          "feature accents",
-          "titles, UI fragments, graphics",
-          "versions for social / website / deck",
+          "idea extraction",
+          "clean captions",
+          "B-roll / transitions",
+          "platform exports",
         ],
-        cta: "Discuss launch",
+        cta: "Discuss Reels Volume",
       },
       {
-        code: "P03",
-        title: "Long-form Cut",
-        audience: "For YouTube, courses, podcasts, and educational content.",
-        text: "I cut long videos so they do not collapse in pace: remove noise, keep structure, and strengthen meaning.",
+        code: "PRODUCT MOTION",
+        title: "Product Motion",
+        audience: "For SaaS, crypto, tech and launches.",
+        text: "I package a product or feature into a motion video: UI animation, product structure, 16:9 and clear delivery.",
+        price: "from ₽150–300 / sec",
+        timeline: "minimum project — from ₽12,000",
         includes: [
-          "material cleanup",
-          "episode structure",
-          "semantic block editing",
-          "pause and pace work",
-          "16:9 and/or 9:16 export",
+          "explanation structure",
+          "UI animation",
+          "motion design",
+          "16:9 export",
         ],
-        cta: "Discuss long-form",
+        cta: "Discuss Product Motion",
+      },
+      {
+        code: "COURSES",
+        title: "Courses",
+        audience: "For courses, lessons and educational content.",
+        text: "I structure lessons with pause cleanup, sound, titles, slides and clear delivery.",
+        price: "from ₽1,500–3,000 / lesson",
+        timeline: "full course — after review",
+        includes: [
+          "pause cleanup",
+          "lesson structure",
+          "sound / titles",
+          "lesson export",
+        ],
+        cta: "Discuss Courses",
+      },
+      {
+        code: "MOTION SHORTS",
+        title: "Motion Shorts",
+        audience: "For short visual hooks and vertical motion videos.",
+        text: "Short 5–10 second vertical motion videos built for a fast visual hook and retention.",
+        price: "from ₽3,000–8,000 / video",
+        timeline: "after review",
+        includes: [
+          "visual hook",
+          "motion loop",
+          "pace and text",
+          "9:16 export",
+        ],
+        cta: "Discuss Motion Shorts",
+      },
+      {
+        code: "ADS / UGC",
+        title: "Ads / UGC",
+        audience: "For business, products and personal brands.",
+        text: "Ad and UGC-style videos with a quick message, clear offer and multiple creative angles.",
+        price: "from ₽3,000–10,000 / creative",
+        timeline: "after review",
+        includes: [
+          "hook and offer",
+          "task-based edit",
+          "captions",
+          "creative angles",
+        ],
+        cta: "Discuss Ads / UGC",
       },
     ],
     reelEyebrow: "Showreel",
     reelTitle: "Nikolsky Studio Showreel",
     reelText: "60 seconds of short-form, motion, YouTube, courses, and product videos.",
     chapters: "Timeline chapters",
-    casesEyebrow: "Cases",
-    casesTitle: "Work is not a grid. Every case is a task.",
+    casesEyebrow: "SELECTED WORKS",
+    casesTitle: "WORKS",
     casesText:
-      "Filters do not hide projects. They switch tracks: short-form, product motion, education, and long-form.",
+      "Choose a format and watch relevant examples: advanced Reels, batch short-form editing, product motion, courses, motion shorts and ad creatives.",
     all: "All",
     task: "Task",
-    done: "Work done",
+    done: "What was done",
     why: "Why it works",
     deliverables: "Deliverables",
     openCase: "Open case",
@@ -399,6 +477,7 @@ type RuntimeText = LandingCopy[Lang] & {
   faqOpen?: string;
   faqClose?: string;
   productsText?: string;
+  pricingNote?: string;
   problemsLabel?: string;
   problems?: readonly string[];
   methodText?: string;
@@ -606,10 +685,18 @@ export function StudioLanding({
     })[0];
   }, [liveWorks]);
   const portfolioWorks = useMemo(() => liveWorks.filter((work) => !work.featured), [liveWorks]);
+  const availableWorkFilters = useMemo(
+    () => workCategories.filter((category) => portfolioWorks.some((work) => work.category === category)),
+    [portfolioWorks],
+  );
+  const safeActiveFilter =
+    activeFilter === "All" || availableWorkFilters.includes(activeFilter) ? activeFilter : "All";
   const filteredWorks =
-    activeFilter === "All"
+    safeActiveFilter === "All"
       ? portfolioWorks
-      : portfolioWorks.filter((work) => work.category === activeFilter);
+      : portfolioWorks.filter((work) => work.category === safeActiveFilter);
+  const activeCategoryDescription =
+    safeActiveFilter === "All" ? null : categoryDescriptions[safeActiveFilter]?.[lang] ?? null;
   const toggleFaqItem = (index: number) => {
     setOpenFaqItems((current) =>
       current.includes(index) ? current.filter((item) => item !== index) : [...current, index],
@@ -783,13 +870,13 @@ export function StudioLanding({
               <SectionHeader eyebrow={t.casesEyebrow} title={t.casesTitle} text={t.casesText} />
             </div>
             <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 lg:mx-0 lg:flex-wrap lg:justify-end lg:overflow-visible lg:px-0">
-              {(["All", ...workCategories] as Filter[]).map((filter) => (
+              {(["All", ...availableWorkFilters] as Filter[]).map((filter) => (
                 <button
                   key={filter}
                   type="button"
                   onClick={() => setActiveFilter(filter)}
                   className={`h-10 shrink-0 border px-4 font-mono text-xs uppercase transition ${
-                    activeFilter === filter
+                    safeActiveFilter === filter
                       ? "border-accent bg-accent text-black"
                       : "border-white/12 bg-white/[0.025] text-white/52 hover:border-accent hover:text-accent"
                   }`}
@@ -799,6 +886,18 @@ export function StudioLanding({
               ))}
             </div>
           </div>
+
+          {activeCategoryDescription ? (
+            <motion.p
+              key={`${safeActiveFilter}-${lang}`}
+              initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
+              className="mb-5 max-w-4xl border-l border-accent/55 bg-black/18 py-2 pl-4 text-sm leading-6 text-white/60"
+            >
+              {activeCategoryDescription}
+            </motion.p>
+          ) : null}
 
           <motion.div layout className="grid gap-3">
             <AnimatePresence mode="popLayout">
@@ -822,6 +921,7 @@ export function StudioLanding({
                     index={index}
                     labels={{ task: t.task, done: t.done, open: t.openCase, youtube: t.youtube }}
                     onSelect={setSelectedWork}
+                    reduceMotion={Boolean(reduceMotion)}
                   />
                 </div>
               ))}
@@ -854,15 +954,22 @@ export function StudioLanding({
                 <ProductPanel
                   product={product}
                   label={t.productLabel}
-                  priceLabel={runtimeT.priceLabel ?? "Цена"}
-                  deadlineLabel={runtimeT.deadlineLabel ?? "Срок"}
-                  includedLabel={runtimeT.includedLabel ?? "Что входит"}
+                  audienceLabel={lang === "ru" ? "Для кого" : "For whom"}
+                  priceLabel={runtimeT.priceLabel ?? (lang === "ru" ? "Цена" : "Price")}
+                  deadlineLabel={runtimeT.deadlineLabel ?? (lang === "ru" ? "Срок" : "Timeline")}
+                  includedLabel={runtimeT.includedLabel ?? (lang === "ru" ? "Что входит" : "What is included")}
                   contactUrl={links.telegramUrl}
                   reduceMotion={Boolean(reduceMotion)}
                 />
               </motion.div>
             ))}
           </div>
+
+          {runtimeT.pricingNote ? (
+            <p className="mt-5 max-w-3xl border-l border-accent/45 pl-4 text-sm leading-6 text-white/52">
+              {runtimeT.pricingNote}
+            </p>
+          ) : null}
 
           <TrustStrip items={runtimeT.trustItems ?? getTrustItems(lang)} reduceMotion={Boolean(reduceMotion)} />
         </Reveal>
@@ -1705,6 +1812,7 @@ function ProductPanel({
   priceLabel,
   deadlineLabel,
   includedLabel,
+  audienceLabel,
   contactUrl,
   reduceMotion,
 }: {
@@ -1720,6 +1828,7 @@ function ProductPanel({
     fit?: string;
   };
   label: string;
+  audienceLabel: string;
   priceLabel: string;
   deadlineLabel: string;
   includedLabel: string;
@@ -1740,7 +1849,7 @@ function ProductPanel({
       </div>
       <h3 className="text-2xl font-semibold uppercase leading-[0.98] text-white sm:text-[1.7rem]">{product.title}</h3>
       <div className="mt-5 border-l border-accent/55 pl-3">
-        <p className="font-mono text-[10px] uppercase text-accent/80">Для кого</p>
+        <p className="font-mono text-[10px] uppercase text-accent/80">{audienceLabel}</p>
         <p className="mt-1 text-sm leading-6 text-white/58">{product.audience}</p>
       </div>
       <p className="mt-5 text-sm leading-6 text-white/66">{product.text}</p>
@@ -1818,12 +1927,14 @@ function CasePanel({
   index,
   labels,
   onSelect,
+  reduceMotion,
 }: {
   work: Work;
   lang: Lang;
   index: number;
   labels: { task: string; done: string; open: string; youtube: string };
   onSelect: (work: Work) => void;
+  reduceMotion: boolean;
 }) {
   const displayWork = viewWork(work, lang);
   const done = getWorkDone(work, lang).slice(0, 5);
@@ -1834,15 +1945,18 @@ function CasePanel({
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98 }}
+      whileHover={reduceMotion ? undefined : { y: -2, scale: 1.01 }}
+      whileTap={reduceMotion ? undefined : { scale: 0.985 }}
       transition={{ duration: 0.3, delay: index * 0.02 }}
-      className="group grid overflow-hidden border border-white/10 bg-white/[0.02] transition hover:border-accent/70 lg:grid-cols-[320px_1fr_220px]"
+      className="group grid overflow-hidden border border-white/10 bg-white/[0.02] transition-colors hover:border-accent/70 hover:shadow-[0_0_34px_rgba(0,183,255,0.1)] lg:grid-cols-[320px_1fr_220px]"
     >
       <button type="button" onClick={() => onSelect(work)} className="relative aspect-[1.18/1] overflow-hidden border-b border-white/10 text-left sm:aspect-video lg:aspect-auto lg:border-b-0 lg:border-r">
-        <div className="absolute inset-0 bg-cover bg-center opacity-80 transition" style={{ backgroundImage: `url(${getThumbnailUrl(work)})` }} />
+        <div className="absolute inset-0 bg-cover bg-center opacity-80 transition duration-300 group-hover:scale-[1.018] group-hover:opacity-68" style={{ backgroundImage: `url(${getThumbnailUrl(work)})` }} />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,6,0.08),rgba(3,5,6,0.72))]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,183,255,0.16),transparent_38%)] opacity-0 transition duration-300 group-hover:opacity-100" />
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between sm:bottom-4 sm:left-4 sm:right-4">
           <span className="font-mono text-[11px] uppercase text-accent sm:text-xs">{clipTime(index)}</span>
-          <span className="grid size-10 place-items-center border border-white/18 bg-black/36 text-white backdrop-blur sm:size-11">
+          <span className="grid size-10 place-items-center border border-white/18 bg-black/36 text-white backdrop-blur transition group-hover:border-accent/80 group-hover:text-accent group-hover:shadow-[0_0_22px_rgba(0,183,255,0.22)] sm:size-11">
             <Play size={18} fill="currentColor" />
           </span>
         </div>

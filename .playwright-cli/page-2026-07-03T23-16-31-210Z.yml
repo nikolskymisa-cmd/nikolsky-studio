@@ -1,0 +1,645 @@
+- generic [ref=e1]:
+  - main [ref=e2]:
+    - navigation [ref=e5]:
+      - link "Nikolsky Studio" [ref=e6] [cursor=pointer]:
+        - /url: "#top"
+        - generic [ref=e7]: NS
+        - generic [ref=e8]:
+          - generic [ref=e9]: Nikolsky Studio
+          - generic [ref=e10]: Video Editing / Motion
+      - generic [ref=e11]:
+        - link "Works" [ref=e1017] [cursor=pointer]:
+          - /url: "#work"
+        - link "Products" [ref=e1018] [cursor=pointer]:
+          - /url: "#products"
+        - link "Method" [ref=e1019] [cursor=pointer]:
+          - /url: "#method"
+        - link "Terms" [ref=e1020] [cursor=pointer]:
+          - /url: "#terms"
+        - link "Contact" [ref=e1021] [cursor=pointer]:
+          - /url: "#contact"
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - button "ru" [ref=e19]
+          - button "en" [active] [pressed] [ref=e20]
+        - link "Discuss project" [ref=e1022] [cursor=pointer]:
+          - /url: https://t.me/mishanikolsky
+          - img [ref=e22]
+          - text: Discuss project
+    - generic [ref=e26]:
+      - generic [ref=e27]:
+        - paragraph [ref=e28]: Motion design / video editor / attention director
+        - heading "I direct attention." [level=1] [ref=e1023]
+        - paragraph [ref=e30]: I turn raw footage into Reels, YouTube episodes, courses, and product videos with clear structure, clean pacing, and task-driven delivery.
+        - generic [ref=e31]:
+          - link "View cases" [ref=e1024] [cursor=pointer]:
+            - /url: "#work"
+            - img [ref=e33]
+            - text: View cases
+          - link "Discuss project" [ref=e1025] [cursor=pointer]:
+            - /url: https://t.me/mishanikolsky
+            - img [ref=e37]
+            - text: Discuss project
+        - paragraph [ref=e40]: 6–7 years editing · Reels / YouTube / Motion / Courses · prepaid work
+      - generic [ref=e42]:
+        - button "Showreel Nikolsky Studio Showreel Подборка работ и направлений" [ref=e1026]:
+          - img [ref=e50]
+          - generic [ref=e52]:
+            - paragraph [ref=e53]: Showreel
+            - heading "Nikolsky Studio Showreel" [level=3] [ref=e1027]
+            - paragraph [ref=e55]: Подборка работ и направлений
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - generic [ref=e58]:
+              - paragraph [ref=e59]: Breakdown
+              - paragraph [ref=e60]: Хук, ритм, смысл, упаковка.
+            - button "Watch showreel" [ref=e1028]:
+              - img [ref=e62]
+              - text: Watch showreel
+          - generic [ref=e64]:
+            - generic [ref=e65]:
+              - button "Перейти к Первые секунды" [ref=e66]:
+                - img [ref=e67]
+              - button "ХУК Первые секунды" [ref=e70]:
+                - generic [ref=e71]: ХУК
+                - generic [ref=e72]: Первые секунды
+              - button "Перейти к ХУК" [ref=e76]
+              - paragraph [ref=e77]: Цепляем внимание и задаём тон ролика.
+            - generic [ref=e78]:
+              - button "Перейти к Ритм монтажа" [ref=e79]:
+                - img [ref=e80]
+              - button "РИТМ Ритм монтажа" [ref=e82]:
+                - generic [ref=e83]: РИТМ
+                - generic [ref=e84]: Ритм монтажа
+              - button "Перейти к РИТМ" [ref=e87]
+              - paragraph [ref=e88]: Держим динамику через резы, паузы, звук и смену кадров.
+            - generic [ref=e89]:
+              - button "Перейти к Смысл и подача" [ref=e90]:
+                - img [ref=e91]
+              - button "СМЫСЛ Смысл и подача" [ref=e93]:
+                - generic [ref=e94]: СМЫСЛ
+                - generic [ref=e95]: Смысл и подача
+              - button "Перейти к СМЫСЛ" [ref=e98]
+              - paragraph [ref=e99]: Помогаем зрителю быстро понять идею и не потеряться.
+            - generic [ref=e100]:
+              - button "Перейти к Финальная упаковка" [ref=e101]:
+                - img [ref=e102]
+              - button "ФИНАЛ Финальная упаковка" [ref=e105]:
+                - generic [ref=e106]: ФИНАЛ
+                - generic [ref=e107]: Финальная упаковка
+              - button "Перейти к ФИНАЛ" [ref=e110]
+              - paragraph [ref=e111]: Цвет, звук, титры и детали, которые делают видео собранным.
+    - generic [ref=e113]:
+      - generic [ref=e114]:
+        - generic [ref=e116]:
+          - paragraph [ref=e117]: SELECTED WORKS
+          - heading "WORKS" [level=2] [ref=e1029]
+          - paragraph [ref=e119]: "Choose a format and watch relevant examples: advanced Reels, batch short-form editing, product motion, courses, motion shorts and ad creatives."
+        - generic [ref=e120]:
+          - button "All" [ref=e1030]
+          - button "Reels Pro" [ref=e122]
+          - button "Reels Volume" [ref=e123]
+          - button "Product Motion" [ref=e124]
+          - button "Courses" [ref=e125]
+          - button "Motion Shorts" [ref=e126]
+          - button "Ads / UGC" [ref=e127]
+      - generic [ref=e128]:
+        - article [ref=e130]:
+          - button "00:03:00" [ref=e131]:
+            - generic [ref=e135]:
+              - generic [ref=e136]: 00:03:00
+              - img [ref=e138]
+          - generic [ref=e140]:
+            - generic [ref=e141]:
+              - img [ref=e142]
+              - generic [ref=e144]: Showreel
+              - generic [ref=e145]: /
+              - generic [ref=e146]: Showreel / 16:9
+            - heading "Nikolsky Studio Showreel" [level=3] [ref=e1031]
+            - generic [ref=e148]:
+              - paragraph [ref=e149]: Task
+              - paragraph [ref=e150]: Show the editing range without turning it into a random montage.
+            - generic [ref=e151]:
+              - generic [ref=e1032]: structure
+              - generic [ref=e1033]: pace
+              - generic [ref=e154]: motion
+              - generic [ref=e155]: sound design
+          - generic [ref=e156]:
+            - paragraph [ref=e157]: What was done
+            - generic [ref=e187]:
+              - button "Open case" [ref=e1034]:
+                - text: Open case
+                - img [ref=e189]
+              - link "YouTube" [ref=e192] [cursor=pointer]:
+                - /url: https://youtu.be/Yob34ciuJrw
+                - text: YouTube
+                - img [ref=e193]
+        - article [ref=e197]:
+          - button "00:11:11" [ref=e198]:
+            - generic [ref=e202]:
+              - generic [ref=e203]: 00:11:11
+              - img [ref=e205]
+          - generic [ref=e207]:
+            - generic [ref=e208]:
+              - img [ref=e209]
+              - generic [ref=e211]: Reels Pro
+              - generic [ref=e212]: /
+              - generic [ref=e213]: Reels Pro / 9:16
+            - heading "REELS PRO FOR EXPERT" [level=3] [ref=e1035]
+            - generic [ref=e215]:
+              - paragraph [ref=e216]: Task
+              - paragraph [ref=e217]: Build an expert short-form video with a strong opening, clean pace and premium visual delivery.
+            - generic [ref=e218]:
+              - generic [ref=e1036]: structure
+              - generic [ref=e1037]: hook
+              - generic [ref=e1038]: captions
+              - generic [ref=e222]: motion
+              - generic [ref=e223]: B-roll
+          - generic [ref=e224]:
+            - paragraph [ref=e225]: What was done
+            - generic [ref=e255]:
+              - button "Open case" [ref=e1039]:
+                - text: Open case
+                - img [ref=e257]
+              - link "YouTube" [ref=e260] [cursor=pointer]:
+                - /url: https://youtube.com/shorts/NRr-_TY2X7E
+                - text: YouTube
+                - img [ref=e261]
+        - article [ref=e265]:
+          - button "00:19:22" [ref=e266]:
+            - generic [ref=e270]:
+              - generic [ref=e271]: 00:19:22
+              - img [ref=e273]
+          - generic [ref=e275]:
+            - generic [ref=e276]:
+              - img [ref=e277]
+              - generic [ref=e279]: Product Motion
+              - generic [ref=e280]: /
+              - generic [ref=e281]: Product motion / 16:9
+            - heading "PRODUCT MOTION / CRYPTO EXPLAINER" [level=3] [ref=e282]
+            - generic [ref=e283]:
+              - paragraph [ref=e284]: Task
+              - paragraph [ref=e285]: Explain a product or feature through a dynamic 16:9 motion video.
+            - generic [ref=e286]:
+              - generic [ref=e287]: motion design
+              - generic [ref=e1040]: UI animation
+              - generic [ref=e1041]: structure
+              - generic [ref=e1042]: titles
+              - generic [ref=e1043]: 16:9 export
+          - generic [ref=e292]:
+            - paragraph [ref=e293]: What was done
+            - generic [ref=e323]:
+              - button "Open case" [ref=e1044]:
+                - text: Open case
+                - img [ref=e325]
+              - link "YouTube" [ref=e328] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=ScMzIvxBSi4
+                - text: YouTube
+                - img [ref=e329]
+        - article [ref=e333]:
+          - button "00:27:09" [ref=e334]:
+            - generic [ref=e338]:
+              - generic [ref=e339]: 00:27:09
+              - img [ref=e341]
+          - generic [ref=e343]:
+            - generic [ref=e344]:
+              - img [ref=e345]
+              - generic [ref=e347]: Motion Shorts
+              - generic [ref=e348]: /
+              - generic [ref=e349]: Motion short / 9:16
+            - heading "VIRAL MOTION SHORT" [level=3] [ref=e1045]
+            - generic [ref=e351]:
+              - paragraph [ref=e352]: Task
+              - paragraph [ref=e353]: Create a short vertical motion video with a fast visual hook.
+            - generic [ref=e354]:
+              - generic [ref=e355]: motion loop
+              - generic [ref=e1046]: text
+              - generic [ref=e1047]: pace
+              - generic [ref=e358]: visual hook
+              - generic [ref=e1048]: 9:16 export
+          - generic [ref=e360]:
+            - paragraph [ref=e361]: What was done
+            - generic [ref=e391]:
+              - button "Open case" [ref=e1049]:
+                - text: Open case
+                - img [ref=e393]
+              - link "YouTube" [ref=e396] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=aqz-KE-bpKQ
+                - text: YouTube
+                - img [ref=e397]
+        - article [ref=e401]:
+          - button "00:35:20" [ref=e402]:
+            - generic [ref=e406]:
+              - generic [ref=e407]: 00:35:20
+              - img [ref=e409]
+          - generic [ref=e411]:
+            - generic [ref=e412]:
+              - img [ref=e413]
+              - generic [ref=e415]: Courses
+              - generic [ref=e416]: /
+              - generic [ref=e417]: Course lesson / 16:9
+            - heading "COURSE MODULE EDIT" [level=3] [ref=e1050]
+            - generic [ref=e419]:
+              - paragraph [ref=e420]: Task
+              - paragraph [ref=e421]: Edit a lesson so it stays clear, watchable and easy to follow.
+            - generic [ref=e422]:
+              - generic [ref=e1051]: pause cleanup
+              - generic [ref=e1052]: structure
+              - generic [ref=e1053]: sound
+              - generic [ref=e1054]: titles
+              - generic [ref=e1055]: lesson export
+          - generic [ref=e428]:
+            - paragraph [ref=e429]: What was done
+            - generic [ref=e459]:
+              - button "Open case" [ref=e1056]:
+                - text: Open case
+                - img [ref=e461]
+              - link "YouTube" [ref=e464] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=YE7VzlLtp-4
+                - text: YouTube
+                - img [ref=e465]
+        - article [ref=e469]:
+          - button "00:43:07" [ref=e470]:
+            - generic [ref=e474]:
+              - generic [ref=e475]: 00:43:07
+              - img [ref=e477]
+          - generic [ref=e479]:
+            - generic [ref=e480]:
+              - img [ref=e481]
+              - generic [ref=e483]: Ads / UGC
+              - generic [ref=e484]: /
+              - generic [ref=e485]: Ad creative / 9:16
+            - heading "ADS / UGC CREATIVE" [level=3] [ref=e1057]
+            - generic [ref=e487]:
+              - paragraph [ref=e488]: Task
+              - paragraph [ref=e489]: Build an ad creative with a clear offer and fast delivery.
+            - generic [ref=e490]:
+              - generic [ref=e1058]: hook
+              - generic [ref=e1059]: offer
+              - generic [ref=e1060]: editing
+              - generic [ref=e1061]: captions
+              - generic [ref=e1062]: creative angles
+          - generic [ref=e496]:
+            - paragraph [ref=e497]: What was done
+            - generic [ref=e527]:
+              - button "Open case" [ref=e1063]:
+                - text: Open case
+                - img [ref=e529]
+              - link "YouTube" [ref=e532] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=M7lc1UVf-VE
+                - text: YouTube
+                - img [ref=e533]
+        - article [ref=e537]:
+          - button "00:51:18" [ref=e538]:
+            - generic [ref=e542]:
+              - generic [ref=e543]: 00:51:18
+              - img [ref=e545]
+          - generic [ref=e547]:
+            - generic [ref=e548]:
+              - img [ref=e549]
+              - generic [ref=e551]: Reels Volume
+              - generic [ref=e552]: /
+              - generic [ref=e553]: Reels Volume / 9:16
+            - heading "REELS VOLUME BATCH CUTS" [level=3] [ref=e1064]
+            - generic [ref=e555]:
+              - paragraph [ref=e556]: Task
+              - paragraph [ref=e557]: Turn long-form footage into short clips for regular posting.
+            - generic [ref=e558]:
+              - generic [ref=e1065]: cuts
+              - generic [ref=e1066]: captions
+              - generic [ref=e561]: B-roll
+              - generic [ref=e1067]: transitions
+              - generic [ref=e1068]: sound accents
+          - generic [ref=e564]:
+            - paragraph [ref=e565]: What was done
+            - generic [ref=e595]:
+              - button "Open case" [ref=e1069]:
+                - text: Open case
+                - img [ref=e597]
+              - link "YouTube" [ref=e600] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+                - text: YouTube
+                - img [ref=e601]
+    - generic [ref=e605]:
+      - generic [ref=e607]:
+        - paragraph [ref=e608]: Products
+        - heading "Work formats" [level=2] [ref=e1070]
+        - paragraph [ref=e610]: "Choose the task: Reels Pro, batch short-form editing, Product Motion, Courses, Motion Shorts or Ads / UGC."
+      - generic [ref=e611]:
+        - article [ref=e613]:
+          - generic [ref=e614]:
+            - generic [ref=e615]: REELS PRO
+            - generic [ref=e616]: Product
+          - heading "Reels Pro" [level=3] [ref=e617]
+          - generic [ref=e618]:
+            - paragraph [ref=e619]: For whom
+            - paragraph [ref=e620]: For experts, brands, and premium image-led videos.
+          - paragraph [ref=e621]: "Advanced short-form editing: hook, structure, captions, B-roll, motion inserts, tracking and After Effects."
+          - generic [ref=e622]:
+            - paragraph [ref=e623]: What is included
+            - generic [ref=e624]:
+              - generic [ref=e1071]:
+                - img [ref=e1072]
+                - generic [ref=e1074]: structure and hook
+              - generic [ref=e1075]:
+                - img [ref=e1076]
+                - generic [ref=e1078]: captions / accents
+              - generic [ref=e633]:
+                - img [ref=e634]
+                - generic [ref=e636]: motion / B-roll
+              - generic [ref=e1079]:
+                - img [ref=e1080]
+                - generic [ref=e1082]: 9:16 export
+          - generic [ref=e641]:
+            - generic [ref=e642]:
+              - generic [ref=e643]:
+                - paragraph [ref=e644]: Price
+                - paragraph [ref=e645]: from ₽3,000–7,000 / video
+              - generic [ref=e646]:
+                - paragraph [ref=e647]: Timeline
+                - paragraph [ref=e648]: complex motion — after review
+            - link "Discuss Reels Pro" [ref=e1083] [cursor=pointer]:
+              - /url: https://t.me/mishanikolsky
+              - text: Discuss Reels Pro
+              - img [ref=e650]
+        - article [ref=e654]:
+          - generic [ref=e655]:
+            - generic [ref=e656]: REELS VOLUME
+            - generic [ref=e657]: Product
+          - heading "Reels Volume" [level=3] [ref=e658]
+          - generic [ref=e659]:
+            - paragraph [ref=e660]: For whom
+            - paragraph [ref=e661]: For regular content and batch short-form editing.
+          - paragraph [ref=e662]: I turn long-form ideas into short clips with clean captions, B-roll, simple transitions and sound accents.
+          - generic [ref=e663]:
+            - paragraph [ref=e664]: What is included
+            - generic [ref=e665]:
+              - generic [ref=e1084]:
+                - img [ref=e1085]
+                - generic [ref=e1087]: idea extraction
+              - generic [ref=e1088]:
+                - img [ref=e1089]
+                - generic [ref=e1091]: clean captions
+              - generic [ref=e1092]:
+                - img [ref=e1093]
+                - generic [ref=e1095]: B-roll / transitions
+              - generic [ref=e1096]:
+                - img [ref=e1097]
+                - generic [ref=e1099]: platform exports
+          - generic [ref=e682]:
+            - generic [ref=e683]:
+              - generic [ref=e684]:
+                - paragraph [ref=e685]: Price
+                - paragraph [ref=e686]: from ₽700–1,200 / video
+              - generic [ref=e687]:
+                - paragraph [ref=e688]: Timeline
+                - paragraph [ref=e689]: packages from 10 videos
+            - link "Discuss Reels Volume" [ref=e1100] [cursor=pointer]:
+              - /url: https://t.me/mishanikolsky
+              - text: Discuss Reels Volume
+              - img [ref=e691]
+        - article [ref=e695]:
+          - generic [ref=e696]:
+            - generic [ref=e697]: PRODUCT MOTION
+            - generic [ref=e698]: Product
+          - heading "Product Motion" [level=3] [ref=e699]
+          - generic [ref=e700]:
+            - paragraph [ref=e701]: For whom
+            - paragraph [ref=e702]: For SaaS, crypto, tech and launches.
+          - paragraph [ref=e703]: "I package a product or feature into a motion video: UI animation, product structure, 16:9 and clear delivery."
+          - generic [ref=e704]:
+            - paragraph [ref=e705]: What is included
+            - generic [ref=e706]:
+              - generic [ref=e1101]:
+                - img [ref=e1102]
+                - generic [ref=e1104]: explanation structure
+              - generic [ref=e1105]:
+                - img [ref=e1106]
+                - generic [ref=e1108]: UI animation
+              - generic [ref=e715]:
+                - img [ref=e716]
+                - generic [ref=e718]: motion design
+              - generic [ref=e1109]:
+                - img [ref=e1110]
+                - generic [ref=e1112]: 16:9 export
+          - generic [ref=e723]:
+            - generic [ref=e724]:
+              - generic [ref=e725]:
+                - paragraph [ref=e726]: Price
+                - paragraph [ref=e727]: from ₽150–300 / sec
+              - generic [ref=e728]:
+                - paragraph [ref=e729]: Timeline
+                - paragraph [ref=e730]: minimum project — from ₽12,000
+            - link "Discuss Product Motion" [ref=e1113] [cursor=pointer]:
+              - /url: https://t.me/mishanikolsky
+              - text: Discuss Product Motion
+              - img [ref=e732]
+        - article [ref=e736]:
+          - generic [ref=e737]:
+            - generic [ref=e738]: COURSES
+            - generic [ref=e739]: Product
+          - heading "Courses" [level=3] [ref=e740]
+          - generic [ref=e741]:
+            - paragraph [ref=e742]: For whom
+            - paragraph [ref=e743]: For courses, lessons and educational content.
+          - paragraph [ref=e744]: I structure lessons with pause cleanup, sound, titles, slides and clear delivery.
+          - generic [ref=e745]:
+            - paragraph [ref=e746]: What is included
+            - generic [ref=e747]:
+              - generic [ref=e1114]:
+                - img [ref=e1115]
+                - generic [ref=e1117]: pause cleanup
+              - generic [ref=e1118]:
+                - img [ref=e1119]
+                - generic [ref=e1121]: lesson structure
+              - generic [ref=e1122]:
+                - img [ref=e1123]
+                - generic [ref=e1125]: sound / titles
+              - generic [ref=e1126]:
+                - img [ref=e1127]
+                - generic [ref=e1129]: lesson export
+          - generic [ref=e764]:
+            - generic [ref=e765]:
+              - generic [ref=e766]:
+                - paragraph [ref=e767]: Price
+                - paragraph [ref=e768]: from ₽1,500–3,000 / lesson
+              - generic [ref=e769]:
+                - paragraph [ref=e770]: Timeline
+                - paragraph [ref=e771]: full course — after review
+            - link "Discuss Courses" [ref=e1130] [cursor=pointer]:
+              - /url: https://t.me/mishanikolsky
+              - text: Discuss Courses
+              - img [ref=e773]
+        - article [ref=e777]:
+          - generic [ref=e778]:
+            - generic [ref=e779]: MOTION SHORTS
+            - generic [ref=e780]: Product
+          - heading "Motion Shorts" [level=3] [ref=e781]
+          - generic [ref=e782]:
+            - paragraph [ref=e783]: For whom
+            - paragraph [ref=e784]: For short visual hooks and vertical motion videos.
+          - paragraph [ref=e785]: Short 5–10 second vertical motion videos built for a fast visual hook and retention.
+          - generic [ref=e786]:
+            - paragraph [ref=e787]: What is included
+            - generic [ref=e788]:
+              - generic [ref=e789]:
+                - img [ref=e790]
+                - generic [ref=e792]: visual hook
+              - generic [ref=e793]:
+                - img [ref=e794]
+                - generic [ref=e796]: motion loop
+              - generic [ref=e1131]:
+                - img [ref=e1132]
+                - generic [ref=e1134]: pace and text
+              - generic [ref=e1135]:
+                - img [ref=e1136]
+                - generic [ref=e1138]: 9:16 export
+          - generic [ref=e805]:
+            - generic [ref=e806]:
+              - generic [ref=e807]:
+                - paragraph [ref=e808]: Price
+                - paragraph [ref=e809]: from ₽3,000–8,000 / video
+              - generic [ref=e810]:
+                - paragraph [ref=e811]: Timeline
+                - paragraph [ref=e812]: after review
+            - link "Discuss Motion Shorts" [ref=e1139] [cursor=pointer]:
+              - /url: https://t.me/mishanikolsky
+              - text: Discuss Motion Shorts
+              - img [ref=e814]
+        - article [ref=e818]:
+          - generic [ref=e819]:
+            - generic [ref=e820]: ADS / UGC
+            - generic [ref=e821]: Product
+          - heading "Ads / UGC" [level=3] [ref=e822]
+          - generic [ref=e823]:
+            - paragraph [ref=e824]: For whom
+            - paragraph [ref=e825]: For business, products and personal brands.
+          - paragraph [ref=e826]: Ad and UGC-style videos with a quick message, clear offer and multiple creative angles.
+          - generic [ref=e827]:
+            - paragraph [ref=e828]: What is included
+            - generic [ref=e829]:
+              - generic [ref=e1140]:
+                - img [ref=e1141]
+                - generic [ref=e1143]: hook and offer
+              - generic [ref=e1144]:
+                - img [ref=e1145]
+                - generic [ref=e1147]: task-based edit
+              - generic [ref=e1148]:
+                - img [ref=e1149]
+                - generic [ref=e1151]: captions
+              - generic [ref=e1152]:
+                - img [ref=e1153]
+                - generic [ref=e1155]: creative angles
+          - generic [ref=e846]:
+            - generic [ref=e847]:
+              - generic [ref=e848]:
+                - paragraph [ref=e849]: Price
+                - paragraph [ref=e850]: from ₽3,000–10,000 / creative
+              - generic [ref=e851]:
+                - paragraph [ref=e852]: Timeline
+                - paragraph [ref=e853]: after review
+            - link "Discuss Ads / UGC" [ref=e1156] [cursor=pointer]:
+              - /url: https://t.me/mishanikolsky
+              - text: Discuss Ads / UGC
+              - img [ref=e855]
+      - paragraph [ref=e858]: Final price depends on footage volume, motion complexity, deadline and number of revisions.
+      - generic [ref=e860]:
+        - generic [ref=e1157]:
+          - text: "01"
+          - paragraph [ref=e1158]: 6–7 years editing
+        - generic [ref=e863]:
+          - text: "02"
+          - paragraph [ref=e864]: Reels / YouTube / Motion / Courses
+        - generic [ref=e1159]:
+          - text: "03"
+          - paragraph [ref=e1160]: prepaid work
+        - generic [ref=e1161]:
+          - text: "04"
+          - paragraph [ref=e1162]: 5–10 sec test fragment
+        - generic [ref=e1163]:
+          - text: "05"
+          - paragraph [ref=e1164]: direct contact with the specialist
+    - generic [ref=e872]:
+      - generic [ref=e874]:
+        - paragraph [ref=e875]: Method
+        - heading "Meaning first. Rhythm second. Picture third." [level=2] [ref=e1165]
+      - generic [ref=e879]:
+        - generic [ref=e882]:
+          - generic [ref=e883]:
+            - paragraph [ref=e884]: workflow path
+            - heading "От исходников к финалу" [level=3] [ref=e885]
+            - paragraph [ref=e886]: "Вы понимаете, что происходит на каждом этапе: сроки, оплата, правки и выдача фиксируются заранее."
+          - generic [ref=e890]:
+            - button "01 / Brief" [pressed] [ref=e1166]:
+              - img [ref=e1169]
+              - generic [ref=e1172]: 01 / Brief
+            - button "02 / Attention Map" [ref=e1173]:
+              - img [ref=e1176]
+              - generic [ref=e1183]: 02 / Attention Map
+            - button "03 / Edit System" [ref=e1184]:
+              - img [ref=e1187]
+              - generic [ref=e1190]: 03 / Edit System
+            - button "04 / Delivery" [ref=e1191]:
+              - img [ref=e1194]
+              - generic [ref=e1200]: 04 / Delivery
+        - generic [ref=e1201]:
+          - generic [ref=e1202]:
+            - img [ref=e1204]
+            - generic [ref=e1207]:
+              - paragraph [ref=e1208]: Step 01
+              - heading "Brief" [level=3] [ref=e1209]
+          - paragraph [ref=e1210]: I define who the video is for, why it exists, where it goes, and what action it should cause.
+          - generic [ref=e1211]:
+            - generic [ref=e1212]: срок фиксируем
+            - generic [ref=e1213]: правки согласуем
+            - generic [ref=e1214]: выдача под площадку
+    - generic [ref=e957]:
+      - generic [ref=e959]:
+        - paragraph [ref=e960]: Terms
+        - heading "Clear terms. No endless free tests." [level=2] [ref=e1215]
+        - paragraph [ref=e962]: I work with prepayment because editing is not button demonstration. It is full work with meaning, rhythm, and material.
+      - generic [ref=e963]:
+        - generic [ref=e1217]:
+          - paragraph [ref=e1218]: "01"
+          - heading "Small tasks" [level=3] [ref=e1219]
+          - paragraph [ref=e1220]: 100% prepayment before start.
+        - generic [ref=e1222]:
+          - paragraph [ref=e1223]: "02"
+          - heading "Medium projects" [level=3] [ref=e1224]
+          - paragraph [ref=e1225]: 50% before start, 50% before final delivery.
+        - generic [ref=e1227]:
+          - paragraph [ref=e1228]: "03"
+          - heading "Large projects" [level=3] [ref=e1229]
+          - paragraph [ref=e1230]: Stages / milestones.
+        - generic [ref=e1232]:
+          - paragraph [ref=e1233]: "04"
+          - heading "Test" [level=3] [ref=e1234]
+          - paragraph [ref=e1235]: A short 5–10 second fragment. A full test video is paid.
+    - generic [ref=e990]:
+      - generic [ref=e991]:
+        - generic [ref=e992]:
+          - paragraph [ref=e993]: Contact
+          - heading "Bring raw material. Leave with a story cut for the task." [level=2] [ref=e1236]
+          - paragraph [ref=e995]: "Tell me the format: Reels, launch, product video, YouTube, course, or regular content."
+        - generic [ref=e996]:
+          - link "Telegram" [ref=e997] [cursor=pointer]:
+            - /url: https://t.me/mishanikolsky
+            - img [ref=e998]
+            - text: Telegram
+          - generic [ref=e1001]:
+            - link "Email" [ref=e1237] [cursor=pointer]:
+              - /url: mailto:hello@nikolsky.studio
+              - img [ref=e1003]
+              - text: Email
+            - link "IG" [ref=e1006] [cursor=pointer]:
+              - /url: https://instagram.com/nikolsky.studio
+              - text: IG
+              - img [ref=e1007]
+            - link "VK" [ref=e1010] [cursor=pointer]:
+              - /url: https://vk.com/nikolsky
+              - img [ref=e1011]
+              - text: VK
+      - generic [ref=e1013]:
+        - generic [ref=e1014]: Nikolsky Studio
+        - generic [ref=e1015]: YouTube embeds only / no backend / no local video storage
+  - alert [ref=e1016]

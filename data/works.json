@@ -15,14 +15,14 @@
     "workDone": [
       "structure",
       "pace",
-      "motion accents",
-      "sound rhythm"
+      "motion",
+      "sound design"
     ],
     "workDoneRu": [
       "структура",
-      "темп",
-      "анимационные акценты",
-      "ритм звука"
+      "ритм",
+      "motion",
+      "sound design"
     ],
     "whyItWorks": "The reel reads as one controlled sequence instead of separate fragments.",
     "whyItWorksRu": "Шоурил читается как собранная последовательность, а не набор фрагментов.",
@@ -40,73 +40,74 @@
   },
   {
     "id": "expert-reels-system",
-    "title": "Expert Reels System",
-    "titleRu": "Reels для эксперта",
-    "category": "Reels",
+    "title": "REELS PRO FOR EXPERT",
+    "titleRu": "REELS PRO ДЛЯ ЭКСПЕРТА",
+    "category": "Reels Pro",
     "youtubeUrl": "https://youtube.com/shorts/NRr-_TY2X7E",
     "thumbnail": "auto",
-    "description": "Fast vertical edits for expert-led personal brands.",
-    "descriptionRu": "Вертикальный монтаж для экспертного контента.",
-    "task": "Turn raw expert fragments into short videos that hook fast and stay clear.",
-    "taskRu": "Из сырого экспертного фрагмента собрать короткий ролик с понятной мыслью и сильным началом.",
-    "format": "Reels / Shorts / 9:16",
-    "formatRu": "Reels / Shorts / 9:16",
+    "description": "Advanced expert short-form editing.",
+    "descriptionRu": "Сложный монтаж экспертного короткого ролика.",
+    "task": "Build an expert short-form video with a strong opening, clean pace and premium visual delivery.",
+    "taskRu": "Собрать экспертный ролик с сильным началом, ритмом и визуальной подачей.",
+    "format": "Reels Pro / 9:16",
+    "formatRu": "Reels Pro / 9:16",
     "workDone": [
-      "hook rebuilt",
-      "weak pauses removed",
-      "subtitles",
-      "meaning accents",
+      "structure",
+      "hook",
+      "captions",
+      "motion",
       "B-roll"
     ],
     "workDoneRu": [
-      "пересобран хук",
-      "убраны слабые паузы",
+      "структура",
+      "хук",
       "субтитры",
-      "смысловые акценты",
-      "дополнительные кадры"
+      "motion",
+      "B-roll"
     ],
-    "whyItWorks": "The viewer understands the idea earlier and follows the thought without friction.",
-    "whyItWorksRu": "Зритель быстрее понимает тему и легче следует за мыслью.",
+    "whyItWorks": "The video gets to the point faster, keeps the pace and feels more premium than a basic cut.",
+    "whyItWorksRu": "Ролик быстрее вводит зрителя в мысль, держит темп и выглядит дороже обычной нарезки.",
     "deliverables": [
-      "vertical master",
-      "caption version",
-      "social export"
+      "9:16 export",
+      "preview",
+      "project file on request"
     ],
     "deliverablesRu": [
-      "вертикальный мастер",
-      "версия с субтитрами",
-      "экспорт под соцсети",
-      "Новый пункт"
+      "экспорт 9:16",
+      "превью",
+      "файл проекта по запросу"
     ],
-    "featured": true
+    "featured": false
   },
   {
     "id": "crypto-explainer",
-    "title": "Crypto Explainer",
-    "titleRu": "Крипто-эксплейнер",
-    "category": "SaaS / Crypto",
+    "title": "PRODUCT MOTION / CRYPTO EXPLAINER",
+    "titleRu": "PRODUCT MOTION / CRYPTO EXPLAINER",
+    "category": "Product Motion",
     "youtubeUrl": "https://www.youtube.com/watch?v=ScMzIvxBSi4",
     "thumbnail": "auto",
     "description": "Clean product motion for a complex crypto narrative.",
-    "descriptionRu": "Аккуратная подача сложного crypto-продукта.",
-    "task": "Explain a complex product without visual noise or cheap neon.",
-    "taskRu": "Объяснить сложный продукт без визуального шума и перегруза эффектами.",
-    "format": "Product explainer / 16:9",
-    "formatRu": "Продуктовый ролик / 16:9",
+    "descriptionRu": "Аккуратный product motion для сложного crypto-продукта.",
+    "task": "Explain a product or feature through a dynamic 16:9 motion video.",
+    "taskRu": "Объяснить продукт или функцию через динамичный 16:9 motion-ролик.",
+    "format": "Product motion / 16:9",
+    "formatRu": "Product motion / 16:9",
     "workDone": [
-      "script rhythm",
-      "UI accents",
-      "motion hierarchy",
-      "transitions"
+      "motion design",
+      "UI animation",
+      "structure",
+      "titles",
+      "16:9 export"
     ],
     "workDoneRu": [
-      "ритм сценария",
-      "UI-акценты",
-      "визуальная иерархия",
-      "переходы"
+      "motion design",
+      "UI-анимация",
+      "структура",
+      "титры",
+      "экспорт 16:9"
     ],
-    "whyItWorks": "The motion supports comprehension instead of competing with the message.",
-    "whyItWorksRu": "Анимация помогает понять продукт, а не спорит с сообщением.",
+    "whyItWorks": "The video explains the product quickly and removes visual noise.",
+    "whyItWorksRu": "Ролик быстро объясняет суть продукта и убирает визуальный шум.",
     "deliverables": [
       "16:9 master",
       "social cut",
@@ -121,74 +122,74 @@
   },
   {
     "id": "saas-feature-launch",
-    "title": "SaaS Feature Launch",
-    "titleRu": "Запуск SaaS-фичи",
-    "category": "Motion Design",
+    "title": "VIRAL MOTION SHORT",
+    "titleRu": "MOTION SHORT",
+    "category": "Motion Shorts",
     "youtubeUrl": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
     "thumbnail": "auto",
-    "description": "Interface-led motion, transitions, and launch pacing.",
-    "descriptionRu": "Интерфейсный ролик для запуска функции.",
-    "task": "Show a new feature quickly, clearly, and with a premium product feel.",
-    "taskRu": "Показать новую функцию быстро, понятно и визуально аккуратно.",
-    "format": "SaaS launch / product motion",
-    "formatRu": "Запуск SaaS / продуктовый ролик",
+    "description": "Short vertical motion video with fast visual hook.",
+    "descriptionRu": "Короткий vertical motion-ролик с быстрым visual hook.",
+    "task": "Create a short vertical motion video with a fast visual hook.",
+    "taskRu": "Сделать короткий vertical motion-ролик с быстрым visual hook.",
+    "format": "Motion short / 9:16",
+    "formatRu": "Motion short / 9:16",
     "workDone": [
-      "structure",
-      "screen rhythm",
-      "feature accents",
-      "titles",
-      "export variants"
+      "motion loop",
+      "text",
+      "pace",
+      "visual hook",
+      "9:16 export"
     ],
     "workDoneRu": [
-      "структура",
-      "ритм экранов",
-      "акценты на функции",
-      "титры",
-      "версии экспорта"
+      "motion loop",
+      "текст",
+      "ритм",
+      "visual hook",
+      "экспорт 9:16"
     ],
-    "whyItWorks": "The viewer sees the product value before the interface becomes heavy.",
-    "whyItWorksRu": "Зритель видит ценность функции до того, как интерфейс становится тяжёлым.",
+    "whyItWorks": "The short format is easy to process and fits reach-focused posts.",
+    "whyItWorksRu": "Короткий формат быстро считывается и подходит для охватных публикаций.",
     "deliverables": [
-      "website version",
-      "social version",
-      "presentation cut"
+      "9:16 export",
+      "loop version",
+      "cover frame"
     ],
     "deliverablesRu": [
-      "версия для сайта",
-      "версия для соцсетей",
-      "версия для презентации"
+      "экспорт 9:16",
+      "loop-версия",
+      "кадр для обложки"
     ],
     "featured": false
   },
   {
     "id": "course-module-edit",
-    "title": "Course Module Edit",
-    "titleRu": "Монтаж модуля курса",
+    "title": "COURSE MODULE EDIT",
+    "titleRu": "МОНТАЖ МОДУЛЯ КУРСА",
     "category": "Courses",
     "youtubeUrl": "https://www.youtube.com/watch?v=YE7VzlLtp-4",
     "thumbnail": "auto",
-    "description": "Structured educational editing with crisp visual hierarchy.",
+    "description": "Structured educational editing with clear delivery.",
     "descriptionRu": "Структурный монтаж обучающего материала.",
-    "task": "Keep a learning module clear, paced, and easy to follow.",
-    "taskRu": "Собрать учебный модуль так, чтобы его было легко смотреть и понимать.",
+    "task": "Edit a lesson so it stays clear, watchable and easy to follow.",
+    "taskRu": "Собрать обучающий урок так, чтобы его было легко смотреть и понимать.",
     "format": "Course lesson / 16:9",
     "formatRu": "Урок курса / 16:9",
     "workDone": [
-      "cleanup",
-      "semantic blocks",
-      "pauses",
-      "slides",
-      "titles"
+      "pause cleanup",
+      "structure",
+      "sound",
+      "titles",
+      "lesson export"
     ],
     "workDoneRu": [
-      "чистка материала",
-      "смысловые блоки",
-      "паузы",
-      "слайды",
-      "титры"
+      "чистка пауз",
+      "структура",
+      "звук",
+      "титры",
+      "экспорт урока"
     ],
-    "whyItWorks": "The lesson keeps structure and does not collapse into a talking-head recording.",
-    "whyItWorksRu": "Урок держит структуру и не превращается в запись говорящей головы.",
+    "whyItWorks": "The lesson becomes cleaner in pace, clearer in structure and easier to complete.",
+    "whyItWorksRu": "Урок становится чище по темпу, понятнее по структуре и удобнее для прохождения.",
     "deliverables": [
       "lesson master",
       "chapter markers",
@@ -203,81 +204,81 @@
   },
   {
     "id": "youtube-longform-cut",
-    "title": "YouTube Longform Cut",
-    "titleRu": "Монтаж YouTube-выпуска",
-    "category": "YouTube",
+    "title": "ADS / UGC CREATIVE",
+    "titleRu": "ADS / UGC КРЕАТИВ",
+    "category": "Ads / UGC",
     "youtubeUrl": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
     "thumbnail": "auto",
-    "description": "Horizontal narrative edit with retention-first pacing.",
-    "descriptionRu": "Горизонтальный монтаж с фокусом на структуру и темп.",
-    "task": "Make a long video feel structured instead of stretched.",
-    "taskRu": "Собрать длинное видео так, чтобы оно ощущалось структурным, а не растянутым.",
-    "format": "YouTube / 16:9",
-    "formatRu": "YouTube / 16:9",
+    "description": "Ad creative with a clear offer and fast delivery.",
+    "descriptionRu": "Рекламный креатив с понятным оффером и быстрой подачей.",
+    "task": "Build an ad creative with a clear offer and fast delivery.",
+    "taskRu": "Собрать рекламный ролик с понятным оффером и быстрой подачей.",
+    "format": "Ad creative / 9:16",
+    "formatRu": "Ad creative / 9:16",
     "workDone": [
-      "rough cut",
-      "chapter structure",
-      "pace",
-      "B-roll",
-      "audio cleanup"
+      "hook",
+      "offer",
+      "editing",
+      "captions",
+      "creative angles"
     ],
     "workDoneRu": [
-      "черновая сборка",
-      "структура глав",
-      "темп",
-      "дополнительные кадры",
-      "чистка звука"
+      "хук",
+      "оффер",
+      "монтаж",
+      "субтитры",
+      "варианты подачи"
     ],
-    "whyItWorks": "The viewer always understands where the episode is going next.",
-    "whyItWorksRu": "Зритель понимает, куда движется выпуск, и не теряется по темпу.",
+    "whyItWorks": "The video communicates the offer faster and can be used as an ad or social creative.",
+    "whyItWorksRu": "Ролик быстрее доносит предложение и может использоваться как рекламный или social-креатив.",
     "deliverables": [
-      "longform master",
-      "shorts cutdowns",
-      "chapter notes"
+      "9:16 export",
+      "ad version",
+      "creative angles"
     ],
     "deliverablesRu": [
-      "финальный выпуск",
-      "короткие версии",
-      "заметки по главам"
+      "экспорт 9:16",
+      "рекламная версия",
+      "варианты подачи"
     ],
     "featured": false
   },
   {
     "id": "founder-reel-campaign",
-    "title": "Founder Reel Campaign",
-    "titleRu": "Reels-кампания основателя",
-    "category": "Reels",
+    "title": "REELS VOLUME BATCH CUTS",
+    "titleRu": "REELS VOLUME НАРЕЗКА",
+    "category": "Reels Volume",
     "youtubeUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     "thumbnail": "auto",
-    "description": "Short-form cuts designed for sharp first-second impact.",
-    "descriptionRu": "Серия коротких роликов с единым ритмом.",
-    "task": "Package founder expertise into a repeatable short-form rhythm.",
-    "taskRu": "Упаковать экспертизу основателя в повторяемый формат коротких роликов.",
-    "format": "Reels campaign / 9:16",
-    "formatRu": "Кампания Reels / 9:16",
+    "description": "Batch short-form editing for regular content.",
+    "descriptionRu": "Пакетная нарезка для регулярного контента.",
+    "task": "Turn long-form footage into short clips for regular posting.",
+    "taskRu": "Нарезать мысли из длинного материала в короткие ролики для регулярной публикации.",
+    "format": "Reels Volume / 9:16",
+    "formatRu": "Reels Volume / 9:16",
     "workDone": [
-      "content selection",
-      "hooks",
+      "cuts",
       "captions",
-      "motion templates",
-      "exports"
+      "B-roll",
+      "transitions",
+      "sound accents"
     ],
     "workDoneRu": [
-      "отбор фрагментов",
-      "хуки",
+      "нарезка",
       "субтитры",
-      "анимационные шаблоны",
-      "экспорты"
+      "B-roll",
+      "переходы",
+      "звуки"
     ],
-    "whyItWorks": "The videos feel like one content system, not isolated posts.",
-    "whyItWorksRu": "Ролики выглядят как единая контент-система, а не отдельные посты.",
+    "whyItWorks": "The format helps publish consistently without heavy motion production for every clip.",
+    "whyItWorksRu": "Формат помогает выпускать контент стабильно, без тяжёлого motion-продакшена на каждый ролик.",
     "deliverables": [
-      "reels pack",
+      "clips pack",
       "caption style",
       "posting versions"
     ],
     "deliverablesRu": [
-      "пак Reels",
+      "пак роликов",
       "стиль субтитров",
       "версии для публикации"
     ],
