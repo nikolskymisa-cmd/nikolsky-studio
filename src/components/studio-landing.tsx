@@ -654,7 +654,7 @@ export function StudioLanding({
                 onClickCapture={selectInEditor({ type: "text", label: `Позиционирование: карточка ${index + 1}`, path: ["ru", "positionCards", index, 0] })}
                 className={editorClass({ type: "text", label: `Позиционирование: карточка ${index + 1}`, path: ["ru", "positionCards", index, 0] })}
               >
-                <ControlPanel index={index} title={title} text={text} blockLabel={t.blockLabel} />
+                <ControlPanel index={index} title={title} text={text} />
               </div>
             ))}
           </div>
@@ -679,34 +679,6 @@ export function StudioLanding({
                 <ProductPanel product={product} label={t.productLabel} contactUrl={links.telegramUrl} />
               </div>
             ))}
-          </div>
-        </Reveal>
-      </section>
-
-      <section className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <Reveal className="mx-auto max-w-7xl" style={blockStyle("reel")}>
-          <div
-            className={`grid overflow-hidden border border-white/12 bg-[#05080b]/88 lg:grid-cols-[0.78fr_1.22fr]${editorClass({ type: "text", label: "Шоурил-блок", path: ["ru", "reelTitle"] })}`}
-            onClickCapture={selectInEditor({ type: "text", label: "Шоурил-блок", path: ["ru", "reelTitle"] })}
-          >
-            <button type="button" onClick={() => setSelectedWork(showreel)} className="group relative min-h-[320px] overflow-hidden border-b border-white/10 text-left sm:min-h-[420px] lg:border-b-0 lg:border-r">
-              <div className="absolute inset-0 bg-cover bg-center opacity-[0.52]" style={{ backgroundImage: `url(${getThumbnailUrl(showreel)})` }} />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,6,0.18),rgba(3,5,6,0.88)),radial-gradient(circle_at_45%_34%,rgba(0,183,255,0.18),transparent_30%)]" />
-              <div className="relative flex h-full flex-col justify-between p-5 sm:p-7">
-                <div>
-                  <p className="font-mono text-xs uppercase text-accent">{t.reelEyebrow}</p>
-                  <h2 className="mt-4 max-w-xl text-[2.35rem] font-semibold uppercase leading-[0.92] text-white sm:text-6xl sm:leading-[0.9]">
-                    {t.reelTitle}
-                  </h2>
-                  <p className="mt-5 max-w-md text-base leading-7 text-white/62">{t.reelText}</p>
-                </div>
-                <span className="inline-flex h-12 w-fit items-center gap-2 bg-white px-5 text-sm font-semibold text-black transition group-hover:bg-accent">
-                  <Play size={17} fill="currentColor" />
-                  {t.showreelCta}
-                </span>
-              </div>
-            </button>
-            <TimelineChapters works={portfolioWorks.slice(0, 5)} lang={lang} title={t.chapters} onSelect={setSelectedWork} />
           </div>
         </Reveal>
       </section>
@@ -810,7 +782,7 @@ export function StudioLanding({
                   onClickCapture={selectInEditor({ type: "text", label: `Условия: карточка ${index + 1}`, path: ["ru", "terms", index, 0] })}
                   className={editorClass({ type: "text", label: `Условия: карточка ${index + 1}`, path: ["ru", "terms", index, 0] })}
                 >
-                  <ControlPanel index={index} title={title} text={text} blockLabel={t.blockLabel} compact />
+                  <ControlPanel index={index} title={title} text={text} compact />
                 </div>
               ))}
             </div>
@@ -1043,24 +1015,27 @@ function ControlPanel({
   index,
   title,
   text,
-  blockLabel,
   compact = false,
 }: {
   index: number;
   title: string;
   text: string;
-  blockLabel: string;
   compact?: boolean;
 }) {
   return (
-    <div className={`border border-white/10 bg-white/[0.02] p-4 sm:p-5 ${compact ? "sm:min-h-40" : "sm:min-h-44"}`}>
-      <div className="mb-4 flex items-center justify-between font-mono text-[11px] uppercase sm:mb-6 sm:text-xs">
-        <span className="text-accent">{blockLabel} / {String(index + 1).padStart(2, "0")}</span>
-        <span className="text-white/32">00:{String(index * 9 + 3).padStart(2, "0")}:12</span>
+    <motion.div
+      whileHover={{ y: -4, scale: 1.018 }}
+      transition={{ type: "spring", stiffness: 420, damping: 18, mass: 0.7 }}
+      className={`group relative overflow-hidden border border-white/10 bg-white/[0.02] p-4 transition-colors hover:border-accent/75 hover:shadow-[0_0_0_1px_rgba(0,183,255,0.22),0_18px_60px_rgba(0,183,255,0.12)] sm:p-5 ${compact ? "sm:min-h-40" : "sm:min-h-44"}`}
+    >
+      <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/80 to-transparent" />
+        <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-accent/55 to-transparent" />
       </div>
+      <p className="mb-4 font-mono text-[11px] uppercase text-accent/80 sm:mb-5 sm:text-xs">{String(index + 1).padStart(2, "0")}</p>
       <h3 className="text-xl font-semibold uppercase text-white sm:text-2xl">{title}</h3>
       <p className="mt-3 text-sm leading-6 text-white/62 sm:mt-4 sm:text-base sm:leading-7">{text}</p>
-    </div>
+    </motion.div>
   );
 }
 
@@ -1081,7 +1056,11 @@ function ProductPanel({
   contactUrl: string;
 }) {
   return (
-    <article className="group flex flex-col border border-white/10 bg-white/[0.025] p-4 transition hover:border-accent/70 sm:p-5 lg:min-h-[540px]">
+    <motion.article
+      whileHover={{ y: -5, scale: 1.012 }}
+      transition={{ type: "spring", stiffness: 420, damping: 18, mass: 0.75 }}
+      className="group flex flex-col border border-white/10 bg-white/[0.025] p-4 transition hover:border-accent/75 hover:shadow-[0_0_0_1px_rgba(0,183,255,0.2),0_22px_70px_rgba(0,183,255,0.1)] sm:p-5 lg:min-h-[540px]"
+    >
       <div className="mb-5 flex items-center justify-between border-b border-white/10 pb-3 font-mono text-[11px] uppercase sm:mb-8 sm:pb-4 sm:text-xs">
         <span className="text-accent">{product.code}</span>
         <span className="text-white/32">{label}</span>
@@ -1101,7 +1080,7 @@ function ProductPanel({
         {product.cta}
         <ArrowUpRight size={15} />
       </a>
-    </article>
+    </motion.article>
   );
 }
 
