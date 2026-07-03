@@ -14,22 +14,83 @@ import {
   Clock3,
   Film,
   Mail,
+  Pause,
   Play,
   Send,
   X,
 } from "lucide-react";
 import type { CSSProperties, MouseEvent } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { Reveal } from "@/components/reveal";
 import { YouTubeEmbed } from "@/components/youtube-embed";
 import { profile } from "@/lib/profile";
-import { getThumbnailUrl } from "@/lib/youtube";
+import { fallbackShowreelDuration, showreelTracks, type ShowreelTrack } from "@/lib/showreel-breakdown";
+import { getThumbnailUrl, getYouTubeId } from "@/lib/youtube";
 import { workCategories, type PortfolioCategory, type Work } from "@/types/work";
 import editableCopy from "../../data/landing-content.json";
 
 type Lang = "ru" | "en";
 type Filter = "All" | PortfolioCategory;
+
+type YouTubePlayer = {
+  playVideo: () => void;
+  pauseVideo: () => void;
+  seekTo: (seconds: number, allowSeekAhead?: boolean) => void;
+  getCurrentTime: () => number;
+  getDuration: () => number;
+  destroy: () => void;
+};
+
+type YouTubeApi = {
+  Player: new (
+    elementId: string,
+    options: {
+      videoId: string;
+      playerVars?: Record<string, string | number>;
+      events?: {
+        onReady?: (event: { target: YouTubePlayer }) => void;
+        onStateChange?: (event: { data: number; target: YouTubePlayer }) => void;
+      };
+    },
+  ) => YouTubePlayer;
+  PlayerState: {
+    PLAYING: number;
+    PAUSED: number;
+    ENDED: number;
+  };
+};
+
+declare global {
+  interface Window {
+    YT?: YouTubeApi;
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
+let youtubeApiPromise: Promise<YouTubeApi> | null = null;
+
+function loadYouTubeApi() {
+  if (typeof window === "undefined") return Promise.reject(new Error("Window is not available."));
+  if (window.YT?.Player) return Promise.resolve(window.YT);
+
+  youtubeApiPromise ??= new Promise<YouTubeApi>((resolve) => {
+    const previousCallback = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      previousCallback?.();
+      if (window.YT) resolve(window.YT);
+    };
+
+    if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+      const script = document.createElement("script");
+      script.src = "https://www.youtube.com/iframe_api";
+      script.async = true;
+      document.head.appendChild(script);
+    }
+  });
+
+  return youtubeApiPromise;
+}
 
 type StudioLandingProps = {
   works: Work[];
@@ -406,6 +467,17 @@ function clipTime(index: number) {
   return `00:${String(index * 8 + 3).padStart(2, "0")}:${String((index * 11) % 24).padStart(2, "0")}`;
 }
 
+function formatSeconds(value: number) {
+  const safeValue = Math.max(0, Math.floor(value));
+  const minutes = Math.floor(safeValue / 60);
+  const seconds = safeValue % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function clampPercent(value: number) {
+  return Math.max(0, Math.min(100, value));
+}
+
 function Waveform({ seed = 0, bars = 32, className = "" }: { seed?: number; bars?: number; className?: string }) {
   return (
     <div className={`flex h-12 items-center gap-1 overflow-hidden ${className}`} aria-hidden>
@@ -631,9 +703,6 @@ export function StudioLanding({
               work={viewWork(showreel, lang)}
               label={t.showreelLabel}
               button={t.showreelCta}
-              tracks={t.tracks}
-              safeFrame={t.safeFrame}
-              onPlay={() => setSelectedWork(showreel)}
             />
           </div>
         </div>
@@ -950,18 +1019,134 @@ function ShowreelPlayer({
   work,
   label,
   button,
-  tracks,
-  safeFrame,
-  onPlay,
 }: {
   work: Work;
   label: string;
   button: string;
-  tracks: readonly string[];
-  safeFrame: string;
-  onPlay: () => void;
 }) {
   const thumbnailUrl = getThumbnailUrl(work);
+  const videoId = getYouTubeId(work.youtubeUrl);
+  const playerHostId = `yt-${useId().replace(/:/g, "")}`;
+  const playerRef = useRef<YouTubePlayer | null>(null);
+  const pendingSeekRef = useRef<number | null>(null);
+  const autoplayOnReadyRef = useRef(false);
+  const [playerActive, setPlayerActive] = useState(false);
+  const [playerReady, setPlayerReady] = useState(false);
+  const [durationKnown, setDurationKnown] = useState(false);
+  const [duration, setDuration] = useState(fallbackShowreelDuration);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const timelineDuration = durationKnown ? duration : fallbackShowreelDuration;
+  const progress = clampPercent((currentTime / Math.max(timelineDuration, 1)) * 100);
+
+  useEffect(() => {
+    if (!playerActive || !videoId) return;
+    let disposed = false;
+
+    loadYouTubeApi().then((api) => {
+      if (disposed) return;
+
+      playerRef.current = new api.Player(playerHostId, {
+        videoId,
+        playerVars: {
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1,
+          controls: 1,
+          enablejsapi: 1,
+          autoplay: 0,
+          mute: 1,
+        },
+        events: {
+          onReady: (event) => {
+            if (disposed) return;
+            setPlayerReady(true);
+            const apiDuration = event.target.getDuration();
+            if (Number.isFinite(apiDuration) && apiDuration > 0) {
+              setDuration(apiDuration);
+              setDurationKnown(true);
+            }
+
+            if (pendingSeekRef.current !== null) {
+              event.target.seekTo(pendingSeekRef.current, true);
+              pendingSeekRef.current = null;
+            }
+
+            if (autoplayOnReadyRef.current) event.target.playVideo();
+          },
+          onStateChange: (event) => {
+            if (disposed || !window.YT?.PlayerState) return;
+            setIsPlaying(event.data === window.YT.PlayerState.PLAYING);
+            if (event.data === window.YT.PlayerState.ENDED) setCurrentTime(0);
+          },
+        },
+      });
+    });
+
+    return () => {
+      disposed = true;
+      playerRef.current?.destroy();
+      playerRef.current = null;
+      setPlayerReady(false);
+    };
+  }, [playerActive, playerHostId, videoId]);
+
+  useEffect(() => {
+    if (!playerActive) return;
+    let frame = 0;
+
+    const tick = () => {
+      const player = playerRef.current;
+      if (player) {
+        const apiDuration = player.getDuration();
+        const apiTime = player.getCurrentTime();
+
+        if (Number.isFinite(apiDuration) && apiDuration > 0) {
+          setDuration(apiDuration);
+          setDurationKnown(true);
+        }
+
+        if (Number.isFinite(apiTime)) setCurrentTime(apiTime);
+      }
+      frame = window.requestAnimationFrame(tick);
+    };
+
+    frame = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(frame);
+  }, [playerActive]);
+
+  const togglePlayback = () => {
+    if (!playerActive) {
+      autoplayOnReadyRef.current = true;
+      setPlayerActive(true);
+      setIsPlaying(true);
+      return;
+    }
+
+    if (!playerReady || !playerRef.current) return;
+
+    if (isPlaying) {
+      playerRef.current.pauseVideo();
+      setIsPlaying(false);
+    } else {
+      playerRef.current.playVideo();
+      setIsPlaying(true);
+    }
+  };
+
+  const seekToSegment = (start: number) => {
+    const wasPlaying = isPlaying;
+    pendingSeekRef.current = start;
+    autoplayOnReadyRef.current = wasPlaying;
+    setCurrentTime(start);
+    setPlayerActive(true);
+
+    if (playerRef.current) {
+      playerRef.current.seekTo(start, true);
+      if (wasPlaying) playerRef.current.playVideo();
+    }
+  };
+
   return (
     <motion.div
       initial={false}
@@ -971,43 +1156,111 @@ function ShowreelPlayer({
     >
       <div className="flex items-center justify-between border-b border-white/10 px-3 py-2.5 font-mono text-[10px] uppercase text-white/42 sm:px-4 sm:py-3 sm:text-[11px]">
         <span>{label}</span>
-        <span>00:00:00:00</span>
+        <span>{durationKnown ? `${formatSeconds(currentTime)} / ${formatSeconds(duration)}` : "--:--"}</span>
       </div>
-      <button type="button" onClick={onPlay} className="group relative block aspect-video w-full overflow-hidden text-left">
-        <div className="absolute inset-0 bg-cover bg-center opacity-[0.68]" style={{ backgroundImage: `url(${thumbnailUrl})` }} />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,6,0.05),rgba(3,5,6,0.82)),radial-gradient(circle_at_50%_35%,rgba(0,183,255,0.16),transparent_32%)]" />
-        <div className="absolute inset-4 border border-white/12 sm:inset-6" />
-        <div className="absolute left-4 top-4 font-mono text-[10px] uppercase text-white/48 sm:left-5 sm:top-5 sm:text-[11px]">{safeFrame}</div>
-        <div className="absolute inset-0 grid place-items-center">
-          <span className="grid size-14 place-items-center border border-white/24 bg-white/[0.08] text-white backdrop-blur transition group-hover:border-accent group-hover:text-accent sm:size-20">
-            <Play size={26} fill="currentColor" className="sm:size-[34px]" />
-          </span>
-        </div>
-        <div className="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-5">
-          <p className="font-mono text-[10px] uppercase text-accent sm:text-[11px]">{work.category}</p>
-          <h3 className="mt-2 text-2xl font-semibold uppercase leading-none text-white sm:text-4xl">{work.title}</h3>
-        </div>
-      </button>
-      <div className="hidden border-t border-white/10 sm:grid">
-        {tracks.map((track, index) => (
-          <div key={track} className="grid grid-cols-[92px_1fr] border-b border-white/10 last:border-b-0">
-            <div className="border-r border-white/10 px-3 py-3 font-mono text-[10px] uppercase text-white/38">{track}</div>
-            <div className="relative flex items-center gap-2 overflow-hidden px-3 py-2">
-              <span className="h-7 w-[30%] bg-accent/14" />
-              <span className="h-7 w-[18%] bg-white/10" />
-              <span className="h-7 w-[28%] bg-accent/22" />
-              <span className="absolute bottom-0 top-0 w-px bg-accent/80" style={{ left: `${26 + index * 14}%` }} />
+
+      <div className="relative aspect-video w-full overflow-hidden bg-black">
+        {playerActive && videoId ? <div id={playerHostId} className="absolute inset-0 h-full w-full" /> : null}
+        {!playerActive ? (
+          <button type="button" onClick={togglePlayback} className="group absolute inset-0 block w-full text-left">
+            <div className="absolute inset-0 bg-cover bg-center opacity-[0.68]" style={{ backgroundImage: `url(${thumbnailUrl})` }} />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,6,0.05),rgba(3,5,6,0.82)),radial-gradient(circle_at_50%_35%,rgba(0,183,255,0.16),transparent_32%)]" />
+            <div className="absolute inset-4 border border-white/12 sm:inset-6" />
+            <div className="absolute inset-0 grid place-items-center">
+              <span className="grid size-14 place-items-center border border-white/24 bg-white/[0.08] text-white backdrop-blur transition group-hover:border-accent group-hover:text-accent sm:size-20">
+                <Play size={26} fill="currentColor" className="sm:size-[34px]" />
+              </span>
             </div>
-          </div>
-        ))}
+            <div className="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-5">
+              <p className="font-mono text-[10px] uppercase text-accent sm:text-[11px]">{work.category}</p>
+              <h3 className="mt-2 text-2xl font-semibold uppercase leading-none text-white sm:text-4xl">{work.title}</h3>
+              <p className="mt-2 max-w-sm text-xs leading-5 text-white/56 sm:text-sm">Подборка работ и направлений</p>
+            </div>
+          </button>
+        ) : null}
       </div>
-      <div className="grid gap-3 px-3 py-3 sm:grid-cols-[1fr_auto] sm:items-center sm:px-4 sm:py-4">
-        <Waveform bars={22} className="h-9 sm:h-12" />
-        <button type="button" onClick={onPlay} className="h-10 bg-white px-5 text-sm font-semibold text-black transition hover:bg-accent sm:h-11">
-          {button}
-        </button>
+
+      <div className="border-t border-white/10 p-3 sm:p-4">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div>
+            <p className="font-mono text-[10px] uppercase text-accent sm:text-[11px]">Breakdown</p>
+            <p className="mt-1 text-xs leading-5 text-white/45 sm:text-sm">Как собирается внимание: хук, ритм, смысл, упаковка.</p>
+          </div>
+          <button type="button" onClick={togglePlayback} className="inline-flex h-10 shrink-0 items-center justify-center gap-2 bg-white px-4 text-sm font-semibold text-black transition hover:bg-accent">
+            {isPlaying ? <Pause size={15} fill="currentColor" /> : <Play size={15} fill="currentColor" />}
+            {button}
+          </button>
+        </div>
+
+        <div className="grid gap-2">
+          {showreelTracks.map((track) => (
+            <BreakdownTrackRow
+              key={track.id}
+              track={track}
+              currentTime={currentTime}
+              duration={timelineDuration}
+              progress={progress}
+              onSeek={seekToSegment}
+            />
+          ))}
+        </div>
       </div>
     </motion.div>
+  );
+}
+
+function BreakdownTrackRow({
+  track,
+  currentTime,
+  duration,
+  progress,
+  onSeek,
+}: {
+  track: ShowreelTrack;
+  currentTime: number;
+  duration: number;
+  progress: number;
+  onSeek: (seconds: number) => void;
+}) {
+  const active = track.segments.some((segment) => currentTime >= segment.start && currentTime <= segment.end);
+
+  return (
+    <div
+      className={`grid gap-2 border p-3 transition sm:grid-cols-[92px_minmax(0,1fr)_150px] sm:items-center ${
+        active
+          ? "border-accent/60 bg-accent/[0.055] shadow-[0_0_28px_rgba(0,183,255,0.1)]"
+          : "border-white/10 bg-white/[0.018]"
+      }`}
+    >
+      <button type="button" onClick={() => onSeek(track.segments[0]?.start ?? 0)} className="text-left">
+        <span className={`block font-mono text-[11px] uppercase ${active ? "text-accent" : "text-white/44"}`}>{track.label}</span>
+        <span className="mt-1 block text-sm font-semibold uppercase leading-4 text-white">{track.title}</span>
+      </button>
+
+      <div className="relative h-8 overflow-hidden border border-white/10 bg-black/28">
+        <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-white/10" />
+        <span className="absolute bottom-0 top-0 z-20 w-px bg-accent shadow-[0_0_16px_rgba(0,183,255,0.75)]" style={{ left: `${progress}%` }} />
+        {track.segments.map((segment, index) => {
+          const left = clampPercent((segment.start / duration) * 100);
+          const width = clampPercent(((segment.end - segment.start) / duration) * 100);
+          const segmentActive = currentTime >= segment.start && currentTime <= segment.end;
+          return (
+            <button
+              key={`${track.id}-${index}`}
+              type="button"
+              title={`Перейти к ${track.label}`}
+              onClick={() => onSeek(segment.start)}
+              className={`absolute top-1/2 h-4 -translate-y-1/2 transition ${
+                segmentActive ? "bg-accent shadow-[0_0_18px_rgba(0,183,255,0.55)]" : "bg-accent/24 hover:bg-accent/58"
+              }`}
+              style={{ left: `${left}%`, width: `${Math.max(width, 4)}%` }}
+            />
+          );
+        })}
+      </div>
+
+      <p className={`text-xs leading-5 sm:text-[13px] ${active ? "text-white/78" : "text-white/44"}`}>{track.description}</p>
+    </div>
   );
 }
 
