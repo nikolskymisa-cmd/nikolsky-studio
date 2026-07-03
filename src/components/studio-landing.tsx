@@ -13,12 +13,19 @@ import {
   ChevronDown,
   CirclePlay,
   Clock3,
+  ClipboardList,
   Film,
   Mail,
   Pause,
   Play,
+  RefreshCcw,
+  ScanSearch,
+  Scissors,
   Send,
+  ShieldCheck,
+  Upload,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import type { CSSProperties, MouseEvent } from "react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
@@ -395,6 +402,8 @@ type RuntimeText = LandingCopy[Lang] & {
   problemsLabel?: string;
   problems?: readonly string[];
   methodText?: string;
+  methodNote?: string;
+  trustItems?: readonly string[];
   faq?: readonly (readonly [string, string])[];
 };
 
@@ -656,18 +665,28 @@ export function StudioLanding({
   };
 
   useEffect(() => {
-    if (!selectedWork) {
+    const hasOverlay = Boolean(selectedWork) || faqVisible;
+    if (!hasOverlay) {
       document.body.style.overflow = "";
       return;
     }
+
     document.body.style.overflow = "hidden";
-    const onKey = (event: KeyboardEvent) => event.key === "Escape" && setSelectedWork(null);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (selectedWork) {
+        setSelectedWork(null);
+        return;
+      }
+      setFaqVisible(false);
+    };
+
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", onKey);
     };
-  }, [selectedWork]);
+  }, [selectedWork, faqVisible]);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-background text-foreground" style={mainStyle}>
@@ -821,22 +840,7 @@ export function StudioLanding({
             <SectionHeader eyebrow={t.productsEyebrow} title={t.productsTitle} text={runtimeT.productsText} />
           </div>
 
-          {runtimeT.problems?.length ? (
-            <div className="mt-7 border border-white/10 bg-black/20 p-3 shadow-[0_18px_70px_rgba(0,0,0,0.16)] backdrop-blur-[2px] sm:p-4">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <span className="shrink-0 font-mono text-[10px] uppercase text-accent sm:text-[11px]">{runtimeT.problemsLabel}</span>
-                <div className="flex flex-wrap gap-2">
-                  {runtimeT.problems.map((problem) => (
-                    <span key={problem} className="border border-white/[0.08] bg-white/[0.025] px-2.5 py-1.5 font-mono text-[10px] uppercase leading-4 text-white/50">
-                      {problem}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : null}
-
-          <div className="mt-8 grid items-stretch gap-3 lg:grid-cols-4">
+          <div className="mt-8 grid items-stretch gap-3 md:grid-cols-2 xl:grid-cols-4">
             {t.products.map((product, index) => (
               <motion.div
                 key={product.code}
@@ -854,10 +858,13 @@ export function StudioLanding({
                   deadlineLabel={runtimeT.deadlineLabel ?? "Срок"}
                   includedLabel={runtimeT.includedLabel ?? "Что входит"}
                   contactUrl={links.telegramUrl}
+                  reduceMotion={Boolean(reduceMotion)}
                 />
               </motion.div>
             ))}
           </div>
+
+          <TrustStrip items={runtimeT.trustItems ?? getTrustItems(lang)} reduceMotion={Boolean(reduceMotion)} />
         </Reveal>
       </section>
 
@@ -875,6 +882,7 @@ export function StudioLanding({
             activeStep={activeMethodStep}
             setActiveStep={setActiveMethodStep}
             stepLabel={t.stepLabel}
+            note={runtimeT.methodNote}
             reduceMotion={Boolean(reduceMotion)}
             getEditorProps={(index) => ({
               onClickCapture: selectInEditor({ type: "text", label: `Метод: шаг ${index + 1}`, path: ["ru", "methodSteps", index, 0] }),
@@ -900,7 +908,7 @@ export function StudioLanding({
                 onClickCapture={selectInEditor({ type: "text", label: `Условия: карточка ${index + 1}`, path: ["ru", "terms", index, 0] })}
                 className={editorClass({ type: "text", label: `Условия: карточка ${index + 1}`, path: ["ru", "terms", index, 0] })}
               >
-                <ControlPanel index={index} title={title} text={text} compact />
+                <ControlPanel index={index} title={title} text={text} compact reduceMotion={Boolean(reduceMotion)} />
               </div>
             ))}
           </div>
@@ -909,61 +917,14 @@ export function StudioLanding({
             <div className="mt-8">
               <button
                 type="button"
-                onClick={() => setFaqVisible((current) => !current)}
+                onClick={() => setFaqVisible(true)}
                 className="inline-flex h-12 w-full items-center justify-center gap-3 border border-white/12 bg-white px-5 text-sm font-semibold text-black transition hover:border-accent hover:bg-accent active:scale-[0.98] sm:w-auto"
               >
-                {faqVisible ? runtimeT.faqClose ?? "Скрыть FAQ" : runtimeT.faqOpen ?? "Открыть FAQ"}
-                <ChevronDown size={17} className={`transition-transform duration-200 ${faqVisible ? "rotate-180" : ""}`} />
+                {runtimeT.faqOpen ?? "Открыть FAQ"}
+                <ArrowUpRight size={17} />
               </button>
             </div>
           ) : null}
-
-          <AnimatePresence initial={false}>
-            {faqVisible && runtimeT.faq?.length ? (
-              <motion.div
-                key="faq"
-                initial={reduceMotion ? false : { opacity: 0, transform: "translateY(14px)" }}
-                animate={reduceMotion ? undefined : { opacity: 1, transform: "translateY(0px)" }}
-                exit={reduceMotion ? undefined : { opacity: 0, transform: "translateY(8px)" }}
-                transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
-                className="mt-5 grid gap-2"
-              >
-                {runtimeT.faq.map(([question, answer], index) => {
-                  const isOpen = openFaqItems.includes(index);
-                  return (
-                    <div
-                      key={question}
-                      onClickCapture={selectInEditor({ type: "text", label: `FAQ ${index + 1}`, path: ["ru", "faq", index, 0] })}
-                      className={`border border-white/10 bg-black/24${editorClass({ type: "text", label: `FAQ ${index + 1}`, path: ["ru", "faq", index, 0] })}`}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => toggleFaqItem(index)}
-                        className="flex w-full items-center justify-between gap-4 p-4 text-left transition hover:bg-white/[0.025] sm:p-5"
-                      >
-                        <span className="text-base font-semibold uppercase leading-tight text-white sm:text-lg">{question}</span>
-                        <ChevronDown size={18} className={`shrink-0 text-accent transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
-                      </button>
-                      <AnimatePresence initial={false}>
-                        {isOpen ? (
-                          <motion.div
-                            key="answer"
-                            initial={reduceMotion ? false : { opacity: 0, transform: "translateY(-4px)" }}
-                            animate={reduceMotion ? undefined : { opacity: 1, transform: "translateY(0px)" }}
-                            exit={reduceMotion ? undefined : { opacity: 0, transform: "translateY(-4px)" }}
-                            transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
-                            className="px-4 pb-4 text-sm leading-6 text-white/58 sm:px-5 sm:pb-5 sm:text-base sm:leading-7"
-                          >
-                            {answer}
-                          </motion.div>
-                        ) : null}
-                      </AnimatePresence>
-                    </div>
-                  );
-                })}
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
         </Reveal>
       </section>
 
@@ -1023,6 +984,21 @@ export function StudioLanding({
           deliverables: t.deliverables,
           project: t.projectCta,
         }}
+      />
+
+      <FaqOverlay
+        open={faqVisible}
+        title={lang === "ru" ? "Частые вопросы" : "FAQ"}
+        closeLabel={runtimeT.faqClose ?? "Закрыть FAQ"}
+        items={runtimeT.faq ?? []}
+        openItems={openFaqItems}
+        onToggleItem={toggleFaqItem}
+        onClose={() => setFaqVisible(false)}
+        reduceMotion={Boolean(reduceMotion)}
+        getEditorProps={(index) => ({
+          onClickCapture: selectInEditor({ type: "text", label: `FAQ ${index + 1}`, path: ["ru", "faq", index, 0] }),
+          className: editorClass({ type: "text", label: `FAQ ${index + 1}`, path: ["ru", "faq", index, 0] }),
+        })}
       />
     </main>
   );
@@ -1145,11 +1121,62 @@ function SectionGlow({ variant }: { variant: "services" | "workflow" | "terms" |
   );
 }
 
+const workflowIcons: readonly LucideIcon[] = [ClipboardList, ScanSearch, ShieldCheck, Scissors, RefreshCcw, Upload];
+
+function getTrustItems(lang: Lang) {
+  return lang === "ru"
+    ? [
+        "6–7 лет в монтаже",
+        "Reels / YouTube / Motion / Courses",
+        "работа по предоплате",
+        "короткий тест 5–10 секунд",
+        "прямой контакт со специалистом",
+      ]
+    : [
+        "6–7 years editing",
+        "Reels / YouTube / Motion / Courses",
+        "prepaid work",
+        "5–10 sec test fragment",
+        "direct contact with the specialist",
+      ];
+}
+
+function TrustStrip({ items, reduceMotion }: { items: readonly string[]; reduceMotion: boolean }) {
+  return (
+    <motion.div
+      initial={reduceMotion ? false : { opacity: 0, transform: "translateY(14px)" }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, transform: "translateY(0px)" }}
+      viewport={{ once: true, margin: "-70px" }}
+      transition={{ duration: 0.32, ease: [0.23, 1, 0.32, 1] }}
+      className="mt-5 overflow-hidden border border-white/10 bg-black/24 shadow-[0_20px_80px_rgba(0,0,0,0.18)] backdrop-blur-[2px] sm:mt-6"
+    >
+      <div className="grid grid-cols-2 divide-x divide-y divide-white/10 sm:grid-cols-5 sm:divide-y-0">
+        {items.slice(0, 5).map((item, index) => (
+          <motion.div
+            key={item}
+            initial={reduceMotion ? false : { opacity: 0, transform: "translateY(10px)" }}
+            whileInView={reduceMotion ? undefined : { opacity: 1, transform: "translateY(0px)" }}
+            viewport={{ once: true, margin: "-70px" }}
+            transition={{ duration: 0.28, delay: index * 0.035, ease: [0.23, 1, 0.32, 1] }}
+            whileHover={reduceMotion ? undefined : { y: -2, scale: 1.012 }}
+            whileTap={reduceMotion ? undefined : { scale: 0.985 }}
+            className="relative min-h-24 p-4 transition-colors hover:bg-accent/[0.035] sm:min-h-28"
+          >
+            <span className="font-mono text-[10px] uppercase text-accent/70">{String(index + 1).padStart(2, "0")}</span>
+            <p className="mt-4 text-sm font-semibold uppercase leading-5 text-white/78 sm:text-[15px]">{item}</p>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
 function WorkflowTimeline({
   steps,
   activeStep,
   setActiveStep,
   stepLabel,
+  note,
   reduceMotion,
   getEditorProps,
 }: {
@@ -1157,6 +1184,7 @@ function WorkflowTimeline({
   activeStep: number;
   setActiveStep: (index: number) => void;
   stepLabel: string;
+  note?: string;
   reduceMotion: boolean;
   getEditorProps: (index: number) => {
     onClickCapture?: (event: MouseEvent<HTMLElement>) => void;
@@ -1166,54 +1194,67 @@ function WorkflowTimeline({
   const safeActiveStep = Math.min(activeStep, Math.max(0, steps.length - 1));
   const active = steps[safeActiveStep] ?? steps[0];
   const progress = steps.length > 1 ? Math.max(0.035, safeActiveStep / (steps.length - 1)) : 1;
+  const ActiveIcon = workflowIcons[safeActiveStep % workflowIcons.length];
 
   return (
-    <div className="mt-8 overflow-hidden border border-white/10 bg-black/28 shadow-[0_22px_90px_rgba(0,0,0,0.22)] backdrop-blur-[2px]">
+    <div className="mt-9 overflow-hidden border border-white/10 bg-[#030608]/72 shadow-[0_26px_110px_rgba(0,0,0,0.26)] backdrop-blur-[2px]">
       <div className="hidden lg:block">
-        <div className="grid gap-8 border-b border-white/10 p-6 lg:grid-cols-[260px_1fr]">
-          <div>
-            <p className="font-mono text-[11px] uppercase text-accent">workflow path</p>
-            <h3 className="mt-4 text-2xl font-semibold uppercase leading-none text-white">От исходников к финалу</h3>
-            <p className="mt-4 text-sm leading-6 text-white/50">Кликните на этап, чтобы увидеть, что происходит в работе.</p>
-          </div>
-          <div className="relative px-2 pt-8">
-            <div className="absolute left-8 right-8 top-[54px] h-[2px] bg-white/10" />
-            <motion.div
-              className="absolute left-8 right-8 top-[54px] h-[2px] origin-left bg-gradient-to-r from-accent via-accent/80 to-transparent shadow-[0_0_30px_rgba(0,183,255,0.3)]"
-              initial={reduceMotion ? false : { transform: "scaleX(0.035)" }}
-              animate={{ transform: `scaleX(${progress})` }}
-              transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.23, 1, 0.32, 1] }}
-            />
-            <div className="relative grid grid-cols-6 gap-3">
-              {steps.map(([title], index) => {
-                const isActive = index === safeActiveStep;
-                const isDone = index < safeActiveStep;
-                const editorProps = getEditorProps(index);
-                return (
-                  <button
-                    key={title}
-                    type="button"
-                    aria-pressed={isActive}
-                    onClick={() => setActiveStep(index)}
-                    onClickCapture={editorProps.onClickCapture}
-                    className={`group flex min-w-0 flex-col items-center gap-4 text-center${editorProps.className ?? ""}`}
-                  >
-                    <span
-                      className={`relative grid size-12 place-items-center border font-mono text-xs transition-colors duration-200 ${
-                        isActive
-                          ? "border-accent bg-accent text-black shadow-[0_0_34px_rgba(0,183,255,0.34)]"
-                          : isDone
-                            ? "border-accent/55 bg-accent/[0.075] text-accent"
-                            : "border-white/14 bg-[#05090b] text-white/42 group-hover:border-accent/70 group-hover:text-accent"
-                      }`}
+        <div className="relative p-7">
+          <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_18%,rgba(0,183,255,0.08),transparent_42%),linear-gradient(90deg,transparent,rgba(255,255,255,0.025),transparent)]" />
+          <div className="relative grid gap-9 lg:grid-cols-[300px_1fr]">
+            <div>
+              <p className="font-mono text-[11px] uppercase text-accent">workflow path</p>
+              <h3 className="mt-4 text-3xl font-semibold uppercase leading-none text-white">От исходников к финалу</h3>
+              <p className="mt-4 text-sm leading-6 text-white/55">
+                {note ?? "Вы понимаете, что происходит на каждом этапе: сроки, оплата, правки и выдача фиксируются заранее."}
+              </p>
+            </div>
+
+            <div className="relative px-2 pt-9">
+              <div className="absolute left-8 right-8 top-[61px] h-px bg-white/12" />
+              <motion.div
+                className="absolute left-8 right-8 top-[60px] h-[3px] origin-left rounded-full bg-gradient-to-r from-accent via-accent/80 to-transparent shadow-[0_0_34px_rgba(0,183,255,0.34)]"
+                initial={reduceMotion ? false : { transform: "scaleX(0.035)" }}
+                animate={{ transform: `scaleX(${progress})` }}
+                transition={{ duration: reduceMotion ? 0 : 0.28, ease: [0.23, 1, 0.32, 1] }}
+              />
+              <div className="relative grid grid-cols-6 gap-3">
+                {steps.map(([title], index) => {
+                  const isActive = index === safeActiveStep;
+                  const isDone = index < safeActiveStep;
+                  const Icon = workflowIcons[index % workflowIcons.length];
+                  const editorProps = getEditorProps(index);
+                  return (
+                    <motion.button
+                      key={title}
+                      type="button"
+                      aria-pressed={isActive}
+                      onClick={() => setActiveStep(index)}
+                      onClickCapture={editorProps.onClickCapture}
+                      whileHover={reduceMotion ? undefined : { y: -3, scale: 1.018 }}
+                      whileTap={reduceMotion ? undefined : { scale: 0.985 }}
+                      transition={{ type: "spring", stiffness: 280, damping: 24 }}
+                      className={`group flex min-w-0 flex-col items-center gap-4 text-center outline-none${editorProps.className ?? ""}`}
                     >
-                      <span className="absolute -inset-1 border border-white/[0.04]" />
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className={`truncate font-mono text-[11px] uppercase tracking-normal ${isActive ? "text-white" : "text-white/46"}`}>{title}</span>
-                  </button>
-                );
-              })}
+                      <span
+                        className={`relative grid size-14 place-items-center border transition-colors duration-200 ${
+                          isActive
+                            ? "border-accent bg-accent text-black shadow-[0_0_38px_rgba(0,183,255,0.34)]"
+                            : isDone
+                              ? "border-accent/55 bg-accent/[0.08] text-accent"
+                              : "border-white/14 bg-[#05090b] text-white/42 group-hover:border-accent/70 group-hover:text-accent"
+                        }`}
+                      >
+                        <span className="absolute -inset-1 border border-white/[0.045]" />
+                        <Icon size={20} strokeWidth={1.7} />
+                      </span>
+                      <span className={`font-mono text-[11px] uppercase tracking-normal ${isActive ? "text-white" : "text-white/46"}`}>
+                        {String(index + 1).padStart(2, "0")} / {title}
+                      </span>
+                    </motion.button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -1226,43 +1267,50 @@ function WorkflowTimeline({
               animate={reduceMotion ? undefined : { opacity: 1, transform: "translateY(0px)" }}
               exit={reduceMotion ? undefined : { opacity: 0, transform: "translateY(-8px)" }}
               transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-              className="grid gap-6 bg-gradient-to-r from-accent/[0.06] via-white/[0.018] to-transparent p-6 lg:grid-cols-[260px_1fr_180px] lg:items-center"
+              className="grid gap-6 border-t border-white/10 bg-gradient-to-r from-accent/[0.07] via-white/[0.02] to-transparent p-7 lg:grid-cols-[300px_1fr_210px] lg:items-center"
             >
-              <div className="border-r border-white/10 pr-6">
-                <p className="font-mono text-xs uppercase text-accent">{stepLabel} {String(safeActiveStep + 1).padStart(2, "0")}</p>
-                <h3 className="mt-3 text-3xl font-semibold uppercase leading-none text-white">{active[0]}</h3>
+              <div className="flex items-center gap-4 border-r border-white/10 pr-6">
+                <span className="grid size-14 shrink-0 place-items-center border border-accent/70 bg-accent/[0.08] text-accent shadow-[0_0_28px_rgba(0,183,255,0.16)]">
+                  <ActiveIcon size={22} strokeWidth={1.7} />
+                </span>
+                <div>
+                  <p className="font-mono text-xs uppercase text-accent">{stepLabel} {String(safeActiveStep + 1).padStart(2, "0")}</p>
+                  <h3 className="mt-2 text-3xl font-semibold uppercase leading-none text-white">{active[0]}</h3>
+                </div>
               </div>
               <p className="max-w-3xl text-lg leading-8 text-white/68">{active[1]}</p>
-              <div className="grid gap-2 font-mono text-[10px] uppercase text-white/34">
-                <span className="border border-white/10 bg-black/18 px-3 py-2">brief</span>
-                <span className="border border-white/10 bg-black/18 px-3 py-2">edit</span>
-                <span className="border border-white/10 bg-black/18 px-3 py-2">delivery</span>
+              <div className="grid gap-2 font-mono text-[10px] uppercase text-white/36">
+                <span className="border border-white/10 bg-black/22 px-3 py-2">срок фиксируем</span>
+                <span className="border border-white/10 bg-black/22 px-3 py-2">правки согласуем</span>
+                <span className="border border-white/10 bg-black/22 px-3 py-2">выдача под площадку</span>
               </div>
             </motion.div>
           </AnimatePresence>
         ) : null}
       </div>
 
-      <div className="grid gap-2 lg:hidden">
+      <div className="grid gap-3 p-4 lg:hidden">
         {steps.map(([title, text], index) => {
           const isActive = index === safeActiveStep;
           const isDone = index < safeActiveStep;
+          const Icon = workflowIcons[index % workflowIcons.length];
           const editorProps = getEditorProps(index);
           return (
-            <div key={title} className="relative pl-9">
-              {index < steps.length - 1 ? <span aria-hidden className="absolute left-[18px] top-11 h-[calc(100%-12px)] w-px bg-white/10" /> : null}
-              <button
+            <div key={title} className="relative pl-10">
+              {index < steps.length - 1 ? <span aria-hidden className="absolute left-[19px] top-11 h-[calc(100%-10px)] w-px bg-white/10" /> : null}
+              <motion.button
                 type="button"
                 onClick={() => setActiveStep(index)}
                 onClickCapture={editorProps.onClickCapture}
+                whileTap={reduceMotion ? undefined : { scale: 0.985 }}
                 className={`flex w-full items-center gap-3 border p-3 text-left transition ${
                   isActive
-                    ? "border-accent/80 bg-accent/[0.055]"
-                    : "border-white/10 bg-black/18"
+                    ? "border-accent/80 bg-accent/[0.055] shadow-[0_0_26px_rgba(0,183,255,0.11)]"
+                    : "border-white/10 bg-black/20"
                 }${editorProps.className ?? ""}`}
               >
                 <span
-                  className={`absolute left-0 top-3 grid size-9 place-items-center border font-mono text-[11px] ${
+                  className={`absolute left-0 top-3 grid size-9 place-items-center border ${
                     isActive
                       ? "border-accent bg-accent text-black shadow-[0_0_28px_rgba(0,183,255,0.32)]"
                       : isDone
@@ -1270,13 +1318,13 @@ function WorkflowTimeline({
                         : "border-white/14 bg-black text-white/42"
                   }`}
                 >
-                  {String(index + 1).padStart(2, "0")}
+                  <Icon size={17} strokeWidth={1.7} />
                 </span>
                 <span>
                   <span className="block font-mono text-[10px] uppercase text-accent/75">{stepLabel} {String(index + 1).padStart(2, "0")}</span>
                   <span className="mt-1 block text-base font-semibold uppercase text-white">{title}</span>
                 </span>
-              </button>
+              </motion.button>
               <AnimatePresence initial={false}>
                 {isActive ? (
                   <motion.p
@@ -1627,21 +1675,26 @@ function ControlPanel({
   title,
   text,
   compact = false,
+  reduceMotion = false,
 }: {
   index: number;
   title: string;
   text: string;
   compact?: boolean;
+  reduceMotion?: boolean;
 }) {
   return (
-    <div
-      className={`relative h-full overflow-hidden border border-white/10 bg-black/22 p-4 transition-colors duration-150 hover:border-accent/60 sm:p-5 ${compact ? "sm:min-h-36" : "sm:min-h-44"}`}
+    <motion.div
+      whileHover={reduceMotion ? undefined : { y: -3, scale: 1.015 }}
+      whileTap={reduceMotion ? undefined : { scale: 0.985 }}
+      transition={{ type: "spring", stiffness: 280, damping: 24 }}
+      className={`relative h-full overflow-hidden border border-white/10 bg-black/24 p-4 transition-colors duration-150 hover:border-accent/65 hover:shadow-[0_0_34px_rgba(0,183,255,0.12)] sm:p-5 ${compact ? "sm:min-h-36" : "sm:min-h-44"}`}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/35 to-transparent" />
       <p className="mb-4 font-mono text-[11px] uppercase text-accent/80">{String(index + 1).padStart(2, "0")}</p>
       <h3 className="text-lg font-semibold uppercase leading-tight text-white sm:text-xl">{title}</h3>
       <p className="mt-3 text-sm leading-6 text-white/58">{text}</p>
-    </div>
+    </motion.div>
   );
 }
 
@@ -1652,6 +1705,7 @@ function ProductPanel({
   deadlineLabel,
   includedLabel,
   contactUrl,
+  reduceMotion,
 }: {
   product: {
     code: string;
@@ -1669,10 +1723,14 @@ function ProductPanel({
   deadlineLabel: string;
   includedLabel: string;
   contactUrl: string;
+  reduceMotion: boolean;
 }) {
   return (
-    <article
-      className="relative flex h-full min-h-[520px] flex-col overflow-hidden border border-white/10 bg-black/28 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.16)] transition-colors duration-150 hover:border-accent/65 sm:p-6"
+    <motion.article
+      whileHover={reduceMotion ? undefined : { y: -4, scale: 1.012 }}
+      whileTap={reduceMotion ? undefined : { scale: 0.985 }}
+      transition={{ type: "spring", stiffness: 260, damping: 24 }}
+      className="relative flex h-full min-h-[470px] flex-col overflow-hidden border border-white/10 bg-black/30 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.16)] transition-colors duration-150 hover:border-accent/65 hover:shadow-[0_0_42px_rgba(0,183,255,0.12)] sm:p-6 xl:min-h-[500px]"
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/70 to-transparent opacity-70" />
       <div className="mb-6 flex items-center justify-between gap-3 font-mono text-[11px] uppercase">
@@ -1680,8 +1738,11 @@ function ProductPanel({
         <span className="text-white/28">{label}</span>
       </div>
       <h3 className="text-2xl font-semibold uppercase leading-[0.98] text-white sm:text-[1.7rem]">{product.title}</h3>
-      <p className="mt-3 text-sm leading-6 text-white/55">{product.audience}</p>
-      <p className="mt-5 text-sm leading-6 text-white/68">{product.text}</p>
+      <div className="mt-5 border-l border-accent/55 pl-3">
+        <p className="font-mono text-[10px] uppercase text-accent/80">Для кого</p>
+        <p className="mt-1 text-sm leading-6 text-white/58">{product.audience}</p>
+      </div>
+      <p className="mt-5 text-sm leading-6 text-white/66">{product.text}</p>
       <div className="mt-6">
         <p className="font-mono text-[10px] uppercase text-accent/85">{includedLabel}</p>
         <div className="mt-3 grid gap-2">
@@ -1709,7 +1770,7 @@ function ProductPanel({
           <ArrowUpRight size={15} />
         </a>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
@@ -1820,6 +1881,111 @@ function CasePanel({
         </div>
       </div>
     </motion.article>
+  );
+}
+
+function FaqOverlay({
+  open,
+  title,
+  closeLabel,
+  items,
+  openItems,
+  onToggleItem,
+  onClose,
+  reduceMotion,
+  getEditorProps,
+}: {
+  open: boolean;
+  title: string;
+  closeLabel: string;
+  items: readonly (readonly [string, string])[];
+  openItems: number[];
+  onToggleItem: (index: number) => void;
+  onClose: () => void;
+  reduceMotion: boolean;
+  getEditorProps: (index: number) => {
+    onClickCapture?: (event: MouseEvent<HTMLElement>) => void;
+    className?: string;
+  };
+}) {
+  return (
+    <AnimatePresence>
+      {open ? (
+        <motion.div
+          className="fixed inset-0 z-50 grid place-items-end bg-black/78 px-3 py-3 backdrop-blur-xl sm:place-items-center sm:px-5 sm:py-6"
+          initial={reduceMotion ? false : { opacity: 0 }}
+          animate={reduceMotion ? undefined : { opacity: 1 }}
+          exit={reduceMotion ? undefined : { opacity: 0 }}
+          onMouseDown={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-label={title}
+        >
+          <motion.div
+            className="max-h-[88vh] w-full max-w-3xl overflow-hidden border border-white/12 bg-[#05080b] shadow-[0_36px_140px_rgba(0,0,0,0.55)]"
+            initial={reduceMotion ? false : { opacity: 0, transform: "translateY(18px) scale(0.985)" }}
+            animate={reduceMotion ? undefined : { opacity: 1, transform: "translateY(0px) scale(1)" }}
+            exit={reduceMotion ? undefined : { opacity: 0, transform: "translateY(12px) scale(0.985)" }}
+            transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4 border-b border-white/10 bg-white/[0.025] p-4 sm:p-5">
+              <div>
+                <p className="font-mono text-[11px] uppercase text-accent">FAQ / условия</p>
+                <h3 className="mt-2 text-2xl font-semibold uppercase leading-none text-white sm:text-4xl">{title}</h3>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label={closeLabel}
+                className="grid size-11 shrink-0 place-items-center border border-white/14 bg-black/24 text-white transition hover:border-accent hover:text-accent"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="max-h-[68vh] overflow-y-auto p-3 sm:p-4">
+              <div className="grid gap-2">
+                {items.map(([question, answer], index) => {
+                  const isOpen = openItems.includes(index);
+                  const editorProps = getEditorProps(index);
+                  return (
+                    <div
+                      key={question}
+                      onClickCapture={editorProps.onClickCapture}
+                      className={`border border-white/10 bg-black/24 transition-colors hover:border-accent/40${editorProps.className ?? ""}`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => onToggleItem(index)}
+                        className="flex w-full items-center justify-between gap-4 p-4 text-left transition hover:bg-white/[0.025] sm:p-5"
+                      >
+                        <span className="text-base font-semibold uppercase leading-tight text-white sm:text-lg">{question}</span>
+                        <ChevronDown size={18} className={`shrink-0 text-accent transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                      </button>
+                      <AnimatePresence initial={false}>
+                        {isOpen ? (
+                          <motion.div
+                            key="answer"
+                            initial={reduceMotion ? false : { opacity: 0, transform: "translateY(-4px)" }}
+                            animate={reduceMotion ? undefined : { opacity: 1, transform: "translateY(0px)" }}
+                            exit={reduceMotion ? undefined : { opacity: 0, transform: "translateY(-4px)" }}
+                            transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
+                            className="px-4 pb-4 text-sm leading-6 text-white/60 sm:px-5 sm:pb-5 sm:text-base sm:leading-7"
+                          >
+                            {answer}
+                          </motion.div>
+                        ) : null}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   );
 }
 
