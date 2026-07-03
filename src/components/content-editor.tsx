@@ -80,15 +80,14 @@ const textFields: Array<EditorSelection & { type: "text" }> = [
   { type: "text", label: "Кнопка смотреть работы", path: ["ru", "casesCta"] },
   { type: "text", label: "Кнопка обсудить проект", path: ["ru", "projectCta"] },
   { type: "text", label: "Строка доверия", path: ["ru", "trust"], area: true },
-  { type: "text", label: "Позиционирование: лейбл", path: ["ru", "positionEyebrow"] },
-  { type: "text", label: "Позиционирование: заголовок", path: ["ru", "positionTitle"], area: true },
-  { type: "text", label: "Позиционирование: текст", path: ["ru", "positionText"], area: true },
-  { type: "text", label: "Услуги: заголовок", path: ["ru", "productsTitle"] },
-  { type: "text", label: "Шоурил: заголовок", path: ["ru", "reelTitle"] },
-  { type: "text", label: "Шоурил: текст", path: ["ru", "reelText"], area: true },
   { type: "text", label: "Работы: заголовок", path: ["ru", "casesTitle"] },
   { type: "text", label: "Работы: текст", path: ["ru", "casesText"], area: true },
+  { type: "text", label: "Услуги: заголовок", path: ["ru", "productsTitle"] },
+  { type: "text", label: "Услуги: текст", path: ["ru", "productsText"], area: true },
+  { type: "text", label: "Шоурил: заголовок", path: ["ru", "reelTitle"] },
+  { type: "text", label: "Шоурил: текст", path: ["ru", "reelText"], area: true },
   { type: "text", label: "Метод: заголовок", path: ["ru", "methodTitle"] },
+  { type: "text", label: "Метод: текст", path: ["ru", "methodText"], area: true },
   { type: "text", label: "Условия: заголовок", path: ["ru", "termsTitle"] },
   { type: "text", label: "Условия: текст", path: ["ru", "termsText"], area: true },
   { type: "text", label: "Контакт: заголовок", path: ["ru", "contactTitle"], area: true },
@@ -106,11 +105,11 @@ function getSectionKey(selection: EditorSelection) {
   if (selection.type !== "text") return "page";
   const key = String(selection.path[1] ?? "");
   if (key.startsWith("position")) return "position";
-  if (key.startsWith("products")) return "products";
+  if (key.startsWith("products") || key === "priceLabel" || key === "problems" || key === "problemsLabel") return "products";
   if (key.startsWith("reel") || key === "chapters" || key === "showreelCta" || key === "showreelLabel" || key === "tracks") return "reel";
   if (key.startsWith("cases") || key === "all" || key === "openCase" || key === "youtube") return "cases";
   if (key.startsWith("method")) return "method";
-  if (key.startsWith("terms")) return "terms";
+  if (key.startsWith("terms") || key === "faq") return "terms";
   if (key.startsWith("contact") || key === "footer" || key === "email" || key === "vk") return "contact";
   return "page";
 }
@@ -709,9 +708,13 @@ function SectionPanel({
       ) : null}
 
       {section === "products" ? (
-        <Panel title="Продукты" subtitle="Карточки услуг">
+        <Panel title="Форматы работы" subtitle="Услуги, цены и короткая диагностика">
           <ContentField content={content} path={["ru", "productsEyebrow"]} label="Лейбл" updateContent={updateContent} />
           <ContentField content={content} path={["ru", "productsTitle"]} label="Заголовок" area updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "productsText"]} label="Описание" area updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "priceLabel"]} label="Лейбл цены" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "problemsLabel"]} label="Лейбл проблем" updateContent={updateContent} />
+          <EditableStringList title="Что обычно исправляю" root={["ru", "problems"]} content={content} updateContent={updateContent} />
           <ProductList content={content} updateContent={updateContent} />
         </Panel>
       ) : null}
@@ -742,6 +745,7 @@ function SectionPanel({
         <Panel title="Метод" subtitle="Шаги работы">
           <ContentField content={content} path={["ru", "methodEyebrow"]} label="Лейбл" updateContent={updateContent} />
           <ContentField content={content} path={["ru", "methodTitle"]} label="Заголовок" area updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "methodText"]} label="Описание" area updateContent={updateContent} />
           <PairList title="Шаги" root={["ru", "methodSteps"]} content={content} updateContent={updateContent} />
         </Panel>
       ) : null}
@@ -752,6 +756,7 @@ function SectionPanel({
           <ContentField content={content} path={["ru", "termsTitle"]} label="Заголовок" area updateContent={updateContent} />
           <ContentField content={content} path={["ru", "termsText"]} label="Описание" area updateContent={updateContent} />
           <PairList title="Карточки условий" root={["ru", "terms"]} content={content} updateContent={updateContent} />
+          <PairList title="FAQ" root={["ru", "faq"]} content={content} updateContent={updateContent} />
         </Panel>
       ) : null}
 
@@ -953,6 +958,9 @@ function ProductList({
     title: string;
     audience: string;
     text: string;
+    fit?: string;
+    price?: string;
+    timeline?: string;
     includes: string[];
     cta: string;
   };
@@ -978,7 +986,17 @@ function ProductList({
           onClick={() =>
             updateContent(["ru", "products"], [
               ...products,
-              { code: `P${String(products.length + 1).padStart(2, "0")}`, title: "Новая услуга", audience: "Для кого услуга.", text: "Описание услуги.", includes: ["Новый пункт"], cta: "Обсудить" },
+              {
+                code: `P${String(products.length + 1).padStart(2, "0")}`,
+                title: "Новая услуга",
+                audience: "Для кого услуга.",
+                text: "Описание услуги.",
+                fit: "Кому подходит",
+                price: "от £___",
+                timeline: "Срок после оценки исходников",
+                includes: ["Новый пункт"],
+                cta: "Обсудить",
+              },
             ])
           }
           className="h-8 bg-accent px-2 text-xs font-semibold text-black"
@@ -1000,6 +1018,9 @@ function ProductList({
           <Field label="Название" value={product.title ?? ""} onChange={(nextValue) => updateProduct(index, { title: nextValue })} />
           <Field area label="Для кого" value={product.audience ?? ""} onChange={(nextValue) => updateProduct(index, { audience: nextValue })} />
           <Field area label="Описание" value={product.text ?? ""} onChange={(nextValue) => updateProduct(index, { text: nextValue })} />
+          <Field area label="Подходит для" value={product.fit ?? ""} onChange={(nextValue) => updateProduct(index, { fit: nextValue })} />
+          <Field label="Цена" value={product.price ?? ""} onChange={(nextValue) => updateProduct(index, { price: nextValue })} />
+          <Field area label="Срок / примечание" value={product.timeline ?? ""} onChange={(nextValue) => updateProduct(index, { timeline: nextValue })} />
           <StringList label="Что входит" value={product.includes ?? []} onChange={(nextValue) => updateProduct(index, { includes: nextValue })} />
           <Field label="Кнопка" value={product.cta ?? ""} onChange={(nextValue) => updateProduct(index, { cta: nextValue })} />
         </div>

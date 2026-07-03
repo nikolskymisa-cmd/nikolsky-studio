@@ -384,6 +384,15 @@ const defaultCopy = {
 type LandingCopy = typeof defaultCopy;
 export type { LandingCopy };
 
+type RuntimeText = LandingCopy[Lang] & {
+  priceLabel?: string;
+  productsText?: string;
+  problemsLabel?: string;
+  problems?: readonly string[];
+  methodText?: string;
+  faq?: readonly (readonly [string, string])[];
+};
+
 function mergeCopy<T>(base: T, override: unknown): T {
   if (!override || typeof override !== "object" || Array.isArray(override)) {
     return base;
@@ -523,6 +532,7 @@ export function StudioLanding({
   const liveCopy = editorContent ? (mergeCopy(copy, editorContent) as LandingCopy) : runtimeCopy;
   const liveWorks = editorWorks ?? runtimeWorks;
   const t = liveCopy[lang];
+  const runtimeT = t as RuntimeText;
   const editorStyles = ((liveCopy as unknown as { _editor?: { styles?: Record<string, number | string> } })._editor?.styles ?? {});
   const editorLinks = ((liveCopy as unknown as { _editor?: { links?: Partial<typeof profile> } })._editor?.links ?? {});
   const customBreakdownTracks = (liveCopy as unknown as { _editor?: { showreelTracks?: ShowreelTrack[] } })._editor?.showreelTracks;
@@ -731,50 +741,6 @@ export function StudioLanding({
         </div>
       </section>
 
-      <section className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <Reveal className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.85fr_1.15fr]" style={blockStyle("position")}>
-          <div
-            onClickCapture={selectInEditor({ type: "text", label: "Позиционирование", path: ["ru", "positionTitle"], area: true })}
-            className={editorClass({ type: "text", label: "Позиционирование", path: ["ru", "positionTitle"], area: true })}
-          >
-            <SectionHeader eyebrow={t.positionEyebrow} title={t.positionTitle} text={t.positionText} />
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {t.positionCards.map(([title, text], index) => (
-              <div
-                key={title}
-                onClickCapture={selectInEditor({ type: "text", label: `Позиционирование: карточка ${index + 1}`, path: ["ru", "positionCards", index, 0] })}
-                className={editorClass({ type: "text", label: `Позиционирование: карточка ${index + 1}`, path: ["ru", "positionCards", index, 0] })}
-              >
-                <ControlPanel index={index} title={title} text={text} />
-              </div>
-            ))}
-          </div>
-        </Reveal>
-      </section>
-
-      <section id="products" className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <Reveal className="mx-auto max-w-7xl" style={blockStyle("products")}>
-          <div
-            onClickCapture={selectInEditor({ type: "text", label: "Продукты: заголовок", path: ["ru", "productsTitle"] })}
-            className={editorClass({ type: "text", label: "Продукты: заголовок", path: ["ru", "productsTitle"] })}
-          >
-            <SectionHeader eyebrow={t.productsEyebrow} title={t.productsTitle} />
-          </div>
-          <div className="mt-8 grid gap-3 lg:grid-cols-3">
-            {t.products.map((product, index) => (
-              <div
-                key={product.code}
-                onClickCapture={selectInEditor({ type: "text", label: `Продукт ${index + 1}`, path: ["ru", "products", index, "title"] })}
-                className={editorClass({ type: "text", label: `Продукт ${index + 1}`, path: ["ru", "products", index, "title"] })}
-              >
-                <ProductPanel product={product} label={t.productLabel} contactUrl={links.telegramUrl} />
-              </div>
-            ))}
-          </div>
-        </Reveal>
-      </section>
-
       <section id="work" className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <Reveal className="mx-auto max-w-7xl" style={blockStyle("cases")}>
           <div className="mb-8 grid gap-6 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
@@ -832,27 +798,75 @@ export function StudioLanding({
         </Reveal>
       </section>
 
+      <section id="products" className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+        <Reveal className="mx-auto max-w-7xl" style={blockStyle("products")}>
+          <div
+            onClickCapture={selectInEditor({ type: "text", label: "Услуги: заголовок", path: ["ru", "productsTitle"] })}
+            className={editorClass({ type: "text", label: "Услуги: заголовок", path: ["ru", "productsTitle"] })}
+          >
+            <SectionHeader eyebrow={t.productsEyebrow} title={t.productsTitle} text={runtimeT.productsText} />
+          </div>
+
+          {runtimeT.problems?.length ? (
+            <div className="mt-7 border border-white/10 bg-black/25 p-3 sm:p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <span className="shrink-0 font-mono text-[10px] uppercase text-accent sm:text-[11px]">{runtimeT.problemsLabel}</span>
+                <div className="flex flex-wrap gap-2">
+                  {runtimeT.problems.map((problem) => (
+                    <span key={problem} className="border border-white/[0.08] bg-white/[0.025] px-2.5 py-1.5 font-mono text-[10px] uppercase leading-4 text-white/50">
+                      {problem}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          <div className="mt-8 grid gap-3 lg:grid-cols-4">
+            {t.products.map((product, index) => (
+              <motion.div
+                key={product.code}
+                initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+                whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.34, delay: index * 0.045, ease: [0.23, 1, 0.32, 1] }}
+                onClickCapture={selectInEditor({ type: "text", label: `Продукт ${index + 1}`, path: ["ru", "products", index, "title"] })}
+                className={editorClass({ type: "text", label: `Продукт ${index + 1}`, path: ["ru", "products", index, "title"] })}
+              >
+                <ProductPanel product={product} label={t.productLabel} priceLabel={runtimeT.priceLabel ?? t.productLabel} contactUrl={links.telegramUrl} />
+              </motion.div>
+            ))}
+          </div>
+        </Reveal>
+      </section>
+
       <section id="method" className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <Reveal className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr]" style={blockStyle("method")}>
           <div
             onClickCapture={selectInEditor({ type: "text", label: "Метод", path: ["ru", "methodTitle"] })}
             className={editorClass({ type: "text", label: "Метод", path: ["ru", "methodTitle"] })}
           >
-            <SectionHeader eyebrow={t.methodEyebrow} title={t.methodTitle} />
+            <SectionHeader eyebrow={t.methodEyebrow} title={t.methodTitle} text={runtimeT.methodText} />
           </div>
-          <div className="grid border border-white/10 bg-white/[0.02]">
+          <div className="relative grid gap-3 lg:grid-cols-2">
+            <span aria-hidden className="absolute left-5 top-5 hidden h-[calc(100%-40px)] w-px bg-gradient-to-b from-accent/70 via-white/10 to-transparent sm:block lg:left-1/2 lg:top-6 lg:h-px lg:w-[calc(100%-48px)] lg:-translate-x-1/2" />
             {t.methodSteps.map(([title, text], index) => (
-              <div
+              <motion.div
                 key={title}
+                initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+                whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-90px" }}
+                transition={{ duration: 0.32, delay: index * 0.04, ease: [0.23, 1, 0.32, 1] }}
                 onClickCapture={selectInEditor({ type: "text", label: `Метод: шаг ${index + 1}`, path: ["ru", "methodSteps", index, 0] })}
-                className={`grid gap-3 border-b border-white/10 p-4 last:border-b-0 sm:grid-cols-[112px_1fr] sm:gap-4 sm:p-5${editorClass({ type: "text", label: `Метод: шаг ${index + 1}`, path: ["ru", "methodSteps", index, 0] })}`}
+                className={`relative border border-white/10 bg-white/[0.02] p-4 transition hover:border-accent/65 hover:shadow-[0_0_0_1px_rgba(0,183,255,0.18),0_18px_50px_rgba(0,183,255,0.08)] sm:p-5${editorClass({ type: "text", label: `Метод: шаг ${index + 1}`, path: ["ru", "methodSteps", index, 0] })}`}
               >
-                <span className="font-mono text-xs uppercase text-accent">{t.stepLabel} {String(index + 1).padStart(2, "0")}</span>
-                <div>
-                  <h3 className="text-lg font-semibold uppercase text-white sm:text-xl">{title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-white/62 sm:text-base sm:leading-7">{text}</p>
+                <div className="mb-5 flex items-center justify-between border-b border-white/10 pb-3">
+                  <span className="font-mono text-xs uppercase text-accent">{t.stepLabel} {String(index + 1).padStart(2, "0")}</span>
+                  <span className="h-px w-14 bg-accent/50" />
                 </div>
-              </div>
+                <h3 className="text-lg font-semibold uppercase text-white sm:text-xl">{title}</h3>
+                <p className="mt-3 text-sm leading-6 text-white/62 sm:text-base sm:leading-7">{text}</p>
+              </motion.div>
             ))}
           </div>
         </Reveal>
@@ -879,6 +893,26 @@ export function StudioLanding({
               ))}
             </div>
           </div>
+
+          {runtimeT.faq?.length ? (
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {runtimeT.faq.map(([question, answer], index) => (
+                <motion.div
+                  key={question}
+                  initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+                  whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-90px" }}
+                  transition={{ duration: 0.3, delay: index * 0.035, ease: [0.23, 1, 0.32, 1] }}
+                  onClickCapture={selectInEditor({ type: "text", label: `FAQ ${index + 1}`, path: ["ru", "faq", index, 0] })}
+                  className={`border border-white/10 bg-black/22 p-4 transition hover:border-accent/60 hover:bg-accent/[0.035] sm:p-5${editorClass({ type: "text", label: `FAQ ${index + 1}`, path: ["ru", "faq", index, 0] })}`}
+                >
+                  <p className="font-mono text-[10px] uppercase text-accent sm:text-[11px]">FAQ {String(index + 1).padStart(2, "0")}</p>
+                  <h3 className="mt-3 text-base font-semibold uppercase leading-tight text-white sm:text-lg">{question}</h3>
+                  <p className="mt-3 text-sm leading-6 text-white/58">{answer}</p>
+                </motion.div>
+              ))}
+            </div>
+          ) : null}
         </Reveal>
       </section>
 
@@ -1380,6 +1414,7 @@ function ControlPanel({
 function ProductPanel({
   product,
   label,
+  priceLabel,
   contactUrl,
 }: {
   product: {
@@ -1389,8 +1424,12 @@ function ProductPanel({
     text: string;
     includes: readonly string[];
     cta: string;
+    price?: string;
+    timeline?: string;
+    fit?: string;
   };
   label: string;
+  priceLabel: string;
   contactUrl: string;
 }) {
   return (
@@ -1406,7 +1445,15 @@ function ProductPanel({
       <h3 className="text-2xl font-semibold uppercase leading-[0.98] text-white sm:text-3xl sm:leading-[0.96]">{product.title}</h3>
       <p className="mt-3 text-xs uppercase leading-5 text-white/50 sm:mt-4 sm:min-h-12 sm:text-sm sm:leading-6">{product.audience}</p>
       <p className="mt-4 text-sm leading-6 text-white/66 sm:mt-6 sm:text-base sm:leading-7">{product.text}</p>
-      <div className="mt-5 grid gap-2 sm:mt-8">
+      {product.fit ? <p className="mt-4 border-l border-accent/50 pl-3 text-xs uppercase leading-5 text-white/46">{product.fit}</p> : null}
+      {product.price ? (
+        <div className="mt-5 border border-accent/30 bg-accent/[0.055] p-3">
+          <p className="font-mono text-[10px] uppercase text-accent">{priceLabel}</p>
+          <p className="mt-1 text-lg font-semibold uppercase leading-tight text-white">{product.price}</p>
+          {product.timeline ? <p className="mt-2 text-xs leading-5 text-white/48">{product.timeline}</p> : null}
+        </div>
+      ) : null}
+      <div className="mt-5 grid gap-2 sm:mt-7">
         {product.includes.map((item) => (
           <div key={item} className="flex items-start gap-3 border-t border-white/[0.08] pt-3 text-sm leading-6 text-white/62">
             <Check size={15} className="mt-1 shrink-0 text-accent" />
