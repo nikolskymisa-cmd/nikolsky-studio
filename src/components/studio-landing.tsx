@@ -1168,44 +1168,53 @@ function WorkflowTimeline({
   const progress = steps.length > 1 ? Math.max(0.035, safeActiveStep / (steps.length - 1)) : 1;
 
   return (
-    <div className="mt-8 overflow-hidden border border-white/10 bg-black/26 p-4 shadow-[0_22px_90px_rgba(0,0,0,0.22)] backdrop-blur-[2px] sm:p-6">
+    <div className="mt-8 overflow-hidden border border-white/10 bg-black/28 shadow-[0_22px_90px_rgba(0,0,0,0.22)] backdrop-blur-[2px]">
       <div className="hidden lg:block">
-        <div className="relative px-4 pb-4 pt-8">
-          <div className="absolute left-8 right-8 top-[62px] h-px bg-white/10" />
-          <motion.div
-            className="absolute left-8 right-8 top-[62px] h-px origin-left bg-gradient-to-r from-accent via-accent/70 to-transparent shadow-[0_0_28px_rgba(0,183,255,0.28)]"
-            initial={reduceMotion ? false : { transform: "scaleX(0.035)" }}
-            animate={{ transform: `scaleX(${progress})` }}
-            transition={{ duration: reduceMotion ? 0 : 0.24, ease: [0.23, 1, 0.32, 1] }}
-          />
-          <div className="relative grid grid-cols-6 gap-3">
-            {steps.map(([title], index) => {
-              const isActive = index === safeActiveStep;
-              const isDone = index < safeActiveStep;
-              const editorProps = getEditorProps(index);
-              return (
-                <button
-                  key={title}
-                  type="button"
-                  onClick={() => setActiveStep(index)}
-                  onClickCapture={editorProps.onClickCapture}
-                  className={`group flex min-w-0 flex-col items-center gap-4 text-center${editorProps.className ?? ""}`}
-                >
-                  <span
-                    className={`grid size-11 place-items-center border font-mono text-xs transition duration-200 ${
-                      isActive
-                        ? "border-accent bg-accent text-black shadow-[0_0_34px_rgba(0,183,255,0.34)]"
-                        : isDone
-                          ? "border-accent/60 bg-accent/[0.08] text-accent"
-                          : "border-white/14 bg-black/40 text-white/42 group-hover:border-accent/70 group-hover:text-accent"
-                    }`}
+        <div className="grid gap-8 border-b border-white/10 p-6 lg:grid-cols-[260px_1fr]">
+          <div>
+            <p className="font-mono text-[11px] uppercase text-accent">workflow path</p>
+            <h3 className="mt-4 text-2xl font-semibold uppercase leading-none text-white">От исходников к финалу</h3>
+            <p className="mt-4 text-sm leading-6 text-white/50">Кликните на этап, чтобы увидеть, что происходит в работе.</p>
+          </div>
+          <div className="relative px-2 pt-8">
+            <div className="absolute left-8 right-8 top-[54px] h-[2px] bg-white/10" />
+            <motion.div
+              className="absolute left-8 right-8 top-[54px] h-[2px] origin-left bg-gradient-to-r from-accent via-accent/80 to-transparent shadow-[0_0_30px_rgba(0,183,255,0.3)]"
+              initial={reduceMotion ? false : { transform: "scaleX(0.035)" }}
+              animate={{ transform: `scaleX(${progress})` }}
+              transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.23, 1, 0.32, 1] }}
+            />
+            <div className="relative grid grid-cols-6 gap-3">
+              {steps.map(([title], index) => {
+                const isActive = index === safeActiveStep;
+                const isDone = index < safeActiveStep;
+                const editorProps = getEditorProps(index);
+                return (
+                  <button
+                    key={title}
+                    type="button"
+                    aria-pressed={isActive}
+                    onClick={() => setActiveStep(index)}
+                    onClickCapture={editorProps.onClickCapture}
+                    className={`group flex min-w-0 flex-col items-center gap-4 text-center${editorProps.className ?? ""}`}
                   >
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className={`truncate font-mono text-[11px] uppercase ${isActive ? "text-white" : "text-white/46"}`}>{title}</span>
-                </button>
-              );
-            })}
+                    <span
+                      className={`relative grid size-12 place-items-center border font-mono text-xs transition-colors duration-200 ${
+                        isActive
+                          ? "border-accent bg-accent text-black shadow-[0_0_34px_rgba(0,183,255,0.34)]"
+                          : isDone
+                            ? "border-accent/55 bg-accent/[0.075] text-accent"
+                            : "border-white/14 bg-[#05090b] text-white/42 group-hover:border-accent/70 group-hover:text-accent"
+                      }`}
+                    >
+                      <span className="absolute -inset-1 border border-white/[0.04]" />
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className={`truncate font-mono text-[11px] uppercase tracking-normal ${isActive ? "text-white" : "text-white/46"}`}>{title}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -1216,14 +1225,19 @@ function WorkflowTimeline({
               initial={reduceMotion ? false : { opacity: 0, transform: "translateY(10px)" }}
               animate={reduceMotion ? undefined : { opacity: 1, transform: "translateY(0px)" }}
               exit={reduceMotion ? undefined : { opacity: 0, transform: "translateY(-8px)" }}
-              transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
-              className="mt-4 grid gap-5 border border-accent/25 bg-accent/[0.035] p-6 lg:grid-cols-[180px_1fr]"
+              transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+              className="grid gap-6 bg-gradient-to-r from-accent/[0.06] via-white/[0.018] to-transparent p-6 lg:grid-cols-[260px_1fr_180px] lg:items-center"
             >
-              <div>
+              <div className="border-r border-white/10 pr-6">
                 <p className="font-mono text-xs uppercase text-accent">{stepLabel} {String(safeActiveStep + 1).padStart(2, "0")}</p>
-                <h3 className="mt-3 text-2xl font-semibold uppercase leading-none text-white">{active[0]}</h3>
+                <h3 className="mt-3 text-3xl font-semibold uppercase leading-none text-white">{active[0]}</h3>
               </div>
               <p className="max-w-3xl text-lg leading-8 text-white/68">{active[1]}</p>
+              <div className="grid gap-2 font-mono text-[10px] uppercase text-white/34">
+                <span className="border border-white/10 bg-black/18 px-3 py-2">brief</span>
+                <span className="border border-white/10 bg-black/18 px-3 py-2">edit</span>
+                <span className="border border-white/10 bg-black/18 px-3 py-2">delivery</span>
+              </div>
             </motion.div>
           </AnimatePresence>
         ) : null}
@@ -1620,10 +1634,8 @@ function ControlPanel({
   compact?: boolean;
 }) {
   return (
-    <motion.div
-      whileHover={{ transform: "translateY(-3px) scale(1.01)" }}
-      transition={{ type: "spring", stiffness: 420, damping: 18, mass: 0.7 }}
-      className={`group relative h-full overflow-hidden border border-white/10 bg-black/22 p-4 transition-colors hover:border-accent/60 hover:shadow-[0_0_0_1px_rgba(0,183,255,0.16),0_18px_56px_rgba(0,183,255,0.08)] sm:p-5 ${compact ? "sm:min-h-36" : "sm:min-h-44"}`}
+    <div
+      className={`group relative h-full overflow-hidden border border-white/10 bg-black/22 p-4 transition-[border-color,box-shadow,background-color] duration-200 hover:border-accent/60 hover:bg-accent/[0.025] hover:shadow-[0_0_0_1px_rgba(0,183,255,0.16),0_18px_56px_rgba(0,183,255,0.08)] sm:p-5 ${compact ? "sm:min-h-36" : "sm:min-h-44"}`}
     >
       <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/80 to-transparent" />
@@ -1631,7 +1643,7 @@ function ControlPanel({
       <p className="mb-4 font-mono text-[11px] uppercase text-accent/80">{String(index + 1).padStart(2, "0")}</p>
       <h3 className="text-lg font-semibold uppercase leading-tight text-white sm:text-xl">{title}</h3>
       <p className="mt-3 text-sm leading-6 text-white/58">{text}</p>
-    </motion.div>
+    </div>
   );
 }
 
@@ -1661,10 +1673,8 @@ function ProductPanel({
   contactUrl: string;
 }) {
   return (
-    <motion.article
-      whileHover={{ transform: "translateY(-4px) scale(1.008)" }}
-      transition={{ type: "spring", stiffness: 420, damping: 18, mass: 0.75 }}
-      className="group relative flex h-full min-h-[520px] flex-col overflow-hidden border border-white/10 bg-black/28 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.16)] transition hover:border-accent/65 hover:shadow-[0_0_0_1px_rgba(0,183,255,0.17),0_24px_80px_rgba(0,183,255,0.08)] sm:p-6"
+    <article
+      className="group relative flex h-full min-h-[520px] flex-col overflow-hidden border border-white/10 bg-black/28 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.16)] transition-[border-color,box-shadow,background-color] duration-200 hover:border-accent/65 hover:bg-accent/[0.02] hover:shadow-[0_0_0_1px_rgba(0,183,255,0.17),0_24px_80px_rgba(0,183,255,0.08)] sm:p-6"
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/70 to-transparent opacity-70" />
       <div className="mb-6 flex items-center justify-between gap-3 font-mono text-[11px] uppercase">
@@ -1701,7 +1711,7 @@ function ProductPanel({
           <ArrowUpRight size={15} />
         </a>
       </div>
-    </motion.article>
+    </article>
   );
 }
 
