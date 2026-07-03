@@ -105,11 +105,11 @@ function getSectionKey(selection: EditorSelection) {
   if (selection.type !== "text") return "page";
   const key = String(selection.path[1] ?? "");
   if (key.startsWith("position")) return "position";
-  if (key.startsWith("products") || key === "priceLabel" || key === "problems" || key === "problemsLabel") return "products";
+  if (key.startsWith("products") || key === "priceLabel" || key === "deadlineLabel" || key === "includedLabel" || key === "problems" || key === "problemsLabel") return "products";
   if (key.startsWith("reel") || key === "chapters" || key === "showreelCta" || key === "showreelLabel" || key === "tracks") return "reel";
   if (key.startsWith("cases") || key === "all" || key === "openCase" || key === "youtube") return "cases";
   if (key.startsWith("method")) return "method";
-  if (key.startsWith("terms") || key === "faq") return "terms";
+  if (key.startsWith("terms") || key === "faq" || key === "faqOpen" || key === "faqClose") return "terms";
   if (key.startsWith("contact") || key === "footer" || key === "email" || key === "vk") return "contact";
   return "page";
 }
@@ -713,6 +713,8 @@ function SectionPanel({
           <ContentField content={content} path={["ru", "productsTitle"]} label="Заголовок" area updateContent={updateContent} />
           <ContentField content={content} path={["ru", "productsText"]} label="Описание" area updateContent={updateContent} />
           <ContentField content={content} path={["ru", "priceLabel"]} label="Лейбл цены" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "deadlineLabel"]} label="Лейбл срока" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "includedLabel"]} label="Лейбл пунктов" updateContent={updateContent} />
           <ContentField content={content} path={["ru", "problemsLabel"]} label="Лейбл проблем" updateContent={updateContent} />
           <EditableStringList title="Что обычно исправляю" root={["ru", "problems"]} content={content} updateContent={updateContent} />
           <ProductList content={content} updateContent={updateContent} />
@@ -755,6 +757,8 @@ function SectionPanel({
           <ContentField content={content} path={["ru", "termsEyebrow"]} label="Лейбл" updateContent={updateContent} />
           <ContentField content={content} path={["ru", "termsTitle"]} label="Заголовок" area updateContent={updateContent} />
           <ContentField content={content} path={["ru", "termsText"]} label="Описание" area updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "faqOpen"]} label="Кнопка открыть FAQ" updateContent={updateContent} />
+          <ContentField content={content} path={["ru", "faqClose"]} label="Кнопка закрыть FAQ" updateContent={updateContent} />
           <PairList title="Карточки условий" root={["ru", "terms"]} content={content} updateContent={updateContent} />
           <PairList title="FAQ" root={["ru", "faq"]} content={content} updateContent={updateContent} />
         </Panel>

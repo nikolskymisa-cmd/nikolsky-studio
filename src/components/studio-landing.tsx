@@ -10,6 +10,7 @@ import {
 import {
   ArrowUpRight,
   Check,
+  ChevronDown,
   CirclePlay,
   Clock3,
   Film,
@@ -386,6 +387,10 @@ export type { LandingCopy };
 
 type RuntimeText = LandingCopy[Lang] & {
   priceLabel?: string;
+  deadlineLabel?: string;
+  includedLabel?: string;
+  faqOpen?: string;
+  faqClose?: string;
   productsText?: string;
   problemsLabel?: string;
   problems?: readonly string[];
@@ -527,6 +532,9 @@ export function StudioLanding({
   const [lang, setLang] = useState<Lang>("ru");
   const [activeFilter, setActiveFilter] = useState<Filter>("All");
   const [selectedWork, setSelectedWork] = useState<Work | null>(null);
+  const [activeMethodStep, setActiveMethodStep] = useState(0);
+  const [faqVisible, setFaqVisible] = useState(false);
+  const [openFaqItems, setOpenFaqItems] = useState<number[]>([0]);
   const [runtimeCopy, setRuntimeCopy] = useState<LandingCopy>(copy);
   const [runtimeWorks, setRuntimeWorks] = useState<Work[]>(works);
   const liveCopy = editorContent ? (mergeCopy(copy, editorContent) as LandingCopy) : runtimeCopy;
@@ -593,6 +601,11 @@ export function StudioLanding({
     activeFilter === "All"
       ? portfolioWorks
       : portfolioWorks.filter((work) => work.category === activeFilter);
+  const toggleFaqItem = (index: number) => {
+    setOpenFaqItems((current) =>
+      current.includes(index) ? current.filter((item) => item !== index) : [...current, index],
+    );
+  };
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -798,8 +811,9 @@ export function StudioLanding({
         </Reveal>
       </section>
 
-      <section id="products" className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <Reveal className="mx-auto max-w-7xl" style={blockStyle("products")}>
+      <section id="products" className="scene-section relative overflow-hidden px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+        <SectionGlow variant="services" />
+        <Reveal className="relative z-10 mx-auto max-w-7xl" style={blockStyle("products")}>
           <div
             onClickCapture={selectInEditor({ type: "text", label: "Услуги: заголовок", path: ["ru", "productsTitle"] })}
             className={editorClass({ type: "text", label: "Услуги: заголовок", path: ["ru", "productsTitle"] })}
@@ -808,7 +822,7 @@ export function StudioLanding({
           </div>
 
           {runtimeT.problems?.length ? (
-            <div className="mt-7 border border-white/10 bg-black/25 p-3 sm:p-4">
+            <div className="mt-7 border border-white/10 bg-black/20 p-3 shadow-[0_18px_70px_rgba(0,0,0,0.16)] backdrop-blur-[2px] sm:p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <span className="shrink-0 font-mono text-[10px] uppercase text-accent sm:text-[11px]">{runtimeT.problemsLabel}</span>
                 <div className="flex flex-wrap gap-2">
@@ -822,102 +836,140 @@ export function StudioLanding({
             </div>
           ) : null}
 
-          <div className="mt-8 grid gap-3 lg:grid-cols-4">
+          <div className="mt-8 grid items-stretch gap-3 lg:grid-cols-4">
             {t.products.map((product, index) => (
               <motion.div
                 key={product.code}
-                initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-                whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+                initial={reduceMotion ? false : { opacity: 0, transform: "translateY(18px)" }}
+                whileInView={reduceMotion ? undefined : { opacity: 1, transform: "translateY(0px)" }}
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ duration: 0.34, delay: index * 0.045, ease: [0.23, 1, 0.32, 1] }}
                 onClickCapture={selectInEditor({ type: "text", label: `Продукт ${index + 1}`, path: ["ru", "products", index, "title"] })}
-                className={editorClass({ type: "text", label: `Продукт ${index + 1}`, path: ["ru", "products", index, "title"] })}
+                className={`h-full${editorClass({ type: "text", label: `Продукт ${index + 1}`, path: ["ru", "products", index, "title"] })}`}
               >
-                <ProductPanel product={product} label={t.productLabel} priceLabel={runtimeT.priceLabel ?? t.productLabel} contactUrl={links.telegramUrl} />
+                <ProductPanel
+                  product={product}
+                  label={t.productLabel}
+                  priceLabel={runtimeT.priceLabel ?? "Цена"}
+                  deadlineLabel={runtimeT.deadlineLabel ?? "Срок"}
+                  includedLabel={runtimeT.includedLabel ?? "Что входит"}
+                  contactUrl={links.telegramUrl}
+                />
               </motion.div>
             ))}
           </div>
         </Reveal>
       </section>
 
-      <section id="method" className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <Reveal className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr]" style={blockStyle("method")}>
+      <section id="method" className="scene-section relative overflow-hidden px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+        <SectionGlow variant="workflow" />
+        <Reveal className="relative z-10 mx-auto max-w-7xl" style={blockStyle("method")}>
           <div
             onClickCapture={selectInEditor({ type: "text", label: "Метод", path: ["ru", "methodTitle"] })}
-            className={editorClass({ type: "text", label: "Метод", path: ["ru", "methodTitle"] })}
+            className={`max-w-4xl${editorClass({ type: "text", label: "Метод", path: ["ru", "methodTitle"] })}`}
           >
             <SectionHeader eyebrow={t.methodEyebrow} title={t.methodTitle} text={runtimeT.methodText} />
           </div>
-          <div className="relative grid gap-3 lg:grid-cols-2">
-            <span aria-hidden className="absolute left-5 top-5 hidden h-[calc(100%-40px)] w-px bg-gradient-to-b from-accent/70 via-white/10 to-transparent sm:block lg:left-1/2 lg:top-6 lg:h-px lg:w-[calc(100%-48px)] lg:-translate-x-1/2" />
-            {t.methodSteps.map(([title, text], index) => (
-              <motion.div
-                key={title}
-                initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-                whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-90px" }}
-                transition={{ duration: 0.32, delay: index * 0.04, ease: [0.23, 1, 0.32, 1] }}
-                onClickCapture={selectInEditor({ type: "text", label: `Метод: шаг ${index + 1}`, path: ["ru", "methodSteps", index, 0] })}
-                className={`relative border border-white/10 bg-white/[0.02] p-4 transition hover:border-accent/65 hover:shadow-[0_0_0_1px_rgba(0,183,255,0.18),0_18px_50px_rgba(0,183,255,0.08)] sm:p-5${editorClass({ type: "text", label: `Метод: шаг ${index + 1}`, path: ["ru", "methodSteps", index, 0] })}`}
-              >
-                <div className="mb-5 flex items-center justify-between border-b border-white/10 pb-3">
-                  <span className="font-mono text-xs uppercase text-accent">{t.stepLabel} {String(index + 1).padStart(2, "0")}</span>
-                  <span className="h-px w-14 bg-accent/50" />
-                </div>
-                <h3 className="text-lg font-semibold uppercase text-white sm:text-xl">{title}</h3>
-                <p className="mt-3 text-sm leading-6 text-white/62 sm:text-base sm:leading-7">{text}</p>
-              </motion.div>
-            ))}
-          </div>
+          <WorkflowTimeline
+            steps={t.methodSteps}
+            activeStep={activeMethodStep}
+            setActiveStep={setActiveMethodStep}
+            stepLabel={t.stepLabel}
+            reduceMotion={Boolean(reduceMotion)}
+            getEditorProps={(index) => ({
+              onClickCapture: selectInEditor({ type: "text", label: `Метод: шаг ${index + 1}`, path: ["ru", "methodSteps", index, 0] }),
+              className: editorClass({ type: "text", label: `Метод: шаг ${index + 1}`, path: ["ru", "methodSteps", index, 0] }),
+            })}
+          />
         </Reveal>
       </section>
 
-      <section id="terms" className="scene-section relative px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-        <Reveal className="mx-auto max-w-7xl" style={blockStyle("terms")}>
-          <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr]">
-            <div
-              onClickCapture={selectInEditor({ type: "text", label: "Условия", path: ["ru", "termsTitle"] })}
-              className={editorClass({ type: "text", label: "Условия", path: ["ru", "termsTitle"] })}
-            >
-              <SectionHeader eyebrow={t.termsEyebrow} title={t.termsTitle} text={t.termsText} />
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {t.terms.map(([title, text], index) => (
-                <div
-                  key={title}
-                  onClickCapture={selectInEditor({ type: "text", label: `Условия: карточка ${index + 1}`, path: ["ru", "terms", index, 0] })}
-                  className={editorClass({ type: "text", label: `Условия: карточка ${index + 1}`, path: ["ru", "terms", index, 0] })}
-                >
-                  <ControlPanel index={index} title={title} text={text} compact />
-                </div>
-              ))}
-            </div>
+      <section id="terms" className="scene-section relative overflow-hidden px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+        <SectionGlow variant="terms" />
+        <Reveal className="relative z-10 mx-auto max-w-7xl" style={blockStyle("terms")}>
+          <div
+            onClickCapture={selectInEditor({ type: "text", label: "Условия", path: ["ru", "termsTitle"] })}
+            className={`max-w-4xl${editorClass({ type: "text", label: "Условия", path: ["ru", "termsTitle"] })}`}
+          >
+            <SectionHeader eyebrow={t.termsEyebrow} title={t.termsTitle} text={t.termsText} />
+          </div>
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {t.terms.map(([title, text], index) => (
+              <div
+                key={title}
+                onClickCapture={selectInEditor({ type: "text", label: `Условия: карточка ${index + 1}`, path: ["ru", "terms", index, 0] })}
+                className={editorClass({ type: "text", label: `Условия: карточка ${index + 1}`, path: ["ru", "terms", index, 0] })}
+              >
+                <ControlPanel index={index} title={title} text={text} compact />
+              </div>
+            ))}
           </div>
 
           {runtimeT.faq?.length ? (
-            <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {runtimeT.faq.map(([question, answer], index) => (
-                <motion.div
-                  key={question}
-                  initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-                  whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-90px" }}
-                  transition={{ duration: 0.3, delay: index * 0.035, ease: [0.23, 1, 0.32, 1] }}
-                  onClickCapture={selectInEditor({ type: "text", label: `FAQ ${index + 1}`, path: ["ru", "faq", index, 0] })}
-                  className={`border border-white/10 bg-black/22 p-4 transition hover:border-accent/60 hover:bg-accent/[0.035] sm:p-5${editorClass({ type: "text", label: `FAQ ${index + 1}`, path: ["ru", "faq", index, 0] })}`}
-                >
-                  <p className="font-mono text-[10px] uppercase text-accent sm:text-[11px]">FAQ {String(index + 1).padStart(2, "0")}</p>
-                  <h3 className="mt-3 text-base font-semibold uppercase leading-tight text-white sm:text-lg">{question}</h3>
-                  <p className="mt-3 text-sm leading-6 text-white/58">{answer}</p>
-                </motion.div>
-              ))}
+            <div className="mt-8">
+              <button
+                type="button"
+                onClick={() => setFaqVisible((current) => !current)}
+                className="inline-flex h-12 w-full items-center justify-center gap-3 border border-white/12 bg-white px-5 text-sm font-semibold text-black transition hover:border-accent hover:bg-accent active:scale-[0.98] sm:w-auto"
+              >
+                {faqVisible ? runtimeT.faqClose ?? "Скрыть FAQ" : runtimeT.faqOpen ?? "Открыть FAQ"}
+                <ChevronDown size={17} className={`transition-transform duration-200 ${faqVisible ? "rotate-180" : ""}`} />
+              </button>
             </div>
           ) : null}
+
+          <AnimatePresence initial={false}>
+            {faqVisible && runtimeT.faq?.length ? (
+              <motion.div
+                key="faq"
+                initial={reduceMotion ? false : { opacity: 0, transform: "translateY(14px)" }}
+                animate={reduceMotion ? undefined : { opacity: 1, transform: "translateY(0px)" }}
+                exit={reduceMotion ? undefined : { opacity: 0, transform: "translateY(8px)" }}
+                transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
+                className="mt-5 grid gap-2"
+              >
+                {runtimeT.faq.map(([question, answer], index) => {
+                  const isOpen = openFaqItems.includes(index);
+                  return (
+                    <div
+                      key={question}
+                      onClickCapture={selectInEditor({ type: "text", label: `FAQ ${index + 1}`, path: ["ru", "faq", index, 0] })}
+                      className={`border border-white/10 bg-black/24${editorClass({ type: "text", label: `FAQ ${index + 1}`, path: ["ru", "faq", index, 0] })}`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => toggleFaqItem(index)}
+                        className="flex w-full items-center justify-between gap-4 p-4 text-left transition hover:bg-white/[0.025] sm:p-5"
+                      >
+                        <span className="text-base font-semibold uppercase leading-tight text-white sm:text-lg">{question}</span>
+                        <ChevronDown size={18} className={`shrink-0 text-accent transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                      </button>
+                      <AnimatePresence initial={false}>
+                        {isOpen ? (
+                          <motion.div
+                            key="answer"
+                            initial={reduceMotion ? false : { opacity: 0, transform: "translateY(-4px)" }}
+                            animate={reduceMotion ? undefined : { opacity: 1, transform: "translateY(0px)" }}
+                            exit={reduceMotion ? undefined : { opacity: 0, transform: "translateY(-4px)" }}
+                            transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
+                            className="px-4 pb-4 text-sm leading-6 text-white/58 sm:px-5 sm:pb-5 sm:text-base sm:leading-7"
+                          >
+                            {answer}
+                          </motion.div>
+                        ) : null}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
         </Reveal>
       </section>
 
-      <section id="contact" className="scene-section relative px-4 pb-8 pt-12 sm:px-6 sm:pt-16 lg:px-8 lg:pt-20">
-        <Reveal className={`mx-auto max-w-7xl border border-white/12 bg-white/[0.025] p-4 sm:p-8${editorClass({ type: "text", label: "Контакт", path: ["ru", "contactTitle"], area: true })}`} style={blockStyle("contact")}>
+      <section id="contact" className="scene-section relative overflow-hidden px-4 pb-8 pt-12 sm:px-6 sm:pt-16 lg:px-8 lg:pt-20">
+        <SectionGlow variant="contact" />
+        <Reveal className={`relative z-10 mx-auto max-w-7xl border border-white/12 bg-white/[0.025] p-4 sm:p-8${editorClass({ type: "text", label: "Контакт", path: ["ru", "contactTitle"], area: true })}`} style={blockStyle("contact")}>
           <div className="grid gap-10 lg:grid-cols-[1fr_430px] lg:items-end">
             <div onClickCapture={selectInEditor({ type: "text", label: "Контакт", path: ["ru", "contactTitle"], area: true })}>
               <p className="mb-5 font-mono text-xs uppercase text-accent">{t.contactEyebrow}</p>
@@ -1056,6 +1108,179 @@ function StudioBackground() {
       <div className="editor-bg absolute inset-0" />
       <div className="scanline-layer absolute inset-0" />
       <div className="noise-layer absolute inset-0" />
+    </div>
+  );
+}
+
+function SectionGlow({ variant }: { variant: "services" | "workflow" | "terms" | "contact" }) {
+  const glow: Record<typeof variant, CSSProperties> = {
+    services: {
+      background:
+        "radial-gradient(circle at 18% 16%, rgba(0, 183, 255, 0.12), transparent 30%), radial-gradient(circle at 78% 28%, rgba(255, 255, 255, 0.035), transparent 24%)",
+    },
+    workflow: {
+      background:
+        "radial-gradient(ellipse at 52% 34%, rgba(0, 183, 255, 0.13), transparent 34%), linear-gradient(90deg, transparent 0%, rgba(0, 183, 255, 0.045) 45%, transparent 82%)",
+    },
+    terms: {
+      background:
+        "radial-gradient(circle at 76% 12%, rgba(0, 183, 255, 0.07), transparent 28%), radial-gradient(circle at 18% 78%, rgba(255, 255, 255, 0.025), transparent 24%)",
+    },
+    contact: {
+      background:
+        "radial-gradient(circle at 50% 30%, rgba(0, 183, 255, 0.16), transparent 32%), linear-gradient(180deg, transparent 0%, rgba(0, 183, 255, 0.035) 100%)",
+    },
+  };
+
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+      <div
+        className="absolute inset-x-[-12%] inset-y-[-18%] opacity-80"
+        style={{
+          ...glow[variant],
+          maskImage: "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
+        }}
+      />
+    </div>
+  );
+}
+
+function WorkflowTimeline({
+  steps,
+  activeStep,
+  setActiveStep,
+  stepLabel,
+  reduceMotion,
+  getEditorProps,
+}: {
+  steps: readonly (readonly [string, string])[];
+  activeStep: number;
+  setActiveStep: (index: number) => void;
+  stepLabel: string;
+  reduceMotion: boolean;
+  getEditorProps: (index: number) => {
+    onClickCapture?: (event: MouseEvent<HTMLElement>) => void;
+    className?: string;
+  };
+}) {
+  const safeActiveStep = Math.min(activeStep, Math.max(0, steps.length - 1));
+  const active = steps[safeActiveStep] ?? steps[0];
+  const progress = steps.length > 1 ? Math.max(0.035, safeActiveStep / (steps.length - 1)) : 1;
+
+  return (
+    <div className="mt-8 overflow-hidden border border-white/10 bg-black/26 p-4 shadow-[0_22px_90px_rgba(0,0,0,0.22)] backdrop-blur-[2px] sm:p-6">
+      <div className="hidden lg:block">
+        <div className="relative px-4 pb-4 pt-8">
+          <div className="absolute left-8 right-8 top-[62px] h-px bg-white/10" />
+          <motion.div
+            className="absolute left-8 right-8 top-[62px] h-px origin-left bg-gradient-to-r from-accent via-accent/70 to-transparent shadow-[0_0_28px_rgba(0,183,255,0.28)]"
+            initial={reduceMotion ? false : { transform: "scaleX(0.035)" }}
+            animate={{ transform: `scaleX(${progress})` }}
+            transition={{ duration: reduceMotion ? 0 : 0.24, ease: [0.23, 1, 0.32, 1] }}
+          />
+          <div className="relative grid grid-cols-6 gap-3">
+            {steps.map(([title], index) => {
+              const isActive = index === safeActiveStep;
+              const isDone = index < safeActiveStep;
+              const editorProps = getEditorProps(index);
+              return (
+                <button
+                  key={title}
+                  type="button"
+                  onClick={() => setActiveStep(index)}
+                  onClickCapture={editorProps.onClickCapture}
+                  className={`group flex min-w-0 flex-col items-center gap-4 text-center${editorProps.className ?? ""}`}
+                >
+                  <span
+                    className={`grid size-11 place-items-center border font-mono text-xs transition duration-200 ${
+                      isActive
+                        ? "border-accent bg-accent text-black shadow-[0_0_34px_rgba(0,183,255,0.34)]"
+                        : isDone
+                          ? "border-accent/60 bg-accent/[0.08] text-accent"
+                          : "border-white/14 bg-black/40 text-white/42 group-hover:border-accent/70 group-hover:text-accent"
+                    }`}
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className={`truncate font-mono text-[11px] uppercase ${isActive ? "text-white" : "text-white/46"}`}>{title}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {active ? (
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={`${safeActiveStep}-${active[0]}`}
+              initial={reduceMotion ? false : { opacity: 0, transform: "translateY(10px)" }}
+              animate={reduceMotion ? undefined : { opacity: 1, transform: "translateY(0px)" }}
+              exit={reduceMotion ? undefined : { opacity: 0, transform: "translateY(-8px)" }}
+              transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
+              className="mt-4 grid gap-5 border border-accent/25 bg-accent/[0.035] p-6 lg:grid-cols-[180px_1fr]"
+            >
+              <div>
+                <p className="font-mono text-xs uppercase text-accent">{stepLabel} {String(safeActiveStep + 1).padStart(2, "0")}</p>
+                <h3 className="mt-3 text-2xl font-semibold uppercase leading-none text-white">{active[0]}</h3>
+              </div>
+              <p className="max-w-3xl text-lg leading-8 text-white/68">{active[1]}</p>
+            </motion.div>
+          </AnimatePresence>
+        ) : null}
+      </div>
+
+      <div className="grid gap-2 lg:hidden">
+        {steps.map(([title, text], index) => {
+          const isActive = index === safeActiveStep;
+          const isDone = index < safeActiveStep;
+          const editorProps = getEditorProps(index);
+          return (
+            <div key={title} className="relative pl-9">
+              {index < steps.length - 1 ? <span aria-hidden className="absolute left-[18px] top-11 h-[calc(100%-12px)] w-px bg-white/10" /> : null}
+              <button
+                type="button"
+                onClick={() => setActiveStep(index)}
+                onClickCapture={editorProps.onClickCapture}
+                className={`flex w-full items-center gap-3 border p-3 text-left transition ${
+                  isActive
+                    ? "border-accent/80 bg-accent/[0.055]"
+                    : "border-white/10 bg-black/18"
+                }${editorProps.className ?? ""}`}
+              >
+                <span
+                  className={`absolute left-0 top-3 grid size-9 place-items-center border font-mono text-[11px] ${
+                    isActive
+                      ? "border-accent bg-accent text-black shadow-[0_0_28px_rgba(0,183,255,0.32)]"
+                      : isDone
+                        ? "border-accent/50 bg-accent/[0.08] text-accent"
+                        : "border-white/14 bg-black text-white/42"
+                  }`}
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span>
+                  <span className="block font-mono text-[10px] uppercase text-accent/75">{stepLabel} {String(index + 1).padStart(2, "0")}</span>
+                  <span className="mt-1 block text-base font-semibold uppercase text-white">{title}</span>
+                </span>
+              </button>
+              <AnimatePresence initial={false}>
+                {isActive ? (
+                  <motion.p
+                    key="mobile-step"
+                    initial={reduceMotion ? false : { opacity: 0, transform: "translateY(-4px)" }}
+                    animate={reduceMotion ? undefined : { opacity: 1, transform: "translateY(0px)" }}
+                    exit={reduceMotion ? undefined : { opacity: 0, transform: "translateY(-4px)" }}
+                    transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
+                    className="border-x border-b border-accent/30 bg-black/24 px-3 pb-4 pt-1 text-sm leading-6 text-white/62"
+                  >
+                    {text}
+                  </motion.p>
+                ) : null}
+              </AnimatePresence>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -1396,17 +1621,16 @@ function ControlPanel({
 }) {
   return (
     <motion.div
-      whileHover={{ y: -4, scale: 1.018 }}
+      whileHover={{ transform: "translateY(-3px) scale(1.01)" }}
       transition={{ type: "spring", stiffness: 420, damping: 18, mass: 0.7 }}
-      className={`group relative overflow-hidden border border-white/10 bg-white/[0.02] p-4 transition-colors hover:border-accent/75 hover:shadow-[0_0_0_1px_rgba(0,183,255,0.22),0_18px_60px_rgba(0,183,255,0.12)] sm:p-5 ${compact ? "sm:min-h-40" : "sm:min-h-44"}`}
+      className={`group relative h-full overflow-hidden border border-white/10 bg-black/22 p-4 transition-colors hover:border-accent/60 hover:shadow-[0_0_0_1px_rgba(0,183,255,0.16),0_18px_56px_rgba(0,183,255,0.08)] sm:p-5 ${compact ? "sm:min-h-36" : "sm:min-h-44"}`}
     >
       <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/80 to-transparent" />
-        <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-accent/55 to-transparent" />
       </div>
-      <p className="mb-4 font-mono text-[11px] uppercase text-accent/80 sm:mb-5 sm:text-xs">{String(index + 1).padStart(2, "0")}</p>
-      <h3 className="text-xl font-semibold uppercase text-white sm:text-2xl">{title}</h3>
-      <p className="mt-3 text-sm leading-6 text-white/62 sm:mt-4 sm:text-base sm:leading-7">{text}</p>
+      <p className="mb-4 font-mono text-[11px] uppercase text-accent/80">{String(index + 1).padStart(2, "0")}</p>
+      <h3 className="text-lg font-semibold uppercase leading-tight text-white sm:text-xl">{title}</h3>
+      <p className="mt-3 text-sm leading-6 text-white/58">{text}</p>
     </motion.div>
   );
 }
@@ -1415,6 +1639,8 @@ function ProductPanel({
   product,
   label,
   priceLabel,
+  deadlineLabel,
+  includedLabel,
   contactUrl,
 }: {
   product: {
@@ -1430,41 +1656,51 @@ function ProductPanel({
   };
   label: string;
   priceLabel: string;
+  deadlineLabel: string;
+  includedLabel: string;
   contactUrl: string;
 }) {
   return (
     <motion.article
-      whileHover={{ y: -5, scale: 1.012 }}
+      whileHover={{ transform: "translateY(-4px) scale(1.008)" }}
       transition={{ type: "spring", stiffness: 420, damping: 18, mass: 0.75 }}
-      className="group flex flex-col border border-white/10 bg-white/[0.025] p-4 transition hover:border-accent/75 hover:shadow-[0_0_0_1px_rgba(0,183,255,0.2),0_22px_70px_rgba(0,183,255,0.1)] sm:p-5 lg:min-h-[540px]"
+      className="group relative flex h-full min-h-[520px] flex-col overflow-hidden border border-white/10 bg-black/28 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.16)] transition hover:border-accent/65 hover:shadow-[0_0_0_1px_rgba(0,183,255,0.17),0_24px_80px_rgba(0,183,255,0.08)] sm:p-6"
     >
-      <div className="mb-5 flex items-center justify-between border-b border-white/10 pb-3 font-mono text-[11px] uppercase sm:mb-8 sm:pb-4 sm:text-xs">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/70 to-transparent opacity-70" />
+      <div className="mb-6 flex items-center justify-between gap-3 font-mono text-[11px] uppercase">
         <span className="text-accent">{product.code}</span>
-        <span className="text-white/32">{label}</span>
+        <span className="text-white/28">{label}</span>
       </div>
-      <h3 className="text-2xl font-semibold uppercase leading-[0.98] text-white sm:text-3xl sm:leading-[0.96]">{product.title}</h3>
-      <p className="mt-3 text-xs uppercase leading-5 text-white/50 sm:mt-4 sm:min-h-12 sm:text-sm sm:leading-6">{product.audience}</p>
-      <p className="mt-4 text-sm leading-6 text-white/66 sm:mt-6 sm:text-base sm:leading-7">{product.text}</p>
-      {product.fit ? <p className="mt-4 border-l border-accent/50 pl-3 text-xs uppercase leading-5 text-white/46">{product.fit}</p> : null}
-      {product.price ? (
-        <div className="mt-5 border border-accent/30 bg-accent/[0.055] p-3">
-          <p className="font-mono text-[10px] uppercase text-accent">{priceLabel}</p>
-          <p className="mt-1 text-lg font-semibold uppercase leading-tight text-white">{product.price}</p>
-          {product.timeline ? <p className="mt-2 text-xs leading-5 text-white/48">{product.timeline}</p> : null}
+      <h3 className="text-2xl font-semibold uppercase leading-[0.98] text-white sm:text-[1.7rem]">{product.title}</h3>
+      <p className="mt-3 text-sm leading-6 text-white/55">{product.audience}</p>
+      <p className="mt-5 text-sm leading-6 text-white/68">{product.text}</p>
+      <div className="mt-6">
+        <p className="font-mono text-[10px] uppercase text-accent/85">{includedLabel}</p>
+        <div className="mt-3 grid gap-2">
+          {product.includes.slice(0, 4).map((item) => (
+            <div key={item} className="flex items-start gap-3 text-sm leading-5 text-white/62">
+              <Check size={14} className="mt-0.5 shrink-0 text-accent" />
+              <span>{item}</span>
+            </div>
+          ))}
         </div>
-      ) : null}
-      <div className="mt-5 grid gap-2 sm:mt-7">
-        {product.includes.map((item) => (
-          <div key={item} className="flex items-start gap-3 border-t border-white/[0.08] pt-3 text-sm leading-6 text-white/62">
-            <Check size={15} className="mt-1 shrink-0 text-accent" />
-            <span>{item}</span>
-          </div>
-        ))}
       </div>
-      <a href={contactUrl} target="_blank" rel="noreferrer" className="mt-6 inline-flex h-11 items-center justify-center gap-2 bg-white px-4 text-sm font-semibold text-black transition group-hover:bg-accent sm:mt-auto">
-        {product.cta}
-        <ArrowUpRight size={15} />
-      </a>
+      <div className="mt-auto pt-7">
+        <div className="grid grid-cols-2 gap-2 border-y border-white/10 py-3">
+          <div>
+            <p className="font-mono text-[10px] uppercase text-white/34">{priceLabel}</p>
+            <p className="mt-1 text-sm font-semibold uppercase text-white">{product.price}</p>
+          </div>
+          <div>
+            <p className="font-mono text-[10px] uppercase text-white/34">{deadlineLabel}</p>
+            <p className="mt-1 text-sm font-semibold uppercase text-white">{product.timeline}</p>
+          </div>
+        </div>
+        <a href={contactUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 bg-white px-4 text-sm font-semibold text-black transition hover:bg-accent active:scale-[0.98]">
+          {product.cta}
+          <ArrowUpRight size={15} />
+        </a>
+      </div>
     </motion.article>
   );
 }
