@@ -529,11 +529,16 @@ export function StudioLanding({
   const mainStyle = {
     "--accent": typeof editorStyles.accent === "string" ? editorStyles.accent : undefined,
   } as CSSProperties;
+  const heroTitleSize = Number(editorStyles.heroTitleSize ?? 64);
+  const heroSubtitleSize = Number(editorStyles.heroSubtitleSize ?? 20);
+  const ctaHeight = Number(editorStyles.ctaHeight ?? 56);
+  const ctaPadding = Number(editorStyles.ctaPadding ?? 28);
+  const ctaFontSize = Number(editorStyles.ctaFontSize ?? 15);
   const heroTitleStyle = editorStyles.heroTitleSize
-    ? ({ fontSize: `clamp(2.25rem, ${Number(editorStyles.heroTitleSize) / 12}vw, ${Number(editorStyles.heroTitleSize) / 10}rem)` } as CSSProperties)
+    ? ({ fontSize: `clamp(${Math.max(30, heroTitleSize * 0.68)}px, ${Math.max(4.8, heroTitleSize / 7.8)}vw, ${heroTitleSize * 1.6}px)` } as CSSProperties)
     : undefined;
   const heroSubtitleStyle = editorStyles.heroSubtitleSize
-    ? ({ fontSize: `${Number(editorStyles.heroSubtitleSize)}px` } as CSSProperties)
+    ? ({ fontSize: `${heroSubtitleSize}px`, lineHeight: `${Math.round(heroSubtitleSize * 1.55)}px` } as CSSProperties)
     : undefined;
   const bodyScaleStyle = editorStyles.bodyScale
     ? ({ fontSize: `${Number(editorStyles.bodyScale)}%` } as CSSProperties)
@@ -552,9 +557,9 @@ export function StudioLanding({
     transformOrigin: "center",
   } as CSSProperties;
   const ctaStyle = {
-    height: editorStyles.ctaHeight ? `${Number(editorStyles.ctaHeight)}px` : undefined,
-    paddingInline: editorStyles.ctaPadding ? `${Number(editorStyles.ctaPadding)}px` : undefined,
-    fontSize: editorStyles.ctaFontSize ? `${Number(editorStyles.ctaFontSize)}px` : undefined,
+    height: editorStyles.ctaHeight ? `clamp(44px, ${ctaHeight / 8}vw, ${ctaHeight}px)` : undefined,
+    paddingInline: editorStyles.ctaPadding ? `clamp(14px, ${ctaPadding / 8}vw, ${ctaPadding}px)` : undefined,
+    fontSize: editorStyles.ctaFontSize ? `clamp(12px, ${ctaFontSize / 6}vw, ${ctaFontSize}px)` : undefined,
   } as CSSProperties;
   const blockStyle = (key: string) =>
     ({
@@ -1257,7 +1262,7 @@ function BreakdownTrackRow({
 
   return (
     <div
-      className={`grid gap-2 border p-2 transition sm:grid-cols-[48px_112px_minmax(0,1fr)_190px] sm:items-center sm:gap-3 ${
+      className={`grid grid-cols-[36px_88px_minmax(0,1fr)] items-center gap-2 border p-2 transition sm:grid-cols-[48px_112px_minmax(0,1fr)_190px] sm:gap-3 ${
         active
           ? "border-accent/60 bg-accent/[0.055] shadow-[0_0_28px_rgba(0,183,255,0.1)]"
           : "border-white/10 bg-white/[0.018]"
@@ -1266,7 +1271,7 @@ function BreakdownTrackRow({
       <button
         type="button"
         onClick={() => onSeek(track, track.segments[0]?.start ?? 0)}
-        className={`grid size-10 place-items-center border transition ${
+        className={`grid size-8 place-items-center border transition sm:size-10 ${
           active ? "border-accent/65 text-accent shadow-[0_0_18px_rgba(0,183,255,0.18)]" : "border-white/10 text-white/38 hover:border-accent/45 hover:text-accent"
         }`}
         aria-label={`Перейти к ${track.title}`}
@@ -1274,12 +1279,12 @@ function BreakdownTrackRow({
         <BreakdownIcon icon={track.icon} />
       </button>
 
-      <button type="button" onClick={() => onSeek(track, track.segments[0]?.start ?? 0)} className="text-left">
-        <span className={`block font-mono text-[10px] uppercase ${active ? "text-accent" : "text-white/44"}`}>{track.label}</span>
-        <span className="mt-1 block text-xs font-medium uppercase leading-4 text-white/88 sm:text-[13px]">{track.title}</span>
+      <button type="button" onClick={() => onSeek(track, track.segments[0]?.start ?? 0)} className="min-w-0 text-left">
+        <span className={`block truncate font-mono text-[8px] uppercase sm:text-[10px] ${active ? "text-accent" : "text-white/44"}`}>{track.label}</span>
+        <span className="mt-0.5 block text-[10px] font-medium uppercase leading-3 text-white/88 sm:mt-1 sm:text-[13px] sm:leading-4">{track.title}</span>
       </button>
 
-      <div className="relative h-7 overflow-hidden border border-white/10 bg-black/28">
+      <div className="relative h-6 overflow-hidden border border-white/10 bg-black/28 sm:h-7">
         <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-white/10" />
         {selected ? (
           <span className="absolute bottom-0 top-0 z-20 w-px bg-accent shadow-[0_0_16px_rgba(0,183,255,0.75)] transition-[left] duration-200 ease-linear" style={{ left: `${progress}%` }} />
@@ -1303,7 +1308,7 @@ function BreakdownTrackRow({
         })}
       </div>
 
-      <p className={`text-xs leading-5 ${active ? "text-white/78" : "text-white/44"}`}>{track.description}</p>
+      <p className={`hidden text-xs leading-5 sm:block ${active ? "text-white/78" : "text-white/44"}`}>{track.description}</p>
     </div>
   );
 }
@@ -1311,7 +1316,7 @@ function BreakdownTrackRow({
 function BreakdownIcon({ icon }: { icon: ShowreelTrack["icon"] }) {
   if (icon === "target") {
     return (
-      <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <svg viewBox="0 0 24 24" className="size-5 sm:size-6" fill="none" stroke="currentColor" strokeWidth="1.7">
         <circle cx="12" cy="12" r="4" />
         <path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
       </svg>
@@ -1320,7 +1325,7 @@ function BreakdownIcon({ icon }: { icon: ShowreelTrack["icon"] }) {
 
   if (icon === "pulse") {
     return (
-      <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <svg viewBox="0 0 24 24" className="size-5 sm:size-6" fill="none" stroke="currentColor" strokeWidth="1.7">
         <path d="M4 12h3l2-6 4 13 2-7h5" />
       </svg>
     );
@@ -1328,14 +1333,14 @@ function BreakdownIcon({ icon }: { icon: ShowreelTrack["icon"] }) {
 
   if (icon === "message") {
     return (
-      <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <svg viewBox="0 0 24 24" className="size-5 sm:size-6" fill="none" stroke="currentColor" strokeWidth="1.7">
         <path d="M5 6h14v9H9l-4 4V6Z" />
       </svg>
     );
   }
 
   return (
-    <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.7">
+    <svg viewBox="0 0 24 24" className="size-5 sm:size-6" fill="none" stroke="currentColor" strokeWidth="1.7">
       <path d="M12 2l1.6 6.2L20 10l-6.4 1.8L12 18l-1.6-6.2L4 10l6.4-1.8L12 2Z" />
       <path d="M18 15l.8 3.2L22 19l-3.2.8L18 23l-.8-3.2L14 19l3.2-.8L18 15Z" />
     </svg>
