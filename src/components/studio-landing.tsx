@@ -31,6 +31,8 @@ import type { CSSProperties, MouseEvent } from "react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { Reveal } from "@/components/reveal";
+import { Magnetic } from "@/components/motion-primitives/magnetic";
+import { Spotlight } from "@/components/motion-primitives/spotlight";
 import { YouTubeEmbed } from "@/components/youtube-embed";
 import { profile } from "@/lib/profile";
 import { fallbackShowreelDuration, showreelTracks, type ShowreelTrack } from "@/lib/showreel-breakdown";
@@ -459,6 +461,8 @@ const defaultCopy = {
     youtube: "YouTube",
     methodEyebrow: "Method",
     methodTitle: "Meaning first. Rhythm second. Picture third.",
+    methodText: "From raw footage and review to the final file.",
+    methodNote: "You see what happens at every stage: timeline, payment, revisions and delivery are agreed in advance.",
     methodSteps: [
       ["Brief", "I define who the video is for, why it exists, where it goes, and what action it should cause."],
       ["Attention Map", "I mark where the viewer hooks, where they may drop, and where meaning needs more force."],
@@ -845,26 +849,30 @@ export function StudioLanding({
               {t.heroSub}
             </p>
             <div className="mt-7 grid grid-cols-2 gap-2.5 sm:mt-9 sm:flex sm:flex-row sm:gap-3">
-              <a
-                href="#work"
-                onClickCapture={selectInEditor({ type: "text", label: "Кнопка смотреть работы", path: ["ru", "casesCta"] })}
-                className={`inline-flex h-[50px] items-center justify-center gap-2 bg-accent px-4 text-sm font-semibold text-black shadow-[0_0_34px_rgba(0,183,255,0.16)] transition hover:bg-white sm:h-14 sm:px-7 sm:text-[15px]${editorClass({ type: "text", label: "Кнопка смотреть работы", path: ["ru", "casesCta"] })}`}
-                style={ctaStyle}
-              >
-                <CirclePlay size={17} />
-                {t.casesCta}
-              </a>
-              <a
-                href={links.telegramUrl}
-                target="_blank"
-                rel="noreferrer"
-                onClickCapture={selectInEditor({ type: "text", label: "Кнопка обсудить проект", path: ["ru", "projectCta"] })}
-                className={`inline-flex h-[50px] items-center justify-center gap-2 border border-white/16 bg-white/[0.035] px-4 text-sm font-semibold text-white transition hover:border-accent hover:text-accent sm:h-14 sm:px-7 sm:text-[15px]${editorClass({ type: "text", label: "Кнопка обсудить проект", path: ["ru", "projectCta"] })}`}
-                style={ctaStyle}
-              >
-                <Send size={17} />
-                {t.projectCta}
-              </a>
+              <Magnetic className="block w-full sm:w-auto" intensity={0.075}>
+                <a
+                  href="#work"
+                  onClickCapture={selectInEditor({ type: "text", label: "Кнопка смотреть работы", path: ["ru", "casesCta"] })}
+                  className={`premium-cta inline-flex h-[50px] w-full items-center justify-center gap-2 bg-accent px-4 text-sm font-semibold text-black shadow-[0_0_34px_rgba(0,183,255,0.16)] transition hover:bg-white sm:h-14 sm:w-auto sm:px-7 sm:text-[15px]${editorClass({ type: "text", label: "Кнопка смотреть работы", path: ["ru", "casesCta"] })}`}
+                  style={ctaStyle}
+                >
+                  <CirclePlay size={17} />
+                  {t.casesCta}
+                </a>
+              </Magnetic>
+              <Magnetic className="block w-full sm:w-auto" intensity={0.06}>
+                <a
+                  href={links.telegramUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClickCapture={selectInEditor({ type: "text", label: "Кнопка обсудить проект", path: ["ru", "projectCta"] })}
+                  className={`premium-cta inline-flex h-[50px] w-full items-center justify-center gap-2 border border-white/16 bg-white/[0.035] px-4 text-sm font-semibold text-white transition hover:border-accent hover:text-accent sm:h-14 sm:w-auto sm:px-7 sm:text-[15px]${editorClass({ type: "text", label: "Кнопка обсудить проект", path: ["ru", "projectCta"] })}`}
+                  style={ctaStyle}
+                >
+                  <Send size={17} />
+                  {t.projectCta}
+                </a>
+              </Magnetic>
             </div>
             <p
               onClickCapture={selectInEditor({ type: "text", label: "Строка доверия под кнопками", path: ["ru", "trust"], area: true })}
@@ -1019,6 +1027,8 @@ export function StudioLanding({
             setActiveStep={setActiveMethodStep}
             stepLabel={t.stepLabel}
             note={runtimeT.methodNote}
+            roadTitle={lang === "ru" ? "От исходников к финалу" : "From raw footage to final file"}
+            stageLabels={lang === "ru" ? ["срок фиксируем", "правки согласуем", "выдача под площадку"] : ["timeline fixed", "revisions agreed", "delivery per platform"]}
             reduceMotion={Boolean(reduceMotion)}
             getEditorProps={(index) => ({
               onClickCapture: selectInEditor({ type: "text", label: `Метод: шаг ${index + 1}`, path: ["ru", "methodSteps", index, 0] }),
@@ -1314,6 +1324,8 @@ function WorkflowTimeline({
   setActiveStep,
   stepLabel,
   note,
+  roadTitle,
+  stageLabels,
   reduceMotion,
   getEditorProps,
 }: {
@@ -1322,6 +1334,8 @@ function WorkflowTimeline({
   setActiveStep: (index: number) => void;
   stepLabel: string;
   note?: string;
+  roadTitle: string;
+  stageLabels: readonly [string, string, string];
   reduceMotion: boolean;
   getEditorProps: (index: number) => {
     onClickCapture?: (event: MouseEvent<HTMLElement>) => void;
@@ -1341,9 +1355,9 @@ function WorkflowTimeline({
           <div className="relative grid gap-9 lg:grid-cols-[300px_1fr]">
             <div>
               <p className="font-mono text-[11px] uppercase text-accent">workflow path</p>
-              <h3 className="mt-4 text-3xl font-semibold uppercase leading-none text-white">От исходников к финалу</h3>
+              <h3 className="mt-4 text-3xl font-semibold uppercase leading-none text-white">{roadTitle}</h3>
               <p className="mt-4 text-sm leading-6 text-white/55">
-                {note ?? "Вы понимаете, что происходит на каждом этапе: сроки, оплата, правки и выдача фиксируются заранее."}
+                {note}
               </p>
             </div>
 
@@ -1417,9 +1431,9 @@ function WorkflowTimeline({
               </div>
               <p className="max-w-3xl text-lg leading-8 text-white/68">{active[1]}</p>
               <div className="grid gap-2 font-mono text-[10px] uppercase text-white/36">
-                <span className="border border-white/10 bg-black/22 px-3 py-2">срок фиксируем</span>
-                <span className="border border-white/10 bg-black/22 px-3 py-2">правки согласуем</span>
-                <span className="border border-white/10 bg-black/22 px-3 py-2">выдача под площадку</span>
+                {stageLabels.map((label) => (
+                  <span key={label} className="border border-white/10 bg-black/22 px-3 py-2">{label}</span>
+                ))}
               </div>
             </motion.div>
           </AnimatePresence>
@@ -1712,6 +1726,7 @@ function BreakdownTrackRow({
   progress,
   selected,
   editorMode,
+  seekLabel,
   onSeek,
 }: {
   track: ShowreelTrack;
@@ -1720,6 +1735,7 @@ function BreakdownTrackRow({
   progress: number;
   selected: boolean;
   editorMode: boolean;
+  seekLabel: string;
   onSeek: (track: ShowreelTrack, seconds: number) => void;
 }) {
   const inSegment = track.segments.some((segment) => currentTime >= segment.start && currentTime <= segment.end);
@@ -1739,7 +1755,7 @@ function BreakdownTrackRow({
         className={`grid size-8 place-items-center border transition sm:size-10 ${
           active ? "border-accent/65 text-accent shadow-[0_0_18px_rgba(0,183,255,0.18)]" : "border-white/10 text-white/38 hover:border-accent/45 hover:text-accent"
         }`}
-        aria-label={`Перейти к ${track.title}`}
+        aria-label={`${seekLabel} ${track.title}`}
       >
         <BreakdownIcon icon={track.icon} />
       </button>
@@ -1762,7 +1778,7 @@ function BreakdownTrackRow({
             <button
               key={`${track.id}-${index}`}
               type="button"
-              title={`Перейти к ${track.label}`}
+              title={`${seekLabel} ${track.label}`}
               onClick={() => onSeek(track, segment.start)}
               className={`absolute top-1/2 h-4 -translate-y-1/2 transition ${
                 segmentActive ? "bg-accent shadow-[0_0_18px_rgba(0,183,255,0.55)]" : "bg-accent/24 hover:bg-accent/58"
@@ -1874,20 +1890,22 @@ function ProductPanel({
       whileHover={reduceMotion ? undefined : { y: -4, scale: 1.012 }}
       whileTap={reduceMotion ? undefined : { scale: 0.985 }}
       transition={{ type: "spring", stiffness: 260, damping: 24 }}
-      className="relative flex h-full min-h-[470px] flex-col overflow-hidden border border-white/10 bg-black/30 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.16)] transition-colors duration-150 hover:border-accent/65 hover:shadow-[0_0_42px_rgba(0,183,255,0.12)] sm:p-6 xl:min-h-[500px]"
+      className="group relative isolate flex h-full min-h-[470px] flex-col overflow-hidden border border-white/10 bg-black/30 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.16)] transition-colors duration-150 hover:border-accent/65 hover:shadow-[0_0_42px_rgba(0,183,255,0.12)] sm:p-6 xl:min-h-[500px]"
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/70 to-transparent opacity-70" />
-      <div className="mb-6 flex items-center justify-between gap-3 font-mono text-[11px] uppercase">
+      <Spotlight size={440} />
+      <span aria-hidden className="premium-light-sweep" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-accent/70 to-transparent opacity-70" />
+      <div className="relative z-10 mb-6 flex items-center justify-between gap-3 font-mono text-[11px] uppercase">
         <span className="text-accent">{product.code}</span>
         <span className="text-white/28">{label}</span>
       </div>
-      <h3 className="text-2xl font-semibold uppercase leading-[0.98] text-white sm:text-[1.7rem]">{product.title}</h3>
-      <div className="mt-5 border-l border-accent/55 pl-3">
+      <h3 className="relative z-10 text-2xl font-semibold uppercase leading-[0.98] text-white sm:text-[1.7rem]">{product.title}</h3>
+      <div className="relative z-10 mt-5 border-l border-accent/55 pl-3">
         <p className="font-mono text-[10px] uppercase text-accent/80">{audienceLabel}</p>
         <p className="mt-1 text-sm leading-6 text-white/58">{product.audience}</p>
       </div>
-      <p className="mt-5 text-sm leading-6 text-white/66">{product.text}</p>
-      <div className="mt-6">
+      <p className="relative z-10 mt-5 text-sm leading-6 text-white/66">{product.text}</p>
+      <div className="relative z-10 mt-6">
         <p className="font-mono text-[10px] uppercase text-accent/85">{includedLabel}</p>
         <div className="mt-3 grid gap-2">
           {product.includes.slice(0, 4).map((item) => (
@@ -1898,7 +1916,7 @@ function ProductPanel({
           ))}
         </div>
       </div>
-      <div className="mt-auto pt-7">
+      <div className="relative z-10 mt-auto pt-7">
         <div className="grid grid-cols-2 gap-2 border-y border-white/10 py-3">
           <div>
             <p className="font-mono text-[10px] uppercase text-white/34">{priceLabel}</p>
@@ -1982,9 +2000,11 @@ function CasePanel({
       whileHover={reduceMotion ? undefined : { y: -2, scale: 1.01 }}
       whileTap={reduceMotion ? undefined : { scale: 0.985 }}
       transition={{ duration: 0.3, delay: index * 0.02 }}
-      className="group grid overflow-hidden border border-white/10 bg-white/[0.02] transition-colors hover:border-accent/70 hover:shadow-[0_0_34px_rgba(0,183,255,0.1)] lg:grid-cols-[320px_1fr_220px]"
+      className="group relative isolate grid overflow-hidden border border-white/10 bg-white/[0.02] transition-colors hover:border-accent/70 hover:shadow-[0_0_34px_rgba(0,183,255,0.1)] lg:grid-cols-[320px_1fr_220px]"
     >
-      <button type="button" onClick={() => onSelect(work)} className="relative aspect-[1.18/1] overflow-hidden border-b border-white/10 text-left sm:aspect-video lg:aspect-auto lg:border-b-0 lg:border-r">
+      <Spotlight size={420} />
+      <span aria-hidden className="premium-light-sweep" />
+      <button type="button" onClick={() => onSelect(work)} className="relative z-10 aspect-[1.18/1] overflow-hidden border-b border-white/10 text-left sm:aspect-video lg:aspect-auto lg:border-b-0 lg:border-r">
         <div className="absolute inset-0 bg-cover bg-center opacity-80 transition duration-300 group-hover:scale-[1.018] group-hover:opacity-68" style={{ backgroundImage: `url(${getThumbnailUrl(work)})` }} />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,6,0.08),rgba(3,5,6,0.72))]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,183,255,0.16),transparent_38%)] opacity-0 transition duration-300 group-hover:opacity-100" />
@@ -1995,7 +2015,7 @@ function CasePanel({
           </span>
         </div>
       </button>
-      <div className="p-4 sm:p-5">
+      <div className="relative z-10 p-4 sm:p-5">
         <div className="mb-3 flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase text-white/44 sm:mb-4 sm:text-[11px]">
           <Film size={13} />
           <span>{displayWork.category}</span>
@@ -2015,7 +2035,7 @@ function CasePanel({
           ))}
         </div>
       </div>
-      <div className="grid border-t border-white/10 p-4 sm:p-5 lg:border-l lg:border-t-0">
+      <div className="relative z-10 grid border-t border-white/10 p-4 sm:p-5 lg:border-l lg:border-t-0">
         <p className="hidden font-mono text-[11px] uppercase text-white/38 sm:block">{labels.done}</p>
         <Waveform seed={index * 2} bars={28} className="mt-3 hidden sm:flex" />
         <div className="grid grid-cols-2 gap-2 sm:mt-auto sm:grid-cols-1 sm:pt-5">
